@@ -12,7 +12,7 @@ export default function DashboardPage() {
     const data = await res.json();
 
     if (data.isComplete) {
-      router.push("/mental-counselor");
+      router.push("/dashboard/mental-counselor");
     } else {
       router.push("/profile");
     }

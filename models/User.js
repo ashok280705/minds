@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
+    googleId: {
+      type: String, // ✅ Proper syntax!
+    },
     email: {
       type: String,
       unique: true,
@@ -11,44 +14,37 @@ const UserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-
     },
     name: {
       type: String,
-
     },
     surname: {
       type: String,
-
     },
     middleName: {
-
+      type: String,
     },
     phoneNumber: {
       type: String,
-
     },
     emergencyNumber: {
       type: String,
-
     },
     birthdate: {
       type: Date,
-
     },
     gender: {
       type: String,
       enum: ["male", "female", "other"],
-
     },
     language: {
       type: String,
-      enum: ["en", "hi", "mr"], // English, Hindi, Marathi
+      enum: ["en", "hi", "mr"],
       default: "en",
     },
   },
   {
-    timestamps: true, // adds createdAt & updatedAt
+    timestamps: true,
   }
 );
 

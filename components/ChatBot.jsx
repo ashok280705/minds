@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useEscalate } from "@/lib/hooks/useEscalate";
 import MusicModal from "@/components/MusicModal";
+import DoctorConnectionModal from "@/components/DoctorConnectionModal";
+import { io } from "socket.io-client";
 
 export default function ChatBot() {
   const { data: session } = useSession();
@@ -19,11 +21,42 @@ export default function ChatBot() {
   const [musicUrl, setMusicUrl] = useState("");
   const [musicName, setMusicName] = useState("");
   const [showMusicModal, setShowMusicModal] = useState(false);
+  const [showDoctorModal, setShowDoctorModal] = useState(false);
+  const [doctorInfo, setDoctorInfo] = useState(null);
+  const [socket, setSocket] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      const newSocket = io();
+      setSocket(newSocket);
+
+      // Register user with their ID
+      newSocket.emit("register-user", { userId: session.user.id });
+
+      // Listen for doctor acceptance
+      newSocket.on("doctor-accepted", ({ doctorId, doctorName }) => {
+        setDoctorInfo({ doctorId, doctorName });
+        setShowDoctorModal(true);
+      });
+
+      // Listen for no doctors available
+      newSocket.on("no-doctors-available", ({ message }) => {
+        setMessages(prev => [...prev, { 
+          role: "assistant", 
+          content: `⚠️ ${message}` 
+        }]);
+      });
+
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [session?.user?.id]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -51,12 +84,21 @@ export default function ChatBot() {
     }
 
     if (data.escalate === true && session?.user?.email) {
-      const connectedDoctor = await escalate(session.user.email);
-      if (connectedDoctor) {
-        alert(
-          `🚨 Crisis detected.\nDoctor ${connectedDoctor.name} is connected.\nYour emergency contact has been notified.`
-        );
-      }
+      await escalate(session.user.email);
+      setMessages(prev => [...prev, { 
+        role: "assistant", 
+        content: "🚨 I've detected you might need immediate help. I'm connecting you with a doctor right now. Please hold on..." 
+      }]);
+    }
+  };
+
+  const handleDoctorConnect = (connectionType, roomId) => {
+    if (connectionType === "chat") {
+      // Redirect to chat interface
+      window.location.href = `/session/chat/${roomId}`;
+    } else if (connectionType === "video") {
+      // Redirect to video call interface
+      window.location.href = `/session/video/${roomId}`;
     }
   };
 
@@ -102,6 +144,15 @@ export default function ChatBot() {
         onClose={() => setShowMusicModal(false)}
         url={musicUrl}
         name={musicName}
+      />
+
+      <DoctorConnectionModal
+        isOpen={showDoctorModal}
+        onClose={() => setShowDoctorModal(false)}
+        doctorName={doctorInfo?.doctorName}
+        doctorId={doctorInfo?.doctorId}
+        userId={session?.user?.id}
+        onConnect={handleDoctorConnect}
       />
     </div>
   );

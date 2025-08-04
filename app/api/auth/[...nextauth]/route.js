@@ -26,6 +26,8 @@ export const authOptions = {
         }
 
         if (!account) throw new Error("No account found");
+        if (!account.password) throw new Error("Password is required");
+        if (!credentials.password) throw new Error("Password is required");
 
         const isValid = await bcrypt.compare(
           credentials.password,

@@ -15,7 +15,6 @@ const DoctorSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     specialty: {
       type: String,

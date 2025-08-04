@@ -2,62 +2,72 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import Doctor from "@/models/Doctor";
 import User from "@/models/User";
-import { io } from "@/lib/socket"; // 👈 your Socket.IO server instance
-import twilio from "twilio";
+import EscalationRequest from "@/models/EscalationRequest";
 
-const twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+let twilioClient;
+try {
+  if (process.env.TWILIO_SID && process.env.TWILIO_AUTH_TOKEN) {
+    const twilio = require("twilio");
+    twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+  }
+} catch (error) {
+  console.log("Twilio not configured:", error.message);
+}
 
 export async function POST(req) {
   try {
     await dbConnect();
 
     const { userEmail } = await req.json();
-
-    // 1️⃣ Find user
     const user = await User.findOne({ email: userEmail });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 2️⃣ Find doctor: specialist first, fallback to any
-    let doctor = await Doctor.findOne({ isOnline: true, specialty: "mental-health" });
-    if (!doctor) {
-      doctor = await Doctor.findOne({ isOnline: true });
-    }
+    let doctor = await Doctor.findOne({ isOnline: true, specialty: "psyco" });
+    if (!doctor) doctor = await Doctor.findOne({ isOnline: true });
+    if (!doctor) return NextResponse.json({ error: "No doctor online" }, { status: 503 });
 
-    if (!doctor) {
-      return NextResponse.json({ error: "No doctor available" }, { status: 503 });
-    }
-
-    // 3️⃣ Mark doctor busy
-    doctor.isOnline = false;
-    await doctor.save();
-
-    // 4️⃣ Notify doctor via Socket.IO — emit event so doctor portal shows: Accept / Reject
-    io.to(doctor.socketId).emit("escalation-request", {
-      doctorId: doctor._id,
+    // Create escalation request
+    const escalationRequest = await EscalationRequest.create({
       userId: user._id,
-      userName: user.name,
-      userEmail: user.email,
+      doctorId: doctor._id,
     });
 
-    // 5️⃣ Send WhatsApp to emergency contact
-    if (user.emergencyNumber) {
-      const msg = `🚨 EMERGENCY: ${user.name} may be experiencing a mental health crisis. Please check on them immediately.`;
-      await twilioClient.messages.create({
-        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
-        to: `whatsapp:+91${user.emergencyNumber}`,
-        body: msg,
+    // Mark doctor as busy
+    await Doctor.updateOne({ _id: doctor._id }, { $set: { isOnline: false } });
+
+    if (global._io) {
+      global._io.to(doctor._id.toString()).emit("escalation-request", {
+        requestId: escalationRequest._id,
+        doctorId: doctor._id,
+        userId: user._id,
+        userName: user.name,
+        userEmail: user.email,
       });
+    } else {
+      console.error("⚠️ global._io missing");
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Doctor notified. Awaiting acceptance.",
-    });
+    if (user.emergencyNumber && twilioClient) {
+      try {
+        await twilioClient.messages.create({
+          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+          to: `whatsapp:+91${user.emergencyNumber}`,
+          body: `🚨 Emergency: ${user.name} might need urgent help. Please check on them now.`,
+        });
+      } catch (twilioError) {
+        console.log("Twilio message failed:", twilioError.message);
+      }
+    }
 
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
+    return NextResponse.json({ 
+      success: true, 
+      requestId: escalationRequest._id,
+      doctor: { name: doctor.name, specialty: doctor.specialty }
+    });
+  } catch (error) {
+    console.error("Escalation error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

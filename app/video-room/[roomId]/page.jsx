@@ -208,6 +208,20 @@ export default function VideoRoom() {
           }
         });
 
+        socketInstance.on("user-disconnected", () => {
+          console.log('Other user disconnected');
+          setIsConnected(false);
+          setRemoteStream(null);
+          // Redirect to respective dashboard after 3 seconds
+          setTimeout(() => {
+            if (session.user.isDoctor) {
+              window.location.href = '/doctor';
+            } else {
+              window.location.href = '/';
+            }
+          }, 3000);
+        });
+
         // Doctor creates offer after delay
         if (session.user.isDoctor) {
           setTimeout(async () => {
@@ -280,9 +294,15 @@ export default function VideoRoom() {
       peerConnection.close();
     }
     if (socket) {
+      socket.emit("end-call", roomId);
       socket.disconnect();
     }
-    window.location.href = "/";
+    // Redirect to respective dashboard
+    if (session.user.isDoctor) {
+      window.location.href = '/doctor';
+    } else {
+      window.location.href = '/';
+    }
   };
 
   if (!session) {
@@ -308,23 +328,40 @@ export default function VideoRoom() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-emerald-100 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-            <h1 className="text-emerald-800 font-medium">Therapy Session</h1>
+    <div className="flex flex-col h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+      {/* Elegant Header */}
+      <div className="bg-white/90 backdrop-blur-md shadow-lg border-b border-emerald-100">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-xl">🎥</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-semibold text-emerald-800">Therapy Session</h1>
+                <p className="text-sm text-emerald-600 flex items-center">
+                  <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                  {isConnected ? 'Connected & Secure' : 'Connecting...'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="text-sm text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+                {session?.user?.isDoctor ? '👩‍⚕️ Therapist' : '🌱 You'}
+              </div>
+              <div className="text-sm text-emerald-600 bg-white/70 px-3 py-1 rounded-full">
+                🌿 Safe Space
+              </div>
+            </div>
           </div>
-          <div className="text-sm text-emerald-600">🌿 Safe Space</div>
         </div>
       </div>
 
       {/* Video Area */}
       <div className="flex-1 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full max-w-7xl mx-auto">
           {/* Remote participant */}
-          <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-emerald-100">
+          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-emerald-100 transform hover:scale-[1.02] transition-transform duration-300">
             <video
               ref={remoteVideoRef}
               autoPlay
@@ -341,27 +378,35 @@ export default function VideoRoom() {
               onError={(e) => console.error('Remote video error:', e)}
             />
             {!remoteStream && (
-              <div className="h-full flex items-center justify-center bg-gradient-to-br from-emerald-100 to-teal-100">
+              <div className="h-full flex items-center justify-center bg-gradient-to-br from-emerald-100 via-teal-100 to-cyan-100">
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-emerald-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">
-                      {session?.user?.isDoctor ? "😊" : "👩‍⚕️"}
+                  <div className="w-32 h-32 bg-gradient-to-r from-emerald-300 to-teal-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl animate-pulse">
+                    <span className="text-4xl">
+                      {session?.user?.isDoctor ? "🌱" : "👩‍⚕️"}
                     </span>
                   </div>
-                  <p className="text-emerald-700 font-medium mb-2">
+                  <p className="text-emerald-800 font-semibold text-lg mb-2">
                     {session?.user?.isDoctor ? "Your Patient" : "Your Therapist"}
                   </p>
-                  <p className="text-emerald-500 text-sm">Connecting...</p>
+                  <p className="text-emerald-600 text-sm flex items-center justify-center">
+                    <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-bounce"></span>
+                    Connecting to safe space...
+                  </p>
                 </div>
               </div>
             )}
-            <div className="absolute bottom-4 left-4 bg-emerald-600/90 text-white px-3 py-1 rounded-full text-sm font-medium">
-              {session?.user?.isDoctor ? "Patient" : "Therapist"}
+            <div className="absolute bottom-6 left-6 bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+              {session?.user?.isDoctor ? "🌱 Patient" : "👩‍⚕️ Therapist"}
             </div>
+            {remoteStream && (
+              <div className="absolute top-6 right-6 bg-green-500 text-white p-2 rounded-full shadow-lg animate-pulse">
+                🟢
+              </div>
+            )}
           </div>
 
           {/* Local participant */}
-          <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-emerald-100">
+          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-teal-100 transform hover:scale-[1.02] transition-transform duration-300">
             <video
               ref={localVideoRef}
               autoPlay
@@ -379,66 +424,85 @@ export default function VideoRoom() {
               onError={(e) => console.error('Local video error:', e)}
             />
             {isVideoOff && (
-              <div className="h-full flex items-center justify-center bg-gradient-to-br from-teal-100 to-emerald-100">
+              <div className="h-full flex items-center justify-center bg-gradient-to-br from-teal-100 via-cyan-100 to-emerald-100">
                 <div className="text-center">
-                  <div className="w-24 h-24 bg-teal-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">
-                      {session?.user?.isDoctor ? "👩‍⚕️" : "😊"}
+                  <div className="w-32 h-32 bg-gradient-to-r from-teal-300 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <span className="text-4xl">
+                      {session?.user?.isDoctor ? "👩‍⚕️" : "🌱"}
                     </span>
                   </div>
-                  <p className="text-teal-700 font-medium">
+                  <p className="text-teal-800 font-semibold text-lg">
                     {session?.user?.name || "You"}
                   </p>
+                  <p className="text-teal-600 text-sm mt-2">Camera is off</p>
                 </div>
               </div>
             )}
-            <div className="absolute bottom-4 left-4 bg-teal-600/90 text-white px-3 py-1 rounded-full text-sm font-medium">
-              You
+            <div className="absolute bottom-6 left-6 bg-gradient-to-r from-teal-500 to-cyan-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
+              {session?.user?.isDoctor ? "👩‍⚕️ You" : "🌱 You"}
             </div>
             {isMuted && (
-              <div className="absolute top-4 left-4 bg-red-400 text-white p-2 rounded-full">
+              <div className="absolute top-6 left-6 bg-red-500 text-white p-3 rounded-full shadow-lg animate-bounce">
                 🔇
               </div>
             )}
+            <div className="absolute top-6 right-6 bg-blue-500 text-white p-2 rounded-full shadow-lg">
+              🟢
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="pb-6">
-        <div className="flex items-center justify-center space-x-4">
-          <button
-            onClick={toggleMute}
-            className={`w-14 h-14 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl ${
-              isMuted
-                ? "bg-red-400 hover:bg-red-500"
-                : "bg-white hover:bg-emerald-50 border-2 border-emerald-200"
-            } flex items-center justify-center`}
-          >
-            <span className={`text-xl ${isMuted ? "text-white" : "text-emerald-600"}`}>
-              {isMuted ? "🔇" : "🎤"}
-            </span>
-          </button>
+      {/* Floating Controls */}
+      <div className="pb-8">
+        <div className="flex items-center justify-center space-x-6">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-2 shadow-2xl border border-emerald-100">
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={toggleMute}
+                className={`w-16 h-16 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
+                  isMuted
+                    ? "bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600"
+                    : "bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600"
+                } flex items-center justify-center`}
+                title={isMuted ? "Unmute" : "Mute"}
+              >
+                <span className="text-white text-2xl">
+                  {isMuted ? "🔇" : "🎤"}
+                </span>
+              </button>
 
-          <button
-            onClick={toggleVideo}
-            className={`w-14 h-14 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl ${
-              isVideoOff
-                ? "bg-red-400 hover:bg-red-500"
-                : "bg-white hover:bg-emerald-50 border-2 border-emerald-200"
-            } flex items-center justify-center`}
-          >
-            <span className={`text-xl ${isVideoOff ? "text-white" : "text-emerald-600"}`}>
-              {isVideoOff ? "📹" : "📷"}
-            </span>
-          </button>
+              <button
+                onClick={toggleVideo}
+                className={`w-16 h-16 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
+                  isVideoOff
+                    ? "bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600"
+                    : "bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600"
+                } flex items-center justify-center`}
+                title={isVideoOff ? "Turn on camera" : "Turn off camera"}
+              >
+                <span className="text-white text-2xl">
+                  {isVideoOff ? "📹" : "📷"}
+                </span>
+              </button>
 
-          <button
-            onClick={endCall}
-            className="w-14 h-14 rounded-full bg-red-400 hover:bg-red-500 text-white transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center"
-          >
-            <span className="text-xl">📞</span>
-          </button>
+              <div className="w-px h-8 bg-emerald-200"></div>
+
+              <button
+                onClick={endCall}
+                className="w-16 h-16 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 flex items-center justify-center"
+                title="End session"
+              >
+                <span className="text-2xl">📞</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="text-center mt-4">
+          <p className="text-sm text-emerald-600 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full inline-block shadow-md">
+            🔒 End-to-end encrypted • Your privacy is protected
+          </p>
         </div>
       </div>
     </div>

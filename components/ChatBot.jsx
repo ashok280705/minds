@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useEscalate } from "@/lib/hooks/useEscalate";
 import MusicModal from "@/components/MusicModal";
 import DoctorConnectionModal from "@/components/DoctorConnectionModal";
+
 import { io } from "socket.io-client";
 
 export default function ChatBot() {
@@ -21,11 +22,12 @@ export default function ChatBot() {
   const [musicUrl, setMusicUrl] = useState("");
   const [musicName, setMusicName] = useState("");
   const [showMusicModal, setShowMusicModal] = useState(false);
-  const [showDoctorModal, setShowDoctorModal] = useState(false);
-  const [doctorInfo, setDoctorInfo] = useState(null);
+
   const [socket, setSocket] = useState(null);
   const [currentRequestId, setCurrentRequestId] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [showDoctorModal, setShowDoctorModal] = useState(false);
+  const [doctorInfo, setDoctorInfo] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -74,6 +76,12 @@ export default function ChatBot() {
 
       // Register user with their ID for other socket features
       newSocket.emit("register-user", { userId: session.user.id });
+
+      // Listen for connection acceptance
+      newSocket.on("connection-accepted", ({ roomId, connectionType }) => {
+        // Redirect patient to room
+        window.location.href = `/${connectionType}-room/${roomId}`;
+      });
 
       // Listen for no doctors available
       newSocket.on("no-doctors-available", ({ message }) => {
@@ -179,6 +187,8 @@ export default function ChatBot() {
         doctorName={doctorInfo?.doctorName}
         requestId={doctorInfo?.requestId}
       />
+
+
     </div>
   );
 }

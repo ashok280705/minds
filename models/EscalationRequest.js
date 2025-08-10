@@ -14,8 +14,16 @@ const EscalationRequestSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected"],
+      enum: ["pending", "accepted", "rejected", "completed"],
       default: "pending",
+    },
+    connectionType: {
+      type: String,
+      enum: ["chat", "video"],
+    },
+    connectionStatus: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
     },
     requestedAt: {
       type: Date,

@@ -6,7 +6,7 @@ import Room from "@/models/Room";
 export async function GET(req, { params }) {
   try {
     await dbConnect();
-    const { roomId } = params;
+    const { roomId } = await params;
 
     const room = await Room.findOne({ roomId });
     if (!room) {
@@ -24,7 +24,7 @@ export async function GET(req, { params }) {
 export async function POST(req, { params }) {
   try {
     await dbConnect();
-    const { roomId } = params;
+    const { roomId } = await params;
     const { senderId, senderType, message } = await req.json();
 
     const room = await Room.findOne({ roomId });

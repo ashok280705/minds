@@ -28,6 +28,7 @@ export default function ChatRoom() {
 
     // Join room
     socketInstance.emit("join-room", roomId);
+    console.log('Joined chat room:', roomId);
 
     // Listen for new messages
     socketInstance.on("new-message", (message) => {

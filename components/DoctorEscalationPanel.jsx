@@ -6,7 +6,33 @@ import io from "socket.io-client";
 export default function DoctorEscalationPanel({ inline = false }) {
   const { data: session } = useSession();
   const [requests, setRequests] = useState([]);
+  const [connectionRequests, setConnectionRequests] = useState([]);
   const [socket, setSocket] = useState(null);
+
+  const handleAcceptConnection = async (requestId) => {
+    try {
+      const response = await fetch("/api/escalate/accept-connection", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ requestId }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setConnectionRequests(prev => prev.filter(r => r.requestId !== requestId));
+        // Redirect doctor to room
+        window.location.href = data.redirectUrl;
+      }
+    } catch (error) {
+      console.error("Accept connection error:", error);
+    }
+  };
+
+  const handleRejectConnection = async (requestId) => {
+    setConnectionRequests(prev => prev.filter(r => r.requestId !== requestId));
+  };
 
   useEffect(() => {
     if (!session?.user?.isDoctor || !session?.user?.id) return;
@@ -18,6 +44,11 @@ export default function DoctorEscalationPanel({ inline = false }) {
 
     socketInstance.on("escalation-request", (request) => {
       setRequests(prev => [...prev, request]);
+    });
+
+    socketInstance.on("connection-request", (request) => {
+      console.log("📨 Received connection request:", request);
+      setConnectionRequests(prev => [...prev, request]);
     });
 
     return () => {
@@ -75,10 +106,58 @@ export default function DoctorEscalationPanel({ inline = false }) {
     <div className={containerClass}>
       {!inline && <h3 className="font-bold text-lg mb-3">Escalation Requests</h3>}
       
-      {requests.length === 0 ? (
+      {/* Connection Requests */}
+      {connectionRequests.length > 0 && (
+        <div className="mb-6">
+          <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+            <span>📞</span>
+            Connection Requests
+          </h4>
+          <div className="space-y-3">
+            {connectionRequests.map((request, index) => (
+              <div key={index} className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-semibold text-gray-900">{request.patientName}</p>
+                    <p className="text-sm text-blue-600 capitalize">📹 {request.connectionType} Session Request</p>
+                  </div>
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                    WAITING
+                  </span>
+                </div>
+                
+                <div className="bg-blue-100 border border-blue-200 rounded p-2 mb-3">
+                  <p className="text-xs text-blue-700 flex items-center gap-1">
+                    <span>🔔</span>
+                    Patient wants to start a {request.connectionType} session with you
+                  </p>
+                </div>
+                
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAcceptConnection(request.requestId)}
+                    className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                  >
+                    Accept {request.connectionType}
+                  </button>
+                  <button
+                    onClick={() => handleRejectConnection(request.requestId)}
+                    className="flex-1 bg-gray-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-600 transition"
+                  >
+                    Decline
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Emergency Requests */}
+      {requests.length === 0 && connectionRequests.length === 0 ? (
         <div className="text-center py-8">
           <div className="text-gray-400 text-4xl mb-2">💭</div>
-          <p className="text-gray-500">No pending emergency requests</p>
+          <p className="text-gray-500">No pending requests</p>
           <p className="text-sm text-gray-400 mt-1">You'll be notified when users need help</p>
         </div>
       ) : (

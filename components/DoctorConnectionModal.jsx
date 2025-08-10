@@ -21,6 +21,7 @@ export default function DoctorConnectionModal({
 
   const handleConnection = async (type) => {
     setIsConnecting(true);
+    console.log('Sending connection request:', { requestId, connectionType: type });
     try {
       const response = await fetch("/api/escalate/connect", {
         method: "POST",
@@ -36,8 +37,10 @@ export default function DoctorConnectionModal({
       const data = await response.json();
       if (data.success) {
         onClose();
-        // Redirect to the appropriate room
-        window.location.href = data.redirectUrl;
+        // Show waiting message and start polling for connection acceptance
+        alert(`${type} request sent to Dr. ${doctorName}. Please wait...`);
+        // Start polling for connection status
+        pollForConnectionAcceptance(requestId, type);
       } else {
         console.error("Failed to connect:", data.error);
       }
@@ -46,6 +49,29 @@ export default function DoctorConnectionModal({
     } finally {
       setIsConnecting(false);
     }
+  };
+
+  const pollForConnectionAcceptance = (requestId, connectionType) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/escalate/status/${requestId}`);
+        const data = await response.json();
+        
+        if (data.connectionStatus === "accepted") {
+          clearInterval(pollInterval);
+          // Redirect to room
+          window.location.href = `/${connectionType}-room/${data.roomId || 'temp'}`;
+        } else if (data.connectionStatus === "rejected") {
+          clearInterval(pollInterval);
+          alert("Doctor declined the connection request.");
+        }
+      } catch (error) {
+        console.error("Connection polling error:", error);
+      }
+    }, 2000);
+    
+    // Stop polling after 2 minutes
+    setTimeout(() => clearInterval(pollInterval), 120000);
   };
 
   if (!isOpen) return null;

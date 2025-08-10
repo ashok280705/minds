@@ -3,6 +3,7 @@ import dbConnect from "@/lib/dbConnect";
 import Doctor from "@/models/Doctor";
 import User from "@/models/User";
 import EscalationRequest from "@/models/EscalationRequest";
+import Room from "@/models/Room";
 
 export async function POST(req) {
   try {
@@ -23,7 +24,6 @@ export async function POST(req) {
     escalationRequest.respondedAt = new Date();
     await escalationRequest.save();
 
-    // Status is now "accepted" - patient will detect this via polling
     console.log(`✅ Doctor accepted escalation request: ${escalationRequest._id}`);
 
     return NextResponse.json({ success: true });

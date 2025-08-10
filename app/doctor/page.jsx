@@ -137,14 +137,14 @@ export default function DoctorPage() {
           </div>
         </div>
 
-        {/* Emergency Requests Section */}
+        {/* Requests Section */}
         <div className="bg-white rounded-lg shadow-sm border mb-8">
           <div className="p-6 border-b">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <span className="text-red-500">🚨</span>
-              Emergency Requests
+              Patient Requests
             </h3>
-            <p className="text-sm text-gray-600 mt-1">Urgent requests from users needing immediate help</p>
+            <p className="text-sm text-gray-600 mt-1">Emergency requests and connection requests from patients</p>
           </div>
           <DoctorEscalationPanel inline={true} />
         </div>
@@ -157,9 +157,10 @@ export default function DoctorPage() {
               <h3 className="text-lg font-semibold text-blue-900 mb-2">How it works</h3>
               <ul className="text-blue-800 space-y-1 text-sm">
                 <li>• Toggle your status to "Online" to receive emergency requests</li>
-                <li>• Emergency requests will appear in the section above</li>
-                <li>• Accept requests to help users in crisis situations</li>
-                <li>• Choose between chat or video call when connecting with users</li>
+                <li>• Emergency requests appear first - click "Accept & Help" to respond</li>
+                <li>• After accepting, patient will choose chat or video</li>
+                <li>• Connection requests will then appear for you to accept</li>
+                <li>• Both you and patient will be redirected to the session room</li>
               </ul>
             </div>
           </div>

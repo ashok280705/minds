@@ -38,7 +38,9 @@ export async function POST(req) {
     await Doctor.updateOne({ _id: doctor._id }, { $set: { isOnline: false } });
 
     if (global._io) {
-      global._io.to(doctor._id.toString()).emit("escalation-request", {
+      const doctorRoom = `doctor_${doctor._id.toString()}`;
+      console.log(`📡 Sending escalation request to doctor room ${doctorRoom}`);
+      global._io.to(doctorRoom).emit("escalation-request", {
         requestId: escalationRequest._id,
         doctorId: doctor._id,
         userId: user._id,

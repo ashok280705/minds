@@ -23,39 +23,35 @@ export async function POST(req) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
 
-    const roomId = `room-${Date.now()}-${escalationRequest.userId._id}`;
-
-    // Create room
-    const room = await Room.create({
-      roomId,
-      userId: escalationRequest.userId._id,
-      doctorId: escalationRequest.doctorId._id,
-      type: connectionType,
+    // Update connection request
+    escalationRequest.connectionType = connectionType;
+    escalationRequest.connectionStatus = "pending";
+    await escalationRequest.save();
+    
+    console.log('Connect - Updated request:', {
+      id: escalationRequest._id,
+      connectionType: escalationRequest.connectionType,
+      connectionStatus: escalationRequest.connectionStatus
     });
+    
+    console.log('Connect - Input data:', { requestId, connectionType });
 
-    // Notify both doctor and user to join the room
+    // Notify doctor about connection request
     if (global._io) {
-      global._io.to(escalationRequest.doctorId._id.toString()).emit("start-session", {
-        roomId,
+      const doctorId = escalationRequest.doctorId._id.toString();
+      const doctorRoom = `doctor_${doctorId}`;
+      console.log(`🔔 Sending ${connectionType} request to doctor room ${doctorRoom}`);
+      global._io.to(doctorRoom).emit("connection-request", {
+        requestId: escalationRequest._id,
         connectionType,
         patientName: escalationRequest.userId.name,
         patientId: escalationRequest.userId._id,
       });
-
-      global._io.to(escalationRequest.userId._id.toString()).emit("start-session", {
-        roomId,
-        connectionType,
-        doctorName: escalationRequest.doctorId.name,
-        doctorId: escalationRequest.doctorId._id,
-      });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      roomId,
-      connectionType,
-      redirectUrl: `/${connectionType}-room/${roomId}`
-    });
+    return NextResponse.json({ success: true, message: "Connection request sent to doctor" });
+
+
 
   } catch (err) {
     console.error(err);

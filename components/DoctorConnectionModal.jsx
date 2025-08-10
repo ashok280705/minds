@@ -35,9 +35,9 @@ export default function DoctorConnectionModal({
 
       const data = await response.json();
       if (data.success) {
-        // Close modal and show waiting message
         onClose();
-        // Redirect will happen when doctor accepts the connection type
+        // Redirect to the appropriate room
+        window.location.href = data.redirectUrl;
       } else {
         console.error("Failed to connect:", data.error);
       }

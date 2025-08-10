@@ -24,25 +24,56 @@ export default function ChatBot() {
   const [showDoctorModal, setShowDoctorModal] = useState(false);
   const [doctorInfo, setDoctorInfo] = useState(null);
   const [socket, setSocket] = useState(null);
+  const [currentRequestId, setCurrentRequestId] = useState(null);
+  const [isPolling, setIsPolling] = useState(false);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Poll for escalation request status
+  useEffect(() => {
+    if (!isPolling || !currentRequestId) return;
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/escalate/status/${currentRequestId}`);
+        const data = await response.json();
+        
+        if (data.status === "accepted") {
+          setDoctorInfo({
+            requestId: currentRequestId,
+            doctorId: data.doctorId,
+            doctorName: data.doctorName
+          });
+          setShowMusicModal(false); // Close music modal
+          setShowDoctorModal(true);
+          setIsPolling(false);
+          clearInterval(pollInterval);
+        } else if (data.status === "rejected") {
+          setMessages(prev => [...prev, {
+            role: "assistant",
+            content: "The doctor is currently unavailable. We're finding another doctor for you..."
+          }]);
+          setIsPolling(false);
+          clearInterval(pollInterval);
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [isPolling, currentRequestId]);
+
   useEffect(() => {
     if (session?.user?.id) {
       const newSocket = io();
       setSocket(newSocket);
 
-      // Register user with their ID
+      // Register user with their ID for other socket features
       newSocket.emit("register-user", { userId: session.user.id });
-
-      // Listen for doctor acceptance
-      newSocket.on("doctor-accepted", ({ doctorId, doctorName }) => {
-        setDoctorInfo({ doctorId, doctorName });
-        setShowDoctorModal(true);
-      });
 
       // Listen for no doctors available
       newSocket.on("no-doctors-available", ({ message }) => {
@@ -84,7 +115,11 @@ export default function ChatBot() {
     }
 
     if (data.escalate === true && session?.user?.email) {
-      await escalate(session.user.email);
+      const result = await escalate(session.user.email);
+      if (result?.requestId) {
+        setCurrentRequestId(result.requestId);
+        setIsPolling(true);
+      }
       setMessages(prev => [...prev, { 
         role: "assistant", 
         content: "🚨 I've detected you might need immediate help. I'm connecting you with a doctor right now. Please hold on..." 
@@ -92,15 +127,7 @@ export default function ChatBot() {
     }
   };
 
-  const handleDoctorConnect = (connectionType, roomId) => {
-    if (connectionType === "chat") {
-      // Redirect to chat interface
-      window.location.href = `/session/chat/${roomId}`;
-    } else if (connectionType === "video") {
-      // Redirect to video call interface
-      window.location.href = `/session/video/${roomId}`;
-    }
-  };
+
 
   return (
     <div className="border border-emerald-200 rounded-xl p-4 bg-white shadow w-full max-w-2xl mx-auto">
@@ -150,9 +177,7 @@ export default function ChatBot() {
         isOpen={showDoctorModal}
         onClose={() => setShowDoctorModal(false)}
         doctorName={doctorInfo?.doctorName}
-        doctorId={doctorInfo?.doctorId}
-        userId={session?.user?.id}
-        onConnect={handleDoctorConnect}
+        requestId={doctorInfo?.requestId}
       />
     </div>
   );

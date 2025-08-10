@@ -23,15 +23,8 @@ export async function POST(req) {
     escalationRequest.respondedAt = new Date();
     await escalationRequest.save();
 
-    // Notify user: show modal with [Chat] [Video]
-    if (global._io) {
-      global._io.to(escalationRequest.userId._id.toString()).emit("doctor-accepted", {
-        requestId: escalationRequest._id,
-        doctorId: escalationRequest.doctorId._id,
-        doctorName: escalationRequest.doctorId.name,
-        options: ["chat", "video"],
-      });
-    }
+    // Status is now "accepted" - patient will detect this via polling
+    console.log(`✅ Doctor accepted escalation request: ${escalationRequest._id}`);
 
     return NextResponse.json({ success: true });
   } catch (err) {

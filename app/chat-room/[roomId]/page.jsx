@@ -19,6 +19,13 @@ export default function ChatRoom() {
     const socketInstance = io();
     setSocket(socketInstance);
 
+    // Register user/doctor
+    if (session.user.isDoctor) {
+      socketInstance.emit("register-doctor", { doctorId: session.user.id });
+    } else {
+      socketInstance.emit("register-user", { userId: session.user.id });
+    }
+
     // Join room
     socketInstance.emit("join-room", roomId);
 

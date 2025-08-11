@@ -1,7 +1,38 @@
 "use client";
 import { LogOut, Activity, Stethoscope } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-export default function DoctorNavbar({ status, doctorName, onLogout }) {
+export default function DoctorNavbar({ status, doctorName, onLogout, onStatusChange }) {
+  const { data: session } = useSession();
+  const [isOnline, setIsOnline] = useState(status === 'online');
+
+  useEffect(() => {
+    setIsOnline(status === 'online');
+  }, [status]);
+
+  const toggleStatus = async () => {
+    const newStatus = !isOnline;
+    setIsOnline(newStatus);
+    
+    if (onStatusChange) {
+      onStatusChange(newStatus);
+    }
+    
+    // Update status in database
+    try {
+      await fetch('/api/doctor/online', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          doctorId: session?.user?.id,
+          isOnline: newStatus
+        })
+      });
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
   return (
     <nav className="relative bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 shadow-lg border-b border-emerald-100/50">
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/5"></div>
@@ -22,26 +53,29 @@ export default function DoctorNavbar({ status, doctorName, onLogout }) {
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-md border border-white/20">
+            <button
+              onClick={toggleStatus}
+              className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 shadow-md border border-white/20 hover:bg-white/80 transition-all duration-200"
+            >
               <div className="relative">
                 <div className={`w-3 h-3 rounded-full ${
-                  status === "online"
+                  isOnline
                     ? "bg-emerald-400 shadow-lg shadow-emerald-400/50"
                     : "bg-red-400 shadow-lg shadow-red-400/50"
                 }`}></div>
-                {status === "online" && (
+                {isOnline && (
                   <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping opacity-75"></div>
                 )}
               </div>
               <span className={`capitalize text-sm font-medium ${
-                status === "online" ? "text-emerald-700" : "text-red-700"
+                isOnline ? "text-emerald-700" : "text-red-700"
               }`}>
-                {status}
+                {isOnline ? 'Available' : 'Offline'}
               </span>
               <Activity className={`w-4 h-4 ${
-                status === "online" ? "text-emerald-600" : "text-red-600"
+                isOnline ? "text-emerald-600" : "text-red-600"
               }`} />
-            </div>
+            </button>
 
             {doctorName && (
               <div className="hidden sm:flex items-center space-x-3 bg-white/40 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">

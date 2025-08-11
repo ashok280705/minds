@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
-import DoctorNavbar from "@/components/DoctorNavbar";
+
 import DoctorFooter from "@/components/DoctorFooter";
 
 export default function DoctorLayout({ children }) {
@@ -69,11 +69,6 @@ export default function DoctorLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <DoctorNavbar
-        status={status}
-        doctorName={doctorName}
-        onLogout={handleLogout}
-      />
       <main className="flex-1">{children}</main>
       <DoctorFooter />
     </div>

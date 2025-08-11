@@ -32,6 +32,14 @@ const EscalationRequestSchema = new mongoose.Schema(
     respondedAt: {
       type: Date,
     },
+    triedDoctors: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Doctor"
+    }],
+    originalMessage: {
+      type: String,
+      default: "Emergency request"
+    },
   },
   {
     timestamps: true,

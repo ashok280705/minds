@@ -22,6 +22,20 @@ export default function DoctorEscalationPanel({ inline = false }) {
       if (response.ok) {
         const data = await response.json();
         setConnectionRequests(prev => prev.filter(r => r.requestId !== requestId));
+        
+        // Save session to history
+        await fetch('/api/doctor/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            doctorId: session.user.id,
+            userId: data.userId,
+            requestId: requestId,
+            sessionType: data.connectionType,
+            roomId: data.roomId
+          })
+        });
+        
         // Redirect doctor to room
         window.location.href = data.redirectUrl;
       }

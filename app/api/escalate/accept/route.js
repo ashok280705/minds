@@ -24,7 +24,40 @@ export async function POST(req) {
     escalationRequest.respondedAt = new Date();
     await escalationRequest.save();
 
-    console.log(`✅ Doctor accepted escalation request: ${escalationRequest._id}`);
+    // Notify user that doctor accepted
+    if (global._io) {
+      const eventData = {
+        requestId: escalationRequest._id,
+        doctorName: escalationRequest.doctorId.name,
+        doctorId: escalationRequest.doctorId._id
+      };
+      
+      // Try both MongoDB ID and Google ID for user room
+      const mongoUserRoom = `user_${escalationRequest.userId._id.toString()}`;
+      const googleUserRoom = escalationRequest.userId.googleId ? `user_${escalationRequest.userId.googleId}` : null;
+      
+      console.log(`📡 Emitting doctor-accepted to rooms:`);
+      console.log(`  - MongoDB room: ${mongoUserRoom}`);
+      if (googleUserRoom) console.log(`  - Google room: ${googleUserRoom}`);
+      console.log(`📡 Event data:`, eventData);
+      
+      // Emit to MongoDB ID room
+      global._io.to(mongoUserRoom).emit("doctor-accepted", eventData);
+      
+      // Emit to Google ID room if exists
+      if (googleUserRoom) {
+        global._io.to(googleUserRoom).emit("doctor-accepted", eventData);
+      }
+      
+      // Fallback: emit to all sockets and let client filter
+      global._io.emit("doctor-accepted-broadcast", {
+        ...eventData,
+        targetUserId: escalationRequest.userId._id.toString(),
+        targetGoogleId: escalationRequest.userId.googleId
+      });
+    }
+
+    console.log(`✅ Doctor ${escalationRequest.doctorId.name} accepted escalation request: ${escalationRequest._id} for user: ${escalationRequest.userId._id}`);
 
     return NextResponse.json({ success: true });
   } catch (err) {

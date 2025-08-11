@@ -8,7 +8,7 @@ import DoctorConnectionModal from "@/components/DoctorConnectionModal";
 
 import { io } from "socket.io-client";
 
-export default function ChatBot() {
+export default function ChatBot({ onSessionSave }) {
   const { data: session } = useSession();
   const { escalate, loading: escalating, doctor, error } = useEscalate();
 
@@ -29,6 +29,30 @@ export default function ChatBot() {
   const [showDoctorModal, setShowDoctorModal] = useState(false);
   const [doctorInfo, setDoctorInfo] = useState(null);
   const messagesEndRef = useRef(null);
+
+  const saveChatSession = async (messages) => {
+    if (!session?.user?.id || messages.length < 2) return;
+    
+    try {
+      await fetch('/api/chat-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: session.user.id,
+          messages: messages.map(msg => ({
+            ...msg,
+            timestamp: new Date()
+          }))
+        })
+      });
+      
+      if (onSessionSave) {
+        onSessionSave();
+      }
+    } catch (error) {
+      console.error('Failed to save chat session:', error);
+    }
+  };
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -76,6 +100,39 @@ export default function ChatBot() {
 
       // Register user with their ID for other socket features
       newSocket.emit("register-user", { userId: session.user.id });
+
+      // Listen for doctor acceptance
+      newSocket.on("doctor-accepted", (data) => {
+        console.log('📨 Received doctor-accepted:', data);
+        setDoctorInfo({
+          requestId: data.requestId,
+          doctorId: data.doctorId,
+          doctorName: data.doctorName
+        });
+        setShowMusicModal(false); // Close music modal
+        setShowDoctorModal(true);
+        setIsPolling(false);
+      });
+
+      // Fallback listener for broadcast events
+      newSocket.on("doctor-accepted-broadcast", (data) => {
+        console.log('📨 Received doctor-accepted-broadcast:', data);
+        console.log('📨 Session user ID:', session.user.id);
+        console.log('📨 Target user ID:', data.targetUserId);
+        console.log('📨 Target Google ID:', data.targetGoogleId);
+        
+        if (data.targetUserId === session.user.id || data.targetGoogleId === session.user.id) {
+          console.log('🎉 Match found! Showing doctor modal');
+          setDoctorInfo({
+            requestId: data.requestId,
+            doctorId: data.doctorId,
+            doctorName: data.doctorName
+          });
+          setShowMusicModal(false); // Close music modal
+          setShowDoctorModal(true);
+          setIsPolling(false);
+        }
+      });
 
       // Listen for connection acceptance
       newSocket.on("connection-accepted", ({ roomId, connectionType }) => {
@@ -128,10 +185,18 @@ export default function ChatBot() {
         setCurrentRequestId(result.requestId);
         setIsPolling(true);
       }
-      setMessages(prev => [...prev, { 
+      const suicidalMessage = { 
         role: "assistant", 
-        content: "🚨 I've detected you might need immediate help. I'm connecting you with a doctor right now. Please hold on..." 
-      }]);
+        content: "🚨 I've detected you might need immediate help. I'm connecting you with a doctor right now. Please hold on...",
+        isSuicidalDetection: true
+      };
+      setMessages(prev => [...prev, suicidalMessage]);
+      
+      // Save session with suicidal detection
+      await saveChatSession([...newMessages, suicidalMessage]);
+    } else {
+      // Save regular session
+      await saveChatSession([...newMessages, { role: "assistant", content: data.reply }]);
     }
   };
 

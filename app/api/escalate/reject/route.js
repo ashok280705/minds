@@ -18,36 +18,35 @@ export async function POST(req) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
-    // Update request status
+    // Get list of doctors who have already been tried for this request
+    const triedDoctors = escalationRequest.triedDoctors || [];
+    triedDoctors.push(escalationRequest.doctorId._id);
+
+    // Update current request as rejected
     escalationRequest.status = "rejected";
     escalationRequest.respondedAt = new Date();
+    escalationRequest.triedDoctors = triedDoctors;
     await escalationRequest.save();
 
-    // Make doctor available again
+    // Make current doctor available again
     await Doctor.updateOne(
       { _id: escalationRequest.doctorId._id }, 
       { $set: { isOnline: true } }
     );
 
-    // Find another doctor: specialist first, fallback to any
-    let nextDoctor = await Doctor.findOne({ 
-      isOnline: true, 
-      specialty: "psyco",
-      _id: { $ne: escalationRequest.doctorId._id }
+    // Find next available doctor (excluding already tried ones)
+    const nextDoctor = await Doctor.findOne({ 
+      isOnline: true,
+      _id: { $nin: triedDoctors } // Exclude all tried doctors
     });
-    
-    if (!nextDoctor) {
-      nextDoctor = await Doctor.findOne({ 
-        isOnline: true,
-        _id: { $ne: escalationRequest.doctorId._id }
-      });
-    }
 
     if (nextDoctor) {
-      // Create new escalation request
+      // Create new escalation request with tried doctors list
       const newRequest = await EscalationRequest.create({
         userId: escalationRequest.userId._id,
         doctorId: nextDoctor._id,
+        triedDoctors: triedDoctors, // Pass the list of tried doctors
+        originalMessage: escalationRequest.originalMessage || "Emergency request"
       });
 
       // Mark next doctor busy and notify them
@@ -56,36 +55,43 @@ export async function POST(req) {
         { $set: { isOnline: false } }
       );
 
+      // Notify next doctor via socket
       if (global._io) {
-        global._io.to(nextDoctor._id.toString()).emit("escalation-request", {
+        const doctorRoom = `doctor_${nextDoctor._id.toString()}`;
+        global._io.to(doctorRoom).emit("escalation-request", {
           requestId: newRequest._id,
           doctorId: nextDoctor._id,
           userId: escalationRequest.userId._id,
           userName: escalationRequest.userId.name,
           userEmail: escalationRequest.userId.email,
+          attemptNumber: triedDoctors.length + 1
         });
       }
 
+      console.log(`Request passed to doctor ${nextDoctor._id} (attempt ${triedDoctors.length + 1})`);
+      
       return NextResponse.json({ 
         success: true, 
-        message: "Request sent to another doctor" 
+        message: `Request sent to another doctor (attempt ${triedDoctors.length + 1})` 
       });
     } else {
-      // No doctors available, notify user
+      // No more doctors available, notify user
       if (global._io) {
         global._io.to(escalationRequest.userId._id.toString()).emit("no-doctors-available", {
-          message: "No doctors are currently available. Please try again later or contact emergency services if this is urgent."
+          message: `All available doctors (${triedDoctors.length}) have been contacted. Please try again later or contact emergency services if this is urgent.`
         });
       }
 
+      console.log(`No more doctors available. Tried ${triedDoctors.length} doctors.`);
+      
       return NextResponse.json({ 
         success: true, 
-        message: "No other doctors available" 
+        message: `No more doctors available. Tried ${triedDoctors.length} doctors.` 
       });
     }
 
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Failed" }, { status: 500 });
+    console.error("Reject/Pass error:", err);
+    return NextResponse.json({ error: "Failed to pass request" }, { status: 500 });
   }
 }

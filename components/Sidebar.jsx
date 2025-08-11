@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, CalendarHeart, Users } from "lucide-react";
+import { Brain, CalendarHeart, Users, MessageSquare } from "lucide-react";
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   const links = [
     { href: "/dashboard/mental-counselor", label: "AI Counselor", icon: Brain },
+    { href: "/dashboard/mental-counselor/chat-history", label: "Chat History", icon: MessageSquare },
     { href: "/dashboard/mental-counselor/period-tracker", label: "Period Tracker", icon: CalendarHeart },
     { href: "/dashboard/mental-counselor/community", label: "Community", icon: Users },
   ];

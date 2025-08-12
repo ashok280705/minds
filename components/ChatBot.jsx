@@ -148,9 +148,13 @@ export default function ChatBot({ onSessionSave }) {
           doctorId: data.doctorId,
           doctorName: data.doctorName
         });
-        setShowMusicModal(false); // Close music modal
+        setShowMusicModal(false);
         setShowDoctorModal(true);
         setIsPolling(false);
+        if (synthesis) {
+          synthesis.cancel();
+          setIsSpeaking(false);
+        }
       });
 
       // Fallback listener for broadcast events
@@ -359,66 +363,132 @@ export default function ChatBot({ onSessionSave }) {
 
 
   return (
-    <div className="border border-emerald-200 rounded-xl p-4 bg-white shadow w-full max-w-2xl mx-auto">
-      <div className="h-96 overflow-y-auto mb-4 p-2">
+    <div className="flex flex-col h-[80vh] max-w-4xl mx-auto bg-gradient-to-b from-emerald-50 to-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
+      {/* Chat Header */}
+      <div className="bg-gradient-to-r from-emerald-500 to-teal-500 p-4 text-white">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+              <span className="text-emerald-500 text-lg">🧠</span>
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">{selectedLang === 'hi' ? 'मानसिक स्वास्थ्य सहायक' : 'Mental Health Assistant'}</h3>
+            <p className="text-emerald-100 text-sm">{selectedLang === 'hi' ? 'आपकी सुनने के लिए यहाँ हूँ' : 'Here to listen and support you'}</p>
+          </div>
+          <div className="ml-auto">
+            {isSpeaking && (
+              <div className="flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full">
+                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <span className="text-sm">{selectedLang === 'hi' ? 'बोल रहा है...' : 'Speaking...'}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-white to-emerald-50/30">
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`mb-2 whitespace-pre-wrap ${
-              msg.role === "assistant"
-                ? "text-emerald-800 bg-emerald-50 p-2 rounded"
-                : "text-emerald-600 text-right"
-            }`}
-          >
-            {msg.content}
+          <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.role === 'assistant' && (
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mr-3 shadow-lg flex-shrink-0">
+                <span className="text-white text-sm">🤖</span>
+              </div>
+            )}
+            <div className={`max-w-[75%] ${msg.role === 'user' ? 'order-1' : 'order-2'}`}>
+              <div className={`p-4 rounded-2xl shadow-md ${msg.role === 'assistant' 
+                ? 'bg-white border border-emerald-100 text-gray-800' 
+                : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+              } ${msg.role === 'assistant' ? 'rounded-tl-sm' : 'rounded-tr-sm'}`}>
+                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                {msg.isSuicidalDetection && (
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-600 text-sm font-medium">🚨 {selectedLang === 'hi' ? 'आपातकालीन सहायता सक्रिय' : 'Emergency Support Activated'}</p>
+                  </div>
+                )}
+              </div>
+              <div className={`text-xs text-gray-500 mt-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </div>
+            </div>
+            {msg.role === 'user' && (
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center ml-3 shadow-lg flex-shrink-0">
+                <span className="text-white text-sm">👤</span>
+              </div>
+            )}
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="mb-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Globe className="w-4 h-4 text-emerald-600" />
-          <select 
-            value={selectedLang} 
-            onChange={(e) => setSelectedLang(e.target.value)}
-            className="border border-emerald-200 rounded px-2 py-1 text-sm"
-          >
-            {languages.map(lang => (
-              <option key={lang.code} value={lang.code}>{lang.name}</option>
-            ))}
-          </select>
+      {/* Input Area */}
+      <div className="bg-white border-t border-emerald-100 p-4">
+        {/* Controls Row */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-emerald-50 px-3 py-1 rounded-full">
+              <Globe className="w-4 h-4 text-emerald-600" />
+              <select 
+                value={selectedLang} 
+                onChange={(e) => setSelectedLang(e.target.value)}
+                className="bg-transparent text-sm font-medium text-emerald-700 border-none outline-none"
+              >
+                {languages.map(lang => (
+                  <option key={lang.code} value={lang.code}>{lang.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
           <button
             onClick={isSpeaking ? stopSpeaking : () => {}}
-            className={`p-2 rounded ${isSpeaking ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}
+            className={`p-2 rounded-full transition-all ${isSpeaking ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'}`}
           >
             {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
         </div>
         
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            className="flex-1 border border-emerald-200 rounded px-3 py-2"
-            placeholder={selectedLang === 'hi' ? 'अपनी भावनाएं लिखें...' : selectedLang === 'es' ? 'Escribe tus sentimientos...' : 'Type your feelings...'}
-          />
-          <button
-            onClick={isListening ? () => recognition?.stop() : startListening}
-            disabled={!recognition}
-            className={`p-2 rounded ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-emerald-500 text-white'} disabled:opacity-50`}
-          >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </button>
+        {/* Input Row */}
+        <div className="flex gap-3 items-end">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              placeholder={selectedLang === 'hi' ? 'अपनी भावनाएं साझा करें...' : 'Share your feelings...'}
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
+              <button
+                onClick={isListening ? () => recognition?.stop() : startListening}
+                disabled={!recognition}
+                className={`p-2 rounded-full transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-emerald-500 text-white hover:bg-emerald-600'} disabled:opacity-50`}
+              >
+                {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+          
           <button
             onClick={handleSend}
-            disabled={escalating}
-            className="bg-emerald-500 text-white px-4 py-2 rounded disabled:opacity-50"
+            disabled={escalating || !input.trim()}
+            className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
           >
-            {escalating ? "Escalating..." : "Send"}
+            {escalating ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+            )}
           </button>
+        </div>
+        
+        {/* Helpful Tips */}
+        <div className="mt-3 text-xs text-gray-500 text-center">
+          {selectedLang === 'hi' ? '💡 आप टाइप कर सकते हैं या माइक बटन दबाकर बोल सकते हैं' : '💡 You can type or click the mic to speak'}
         </div>
       </div>
 
@@ -439,7 +509,13 @@ export default function ChatBot({ onSessionSave }) {
 
       <DoctorConnectionModal
         isOpen={showDoctorModal}
-        onClose={() => setShowDoctorModal(false)}
+        onClose={() => {
+          setShowDoctorModal(false);
+          if (synthesis) {
+            synthesis.cancel();
+            setIsSpeaking(false);
+          }
+        }}
         doctorName={doctorInfo?.doctorName}
         requestId={doctorInfo?.requestId}
       />

@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
-import DoctorSessionHistory from "@/components/DoctorSessionHistory";
+
 import DoctorNavbar from "@/components/DoctorNavbar";
 
 export default function DoctorPage() {
@@ -190,9 +190,9 @@ export default function DoctorPage() {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Patient Requests - Takes 2 columns */}
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-8">
+          {/* Patient Requests - Full width */}
+          <div>
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100">
               <div className="p-6 border-b border-emerald-100">
                 <div className="flex items-center justify-between">
@@ -212,22 +212,6 @@ export default function DoctorPage() {
                 </div>
               </div>
               <DoctorEscalationPanel inline={true} />
-            </div>
-          </div>
-
-          {/* Session History - Takes 1 column */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-blue-100 h-full">
-              <div className="p-6 border-b border-blue-100">
-                <h3 className="text-xl font-semibold text-blue-800 flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full">
-                    <span className="text-blue-500 text-xl">📊</span>
-                  </div>
-                  Recent Sessions
-                </h3>
-                <p className="text-sm text-blue-600 mt-2">Your patient interactions</p>
-              </div>
-              <DoctorSessionHistory doctorId={session?.user?.id} />
             </div>
           </div>
         </div>

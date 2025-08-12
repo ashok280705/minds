@@ -6,7 +6,7 @@ export default function MentalCounselorLayout({ children }) {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
-      <main className="flex-1 p-6">{children}</main>
+      <main className="flex-1 ">{children}</main>
     </div>
   );
 }

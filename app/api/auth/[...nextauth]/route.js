@@ -47,6 +47,9 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      httpOptions: {
+        timeout: 10000,
+      },
     }),
   ],
 
@@ -87,9 +90,11 @@ export const authOptions = {
   },
 
   pages: {
-    signIn: "/login",
+    signIn: "/auth/login",
+    error: "/auth/login",
   },
 
+  debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
 };
 

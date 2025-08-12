@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
 import DoctorSessionHistory from "@/components/DoctorSessionHistory";
 import DoctorNavbar from "@/components/DoctorNavbar";
@@ -78,6 +78,11 @@ export default function DoctorPage() {
     await updateOnlineStatus(newStatus);
   };
 
+  const handleLogout = async () => {
+    await updateOnlineStatus(false);
+    await signOut({ callbackUrl: '/' });
+  };
+
   if (!session?.user?.isDoctor) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 flex items-center justify-center">
@@ -97,6 +102,7 @@ export default function DoctorPage() {
         status={isOnline ? 'online' : 'offline'}
         doctorName={session.user.name}
         onStatusChange={handleStatusChange}
+        onLogout={handleLogout}
       />
 
       {/* Hero Section */}

@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { PlayCircle } from "lucide-react";
 
-export default function MusicModal({ open, onClose, url, name }) {
+export default function MusicModal({ open, onClose, url, name, onPlay, onPause, onEnded }) {
   if (!url) return null;
 
   return (
@@ -40,7 +40,13 @@ export default function MusicModal({ open, onClose, url, name }) {
                 We thought this calming music might help you feel a bit better.
               </p>
 
-              <audio controls autoPlay className="w-full rounded">
+              <audio 
+                controls 
+                className="w-full rounded"
+                onPlay={onPlay}
+                onPause={onPause}
+                onEnded={onEnded}
+              >
                 <source src={url} type="audio/mp3" />
                 Your browser does not support the audio element.
               </audio>

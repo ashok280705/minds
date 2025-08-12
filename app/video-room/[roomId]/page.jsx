@@ -301,7 +301,7 @@ export default function VideoRoom() {
     if (session.user.isDoctor) {
       window.location.href = '/doctor';
     } else {
-      window.location.href = '/';
+      window.location.href = '/dashboard';
     }
   };
 

@@ -26,7 +26,20 @@ export async function POST(req) {
 
     let doctor = await Doctor.findOne({ isOnline: true, specialty: "psyco" });
     if (!doctor) doctor = await Doctor.findOne({ isOnline: true });
-    if (!doctor) return NextResponse.json({ error: "No doctor online" }, { status: 503 });
+    
+    if (!doctor) {
+      // No doctors available at all
+      if (global._io) {
+        global._io.to(user._id.toString()).emit("no-doctors-available", {
+          message: "No doctors are currently available. Please try again later or contact emergency services if this is urgent."
+        });
+      }
+      return NextResponse.json({ 
+        success: false, 
+        error: "No doctors are currently available",
+        message: "No doctors are currently available. Please try again later or contact emergency services if this is urgent."
+      }, { status: 200 });
+    }
 
     // Create escalation request
     const escalationRequest = await EscalationRequest.create({

@@ -25,7 +25,7 @@ export default function LayoutWrapper({ children }) {
     pathname === "/doctor/register" ||
     pathname === "/doctor-register" ||
     pathname === "/doctor" ||
-    pathname.startsWith("/chat-room");
+    pathname.startsWith("/chat-room")||pathname.startsWith("/video-room");
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 text-gray-900">

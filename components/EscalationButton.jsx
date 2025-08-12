@@ -54,7 +54,7 @@ export default function EscalationButton() {
         // Wait for doctor response
         console.log("Escalation request sent, waiting for doctor...");
       } else {
-        console.error("Escalation failed:", data.error);
+        // Handle no doctors available case - let ChatBot handle messaging
         setIsEscalating(false);
       }
     } catch (error) {

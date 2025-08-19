@@ -33,14 +33,16 @@ export async function GET(req) {
   return new Response(
     JSON.stringify({
       isComplete: !!isComplete,
-      name: user.name,
-      surname: user.surname,
-      middleName: user.middleName,
-      phoneNumber: user.phoneNumber,
-      emergencyNumber: user.emergencyNumber,
-      birthdate: user.birthdate,
-      gender: user.gender,
-      language: user.language,
+      user: {
+        name: user.name,
+        surname: user.surname,
+        middleName: user.middleName,
+        phoneNumber: user.phoneNumber,
+        emergencyNumber: user.emergencyNumber,
+        birthdate: user.birthdate,
+        gender: user.gender,
+        language: user.language,
+      }
     }),
     {
       status: 200,

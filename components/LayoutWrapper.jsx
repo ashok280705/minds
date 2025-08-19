@@ -2,16 +2,36 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import UserNavbar from "@/components/UserNavbar";
 import Footer from "@/components/Footer";
+import PeriodNotifications from "@/components/PeriodNotifications";
 
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
+  const [userGender, setUserGender] = useState(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (session?.user?.email && mounted) {
+      fetchUserProfile();
+    }
+  }, [session, mounted]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const res = await fetch("/api/user/profile");
+      const data = await res.json();
+      setUserGender(data.user?.gender);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
 
   if (!mounted) {
     // SSR safe fallback (optional)
@@ -42,6 +62,9 @@ export default function LayoutWrapper({ children }) {
           <Footer />
         </footer>
       )}
+      
+      {/* Period Notifications for Female Users */}
+      {!hideLayout && userGender === "female" && <PeriodNotifications />}
     </div>
   );
 }

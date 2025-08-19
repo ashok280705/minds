@@ -1,10 +1,31 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { Brain, FileText, Pill, Heart, Shield, Clock, ArrowRight, Sparkles } from "lucide-react";
+import PeriodStatusWidget from "@/components/PeriodStatusWidget";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const [userGender, setUserGender] = useState(null);
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetchUserProfile();
+    }
+  }, [session]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const res = await fetch("/api/user/profile");
+      const data = await res.json();
+      setUserGender(data.user?.gender);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
 
   const handleMentalCounselorClick = async () => {
     // Check profile completeness
@@ -70,6 +91,13 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Period Status Widget for Female Users */}
+        {userGender === "female" && (
+          <div className="mb-8 max-w-md mx-auto">
+            <PeriodStatusWidget />
+          </div>
+        )}
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl w-full">

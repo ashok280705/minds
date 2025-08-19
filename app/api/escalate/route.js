@@ -24,10 +24,17 @@ export async function POST(req) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    // Check all doctors first
+    const allDoctors = await Doctor.find({});
+    const onlineDoctors = await Doctor.find({ isOnline: true });
+    console.log(`Total doctors: ${allDoctors.length}, Online doctors: ${onlineDoctors.length}`);
+    console.log('Online doctors:', onlineDoctors.map(d => ({ id: d._id, name: d.name, isOnline: d.isOnline })));
+    
     let doctor = await Doctor.findOne({ isOnline: true, specialty: "psyco" });
     if (!doctor) doctor = await Doctor.findOne({ isOnline: true });
     
     if (!doctor) {
+      console.log('No online doctors found for escalation');
       // No doctors available at all
       if (global._io) {
         global._io.to(user._id.toString()).emit("no-doctors-available", {
@@ -47,8 +54,8 @@ export async function POST(req) {
       doctorId: doctor._id,
     });
 
-    // Mark doctor as busy
-    await Doctor.updateOne({ _id: doctor._id }, { $set: { isOnline: false } });
+    // Keep doctor online but track the request
+    console.log('Doctor remains online for other potential requests');
 
     if (global._io) {
       const doctorRoom = `doctor_${doctor._id.toString()}`;

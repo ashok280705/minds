@@ -41,6 +41,7 @@ export async function POST(req) {
       { _id: escalationRequest.doctorId._id }, 
       { $set: { isOnline: true } }
     );
+    console.log(`Doctor ${escalationRequest.doctorId._id} set back to online after rejection`);
 
     // Check total available doctors first
     const totalOnlineDoctors = await Doctor.countDocuments({ isOnline: true });

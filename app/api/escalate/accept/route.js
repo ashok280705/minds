@@ -19,6 +19,13 @@ export async function POST(req) {
       return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
+    // Make doctor available again after accepting
+    await Doctor.updateOne(
+      { _id: escalationRequest.doctorId._id }, 
+      { $set: { isOnline: true } }
+    );
+    console.log(`Doctor ${escalationRequest.doctorId._id} set back to online after accepting`);
+
     // Update request status
     escalationRequest.status = "accepted";
     escalationRequest.respondedAt = new Date();

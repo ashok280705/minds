@@ -7,10 +7,16 @@ export async function POST(req) {
     await dbConnect();
     const { doctorId, isOnline } = await req.json();
 
-    await Doctor.updateOne(
+    const result = await Doctor.updateOne(
       { _id: doctorId },
       { $set: { isOnline } }
     );
+    
+    console.log(`Doctor ${doctorId} status updated to ${isOnline ? 'ONLINE' : 'OFFLINE'}`);
+    
+    // Verify the update
+    const doctor = await Doctor.findById(doctorId);
+    console.log(`Verified doctor ${doctorId} status: ${doctor?.isOnline}`);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -291,7 +291,7 @@ export default function ChatBot({ onSessionSave }) {
       displayMessage = await translateText(input, selectedLang);
     }
 
-    const newMessages = [...messages, { role: "user", content: displayMessage }];
+    const newMessages = [...messages, { role: "user", content: displayMessage, timestamp: new Date().toISOString() }];
     setMessages(newMessages);
     setInput("");
 
@@ -311,7 +311,7 @@ export default function ChatBot({ onSessionSave }) {
     
     setMessages((prev) => [
       ...prev,
-      { role: "assistant", content: aiReply },
+      { role: "assistant", content: aiReply, timestamp: new Date().toISOString() },
     ]);
 
     speakText(aiReply);
@@ -331,7 +331,8 @@ export default function ChatBot({ onSessionSave }) {
       const suicidalMessage = { 
         role: "assistant", 
         content: suicidalContent,
-        isSuicidalDetection: true
+        isSuicidalDetection: true,
+        timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, suicidalMessage]);
       speakText(suicidalContent);
@@ -348,7 +349,8 @@ export default function ChatBot({ onSessionSave }) {
         
         const fallbackMessage = {
           role: "assistant",
-          content: fallbackContent
+          content: fallbackContent,
+          timestamp: new Date().toISOString()
         };
         setMessages(prev => [...prev, fallbackMessage]);
         speakText(fallbackContent);
@@ -409,7 +411,7 @@ export default function ChatBot({ onSessionSave }) {
                 )}
               </div>
               <div className={`text-xs text-gray-500 mt-1 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}
               </div>
             </div>
             {msg.role === 'user' && (

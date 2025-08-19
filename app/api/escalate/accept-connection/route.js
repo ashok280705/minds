@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import EscalationRequest from "@/models/EscalationRequest";
 import Room from "@/models/Room";
+import DoctorSession from "@/models/DoctorSession";
 
 export async function POST(req) {
   try {
@@ -50,6 +51,16 @@ export async function POST(req) {
       type: escalationRequest.connectionType,
     });
 
+    // Create doctor session for tracking
+    const session = await DoctorSession.create({
+      doctorId: escalationRequest.doctorId._id,
+      userId: escalationRequest.userId._id,
+      requestId: escalationRequest._id,
+      sessionType: escalationRequest.connectionType,
+      roomId,
+      status: 'active'
+    });
+
     // Mark connection as accepted and escalation as completed
     escalationRequest.connectionStatus = "accepted";
     escalationRequest.status = "completed";
@@ -68,6 +79,7 @@ export async function POST(req) {
     return NextResponse.json({ 
       success: true, 
       roomId,
+      sessionId: session._id,
       redirectUrl: `/${escalationRequest.connectionType}-room/${roomId}`
     });
 

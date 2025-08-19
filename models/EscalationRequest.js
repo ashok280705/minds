@@ -40,6 +40,14 @@ const EscalationRequestSchema = new mongoose.Schema(
       type: String,
       default: "Emergency request"
     },
+    isReEscalation: {
+      type: Boolean,
+      default: false
+    },
+    previousSessionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DoctorSession"
+    },
   },
   {
     timestamps: true,

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
+import DoctorFeedback from "@/components/DoctorFeedback";
 
 import DoctorNavbar from "@/components/DoctorNavbar";
 
@@ -19,11 +20,19 @@ export default function DoctorPage() {
 
   useEffect(() => {
     if (session?.user?.id) {
+      // Force doctor online when dashboard loads
       updateOnlineStatus(true);
       setIsOnline(true);
       fetchStats();
       
       const statsInterval = setInterval(fetchStats, 30000);
+      
+      // Also refresh online status every 30 seconds to ensure it stays online
+      const statusInterval = setInterval(() => {
+        if (isOnline) {
+          updateOnlineStatus(true);
+        }
+      }, 30000);
       
       const handleBeforeUnload = () => {
         updateOnlineStatus(false);
@@ -33,10 +42,11 @@ export default function DoctorPage() {
       return () => {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         clearInterval(statsInterval);
+        clearInterval(statusInterval);
         updateOnlineStatus(false);
       };
     }
-  }, [session]);
+  }, [session, isOnline]);
 
   const fetchStats = async () => {
     if (!session?.user?.id) return;
@@ -190,9 +200,9 @@ export default function DoctorPage() {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 gap-8">
-          {/* Patient Requests - Full width */}
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Patient Requests - Takes 2 columns */}
+          <div className="lg:col-span-2">
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100">
               <div className="p-6 border-b border-emerald-100">
                 <div className="flex items-center justify-between">
@@ -212,6 +222,22 @@ export default function DoctorPage() {
                 </div>
               </div>
               <DoctorEscalationPanel inline={true} />
+            </div>
+          </div>
+
+          {/* Patient Feedback - Takes 1 column */}
+          <div className="lg:col-span-1">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-yellow-100 h-full">
+              <div className="p-6 border-b border-yellow-100">
+                <h3 className="text-xl font-semibold text-yellow-800 flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full">
+                    <span className="text-yellow-500 text-xl">⭐</span>
+                  </div>
+                  Patient Feedback
+                </h3>
+                <p className="text-sm text-yellow-600 mt-2">Your session ratings</p>
+              </div>
+              <DoctorFeedback doctorId={session?.user?.id} />
             </div>
           </div>
         </div>

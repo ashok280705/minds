@@ -18,14 +18,34 @@ export default function EscalationButton() {
     const socketInstance = io();
     setSocket(socketInstance);
 
-    // Register user
+    // Register user with both formats for compatibility
     socketInstance.emit("register-user", { userId: session.user.id });
+    console.log('Registered user for escalation:', session.user.id);
 
     // Listen for doctor acceptance
     socketInstance.on("doctor-accepted", (data) => {
       setDoctorInfo({ name: data.doctorName });
       setRequestId(data.requestId);
       setShowModal(true);
+      setIsEscalating(false);
+    });
+
+    // Listen for re-escalation notifications
+    socketInstance.on("re-escalation-started", (data) => {
+      console.log('Re-escalation notification received:', data);
+      // Show a more informative message
+      if (data.isDifferentDoctor) {
+        alert(`🔄 We're connecting you with a different doctor: Dr. ${data.doctorName}`);
+      } else {
+        alert(`🔄 ${data.message}`);
+      }
+      setIsEscalating(true); // Show that we're processing
+    });
+
+    // Listen for no doctors available
+    socketInstance.on("no-doctors-available", (data) => {
+      console.log('No doctors available:', data);
+      alert(`⚠️ ${data.message}`);
       setIsEscalating(false);
     });
 
@@ -54,7 +74,9 @@ export default function EscalationButton() {
         // Wait for doctor response
         console.log("Escalation request sent, waiting for doctor...");
       } else {
-        // Handle no doctors available case - let ChatBot handle messaging
+        // Handle no doctors available case
+        console.log('No doctors available for escalation');
+        alert('⚠️ No doctors are currently available. Please try again later or contact emergency services if this is urgent.');
         setIsEscalating(false);
       }
     } catch (error) {

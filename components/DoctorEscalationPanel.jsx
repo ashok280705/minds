@@ -23,20 +23,7 @@ export default function DoctorEscalationPanel({ inline = false }) {
         const data = await response.json();
         setConnectionRequests(prev => prev.filter(r => r.requestId !== requestId));
         
-        // Save session to history
-        await fetch('/api/doctor/sessions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            doctorId: session.user.id,
-            userId: data.userId,
-            requestId: requestId,
-            sessionType: data.connectionType,
-            roomId: data.roomId
-          })
-        });
-        
-        // Redirect doctor to room
+        // Redirect doctor to room (session already created in accept-connection)
         window.location.href = data.redirectUrl;
       }
     } catch (error) {
@@ -183,16 +170,35 @@ export default function DoctorEscalationPanel({ inline = false }) {
                   <p className="font-semibold text-gray-900">{request.userName}</p>
                   <p className="text-sm text-gray-600">{request.userEmail}</p>
                 </div>
-                <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
-                  URGENT
+                <span className={`text-xs px-2 py-1 rounded-full ${
+                  request.isReEscalation ? 
+                    'bg-orange-100 text-orange-800' : 
+                    'bg-red-100 text-red-800'
+                }`}>
+                  {request.isReEscalation ? (request.isRetry ? 'RETRY' : 'RE-ESCALATED') : 'URGENT'}
                 </span>
               </div>
               
               <div className="bg-red-100 border border-red-200 rounded p-2 mb-3">
                 <p className="text-xs text-red-700 flex items-center gap-1">
-                  <span>🚨</span>
-                  User is in emotional distress and needs immediate support
+                  <span>{request.isReEscalation ? '🔄' : '🚨'}</span>
+                  {request.isReEscalation ? 
+                    (request.isRetry ? 
+                      'Patient was not satisfied with previous session and needs another try' :
+                      'Patient was not satisfied and needs a different approach'
+                    ) :
+                    'User is in emotional distress and needs immediate support'
+                  }
                 </p>
+                {request.isReEscalation && (
+                  <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
+                    <span>💡</span>
+                    {request.isRetry ? 
+                      'Consider a different therapeutic approach this time' :
+                      'Fresh perspective needed - patient seeking alternative help'
+                    }
+                  </p>
+                )}
               </div>
               
               <div className="flex gap-2">

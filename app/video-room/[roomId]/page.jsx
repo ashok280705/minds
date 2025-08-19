@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
+import SessionFeedbackModal from "@/components/SessionFeedbackModal";
 
 export default function VideoRoom() {
   const { roomId } = useParams();
@@ -16,6 +17,9 @@ export default function VideoRoom() {
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [hasOffered, setHasOffered] = useState(false);
   const [mediaError, setMediaError] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [doctorName, setDoctorName] = useState("");
+  const [sessionId, setSessionId] = useState(null);
   const remoteStreamRef = useRef(null);
 
   const localVideoRef = useRef(null);
@@ -212,15 +216,23 @@ export default function VideoRoom() {
           console.log('Other user disconnected');
           setIsConnected(false);
           setRemoteStream(null);
-          // Redirect to respective dashboard after 3 seconds
-          setTimeout(() => {
-            if (session.user.isDoctor) {
+          if (!session.user.isDoctor) {
+            setShowFeedback(true);
+          } else {
+            setTimeout(() => {
               window.location.href = '/doctor';
-            } else {
-              window.location.href = '/';
-            }
-          }, 3000);
+            }, 3000);
+          }
         });
+
+        // Listen for re-escalation notifications
+        socketInstance.on("re-escalation-started", (data) => {
+          console.log('Re-escalation started:', data);
+          alert(data.message);
+        });
+
+        // Get room info for feedback
+        fetchRoomInfo();
 
         // Doctor creates offer after delay
         if (session.user.isDoctor) {
@@ -286,6 +298,61 @@ export default function VideoRoom() {
     }
   };
 
+  const fetchRoomInfo = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${roomId}`);
+      const data = await response.json();
+      if (data.room) {
+        setDoctorName(data.room.doctorId?.name || "Doctor");
+        setSessionId(data.room.sessionId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch room info:", error);
+    }
+  };
+
+  const handleFeedback = async (satisfied, rating, comment) => {
+    try {
+      const response = await fetch('/api/session/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          satisfied,
+          rating,
+          comment,
+          userEmail: session.user.email
+        })
+      });
+      
+      const data = await response.json();
+      console.log('Feedback response:', data);
+      
+      if (satisfied) {
+        alert('Thank you for your feedback! We appreciate you taking the time to share your experience.');
+        window.location.href = '/dashboard';
+      } else {
+        if (data.reEscalated) {
+          const message = data.isDifferentDoctor ? 
+            `We understand your concerns. We're connecting you with a different doctor: Dr. ${data.newDoctorName}` :
+            `We're giving you another chance with Dr. ${data.newDoctorName}. They'll try a different approach.`;
+          alert(message);
+          // Wait a moment for the escalation to be processed
+          setTimeout(() => {
+            window.location.href = '/dashboard/mental-counselor';
+          }, 2000);
+        } else {
+          alert('We apologize for the experience. No doctors are currently available for re-connection. Please try again later or contact emergency services if urgent.');
+          window.location.href = '/dashboard';
+        }
+      }
+    } catch (error) {
+      console.error('Feedback error:', error);
+      alert('Failed to submit feedback. Please try again.');
+      window.location.href = '/dashboard';
+    }
+  };
+
   const endCall = () => {
     if (localStream) {
       localStream.getTracks().forEach((track) => track.stop());
@@ -297,11 +364,10 @@ export default function VideoRoom() {
       socket.emit("end-call", roomId);
       socket.disconnect();
     }
-    // Redirect to respective dashboard
     if (session.user.isDoctor) {
       window.location.href = '/doctor';
     } else {
-      window.location.href = '/dashboard';
+      setShowFeedback(true);
     }
   };
 
@@ -505,6 +571,13 @@ export default function VideoRoom() {
           </p>
         </div>
       </div>
+      
+      <SessionFeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        onFeedback={handleFeedback}
+        doctorName={doctorName}
+      />
     </div>
   );
 }

@@ -39,6 +39,11 @@ const DoctorSessionSchema = new mongoose.Schema({
   },
   roomId: {
     type: String
+  },
+  feedback: {
+    satisfied: Boolean,
+    rating: Number,
+    comment: String
   }
 }, {
   timestamps: true

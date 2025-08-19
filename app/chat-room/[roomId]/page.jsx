@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
+import SessionFeedbackModal from "@/components/SessionFeedbackModal";
 
 export default function ChatRoom() {
   const { roomId } = useParams();
@@ -10,6 +11,9 @@ export default function ChatRoom() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [socket, setSocket] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [doctorName, setDoctorName] = useState("");
+  const [sessionId, setSessionId] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -38,16 +42,24 @@ export default function ChatRoom() {
     // Handle user disconnection
     socketInstance.on("user-disconnected", () => {
       console.log('Other user disconnected from chat');
-      // Show notification and redirect after 3 seconds
-      alert('The other participant has left the chat.');
-      setTimeout(() => {
-        if (session.user.isDoctor) {
-          window.location.href = '/doctor-dashboard';
-        } else {
-          window.location.href = '/';
-        }
-      }, 2000);
+      if (!session.user.isDoctor) {
+        // Show feedback modal for users
+        setShowFeedback(true);
+      } else {
+        setTimeout(() => {
+          window.location.href = '/doctor';
+        }, 2000);
+      }
     });
+
+    // Listen for re-escalation notifications
+    socketInstance.on("re-escalation-started", (data) => {
+      console.log('Re-escalation started:', data);
+      alert(data.message);
+    });
+
+    // Get room info for feedback
+    fetchRoomInfo();
 
     // Load existing messages
     fetchMessages();
@@ -70,6 +82,61 @@ export default function ChatRoom() {
       }
     } catch (error) {
       console.error("Failed to fetch messages:", error);
+    }
+  };
+
+  const fetchRoomInfo = async () => {
+    try {
+      const response = await fetch(`/api/rooms/${roomId}`);
+      const data = await response.json();
+      if (data.room) {
+        setDoctorName(data.room.doctorId?.name || "Doctor");
+        setSessionId(data.room.sessionId);
+      }
+    } catch (error) {
+      console.error("Failed to fetch room info:", error);
+    }
+  };
+
+  const handleFeedback = async (satisfied, rating, comment) => {
+    try {
+      const response = await fetch('/api/session/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          satisfied,
+          rating,
+          comment,
+          userEmail: session.user.email
+        })
+      });
+      
+      const data = await response.json();
+      console.log('Feedback response:', data);
+      
+      if (satisfied) {
+        alert('Thank you for your feedback! We appreciate you taking the time to share your experience.');
+        window.location.href = '/';
+      } else {
+        if (data.reEscalated) {
+          const message = data.isDifferentDoctor ? 
+            `We understand your concerns. We're connecting you with a different doctor: Dr. ${data.newDoctorName}` :
+            `We're giving you another chance with Dr. ${data.newDoctorName}. They'll try a different approach.`;
+          alert(message);
+          // Wait a moment for the escalation to be processed
+          setTimeout(() => {
+            window.location.href = '/dashboard/mental-counselor';
+          }, 2000);
+        } else {
+          alert('We apologize for the experience. No doctors are currently available for re-connection. Please try again later or contact emergency services if urgent.');
+          window.location.href = '/';
+        }
+      }
+    } catch (error) {
+      console.error('Feedback error:', error);
+      alert('Failed to submit feedback. Please try again.');
+      window.location.href = '/';
     }
   };
 
@@ -108,9 +175,9 @@ export default function ChatRoom() {
       socket.disconnect();
     }
     if (session.user.isDoctor) {
-      window.location.href = '/doctor-dashboard';
+      window.location.href = '/doctor';
     } else {
-      window.location.href = '/';
+      setShowFeedback(true);
     }
   };
 
@@ -218,6 +285,13 @@ export default function ChatRoom() {
           </p>
         </div>
       </div>
+      
+      <SessionFeedbackModal
+        isOpen={showFeedback}
+        onClose={() => setShowFeedback(false)}
+        onFeedback={handleFeedback}
+        doctorName={doctorName}
+      />
     </div>
   );
 }

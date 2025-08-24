@@ -1,11 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import RiskAnalyzer from "../../../lib/riskAnalyzer.js";
+import escalationService from "../../../lib/escalationService.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const riskAnalyzer = new RiskAnalyzer();
 
 export async function POST(req) {
   try {
-    const { messages } = await req.json();
+    const { messages, userId } = await req.json();
+    const userMessage = messages[messages.length - 1]?.content || "";
 
     const systemPrompt = `
 You are a deeply empathetic AI mental health counselor who truly cares about each person.
@@ -21,8 +25,13 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
     const userInput = messages.map(m => `${m.role}: ${m.content}`).join("\n");
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const result = await model.generateContent(`${systemPrompt}\n${userInput}`);
-    const reply = result.response.text();
+    // Multi-agent processing: Gemini + Risk Analyzer
+    const [geminiResult, riskAnalysis] = await Promise.all([
+      model.generateContent(`${systemPrompt}\n${userInput}`),
+      riskAnalyzer.analyzeRisk(userMessage)
+    ]);
+    
+    const reply = geminiResult.response.text();
     const textLower = reply.toLowerCase();
 
     const crisisKeywords = [
@@ -55,7 +64,18 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
       "heart racing", "terrified", "scared of myself"
     ];
 
-    const escalate = crisisKeywords.some(kw => textLower.includes(kw));
+    // Use BioClinicalBERT risk analysis for escalation decision
+    const escalate = riskAnalysis.risk_level === "Suicidal" || 
+                    crisisKeywords.some(kw => textLower.includes(kw));
+    
+    // Trigger escalation if high risk detected
+    if (escalate && userId) {
+      try {
+        await escalationService.triggerEscalation(userId, riskAnalysis, userMessage);
+      } catch (escalationError) {
+        console.error('Escalation trigger failed:', escalationError);
+      }
+    }
 
     const musicLibrary = [
       {
@@ -86,6 +106,11 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
       reply,
       escalate,
       moodMusic,
+      riskAnalysis: {
+        level: riskAnalysis.risk_level,
+        confidence: riskAnalysis.confidence,
+        method: riskAnalysis.method
+      }
     });
 
   } catch (err) {

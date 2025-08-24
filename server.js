@@ -15,6 +15,11 @@ app.prepare().then(() => {
   // ✅ Initialize Socket.IO and store globally
   const io = initIO(httpServer);
   global._io = io; // ✅ So you can use it in API routes
+  
+  // Initialize escalation service with Socket.IO
+  import('./lib/escalationService.js').then(({ default: escalationService }) => {
+    escalationService.setSocketIO(io);
+  });
 
   httpServer.listen(port, hostname, () => {
     console.log(`> Ready on http://${hostname}:${port}`);

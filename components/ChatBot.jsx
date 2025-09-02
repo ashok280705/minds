@@ -299,7 +299,10 @@ export default function ChatBot({ onSessionSave }) {
     const res = await fetch("/api/gemini-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: [...messages, { role: "user", content: userMessage }] }),
+      body: JSON.stringify({ 
+        messages: [...messages, { role: "user", content: userMessage }],
+        userId: session?.user?.id
+      }),
     });
 
     const data = await res.json();
@@ -322,7 +325,7 @@ export default function ChatBot({ onSessionSave }) {
       setShowMusicModal(true);
     }
 
-    if (data.escalate === true && session?.user?.email) {
+    if (data.escalate === true) {
       let suicidalContent = "🚨 I've detected you might need immediate help. I'm connecting you with a doctor right now. Please hold on...";
       if (selectedLang !== 'en') {
         suicidalContent = await translateText(suicidalContent, selectedLang);
@@ -337,24 +340,9 @@ export default function ChatBot({ onSessionSave }) {
       setMessages(prev => [...prev, suicidalMessage]);
       speakText(suicidalContent);
       
-      const result = await escalate(session.user.email);
-      if (result?.requestId) {
-        setCurrentRequestId(result.requestId);
-        setIsPolling(true);
-      } else {
-        let fallbackContent = "I understand you're going through a difficult time right now. While no doctors are available at the moment, I'm here to support you. Let's talk through what you're feeling. Can you tell me more about what's troubling you?";
-        if (selectedLang !== 'en') {
-          fallbackContent = await translateText(fallbackContent, selectedLang);
-        }
-        
-        const fallbackMessage = {
-          role: "assistant",
-          content: fallbackContent,
-          timestamp: new Date().toISOString()
-        };
-        setMessages(prev => [...prev, fallbackMessage]);
-        speakText(fallbackContent);
-      }
+      // The escalation is already triggered in the gemini-chat API
+      // Just start polling for doctor response
+      console.log('🚨 Escalation detected, starting polling...');
       
       await saveChatSession([...messages, { role: "user", content: userMessage }, suicidalMessage]);
     } else {

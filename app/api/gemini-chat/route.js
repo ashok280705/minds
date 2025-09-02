@@ -10,6 +10,8 @@ export async function POST(req) {
   try {
     const { messages, userId } = await req.json();
     const userMessage = messages[messages.length - 1]?.content || "";
+    
+    console.log('Processing message for userId:', userId);
 
     const systemPrompt = `
 You are a deeply empathetic AI mental health counselor who truly cares about each person.
@@ -69,11 +71,21 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
                     crisisKeywords.some(kw => textLower.includes(kw));
     
     // Trigger escalation if high risk detected
-    if (escalate && userId) {
-      try {
-        await escalationService.triggerEscalation(userId, riskAnalysis, userMessage);
-      } catch (escalationError) {
-        console.error('Escalation trigger failed:', escalationError);
+    if (escalate) {
+      console.log('🚨 SUICIDAL THOUGHTS DETECTED - Triggering escalation');
+      console.log('Risk Analysis:', riskAnalysis);
+      console.log('User Message:', userMessage);
+      
+      if (userId) {
+        try {
+          console.log('Triggering escalation for userId:', userId);
+          await escalationService.triggerEscalation(userId, riskAnalysis, userMessage);
+          console.log('Escalation service triggered successfully');
+        } catch (escalationError) {
+          console.error('Escalation trigger failed:', escalationError);
+        }
+      } else {
+        console.error('No userId provided for escalation');
       }
     }
 

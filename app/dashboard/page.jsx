@@ -48,42 +48,42 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 relative overflow-hidden">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/20 to-teal-100/20"></div>
-      <div className="absolute top-20 left-20 w-32 h-32 bg-emerald-200/30 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-20 w-40 h-40 bg-teal-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div className="absolute top-1/2 right-10 w-24 h-24 bg-cyan-200/30 rounded-full blur-2xl animate-pulse delay-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 to-indigo-100/20"></div>
+      <div className="absolute top-20 left-20 w-32 h-32 bg-blue-200/30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-40 h-40 bg-indigo-200/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      <div className="absolute top-1/2 right-10 w-24 h-24 bg-slate-200/30 rounded-full blur-2xl animate-pulse delay-500"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-6">
         {/* Header Section */}
         <div className="text-center mb-12 max-w-3xl">
           <div className="flex items-center justify-center mb-6">
-            <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-lg">
-              <Brain className="text-white w-8 h-8" />
+            <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
+              <Heart className="text-white w-8 h-8" />
             </div>
           </div>
           
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-emerald-800">Welcome to </span>
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Minds
+            <span className="text-blue-800">Welcome to </span>
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Clarity Care 3.0
             </span>
           </h1>
           
-          <p className="text-lg text-emerald-700/80 font-medium mb-6">
-            Your comprehensive mental wellness companion
+          <p className="text-lg text-blue-700/80 font-medium mb-6">
+            Your comprehensive AI healthcare platform
           </p>
           
           {/* Trust Indicators */}
-          <div className="flex items-center justify-center gap-6 text-sm text-emerald-600/70">
+          <div className="flex items-center justify-center gap-6 text-sm text-blue-600/70">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              <span>Secure & Private</span>
+              <span>HIPAA Compliant</span>
             </div>
             <div className="flex items-center gap-2">
               <Heart className="w-4 h-4" />
-              <span>Professional Care</span>
+              <span>AI-Powered Care</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
@@ -105,41 +105,41 @@ export default function DashboardPage() {
           <ServiceCard
             onClick={handleMentalCounselorClick}
             icon={<Brain className="w-8 h-8" />}
-            title="Mental Counselor"
+            title="AI Mental Counselor"
             description="Connect with your AI mental health companion for personalized support, mood-based music therapy, and crisis intervention with real doctor consultations."
             features={["AI Companion", "Mood Analysis", "Crisis Detection", "Music Therapy"]}
-            gradient="from-emerald-400 to-teal-500"
-            accentColor="emerald"
+            gradient="from-blue-400 to-indigo-500"
+            accentColor="blue"
           />
 
           {/* Reports Analyzer Card */}
           <ServiceCard
             onClick={handleReportsClick}
             icon={<FileText className="w-8 h-8" />}
-            title="Reports Analyzer"
+            title="Medical Reports Analyzer"
             description="Upload and analyze your medical reports with AI-powered insights. Get clear understanding of your health trends and recommendations."
             features={["AI Analysis", "Health Trends", "Report Insights", "Progress Tracking"]}
-            gradient="from-teal-400 to-cyan-500"
-            accentColor="teal"
+            gradient="from-indigo-400 to-purple-500"
+            accentColor="indigo"
           />
 
           {/* Pharmacy Card */}
           <ServiceCard
             onClick={handlePharmacyClick}
             icon={<Pill className="w-8 h-8" />}
-            title="Pharmacy"
+            title="Smart Pharmacy"
             description="Order trusted medications at affordable prices with convenient doorstep delivery and prescription management."
             features={["Trusted Medicines", "Affordable Prices", "Home Delivery", "Prescription Tracking"]}
-            gradient="from-cyan-400 to-blue-500"
-            accentColor="cyan"
+            gradient="from-purple-400 to-pink-500"
+            accentColor="purple"
           />
         </div>
 
         {/* Bottom Section */}
         <div className="mt-16 text-center">
-          <div className="flex items-center justify-center gap-2 text-emerald-600/60 text-sm">
+          <div className="flex items-center justify-center gap-2 text-blue-600/60 text-sm">
             <Sparkles className="w-4 h-4" />
-            <span>Empowering your journey to mental wellness</span>
+            <span>Empowering your healthcare journey with AI</span>
             <Sparkles className="w-4 h-4" />
           </div>
         </div>
@@ -151,26 +151,26 @@ export default function DashboardPage() {
 function ServiceCard({ onClick, icon, title, description, features, gradient, accentColor }) {
   const getAccentClasses = (color) => {
     const colors = {
-      emerald: {
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
-        border: "border-emerald-200",
-        hover: "hover:border-emerald-300",
-        feature: "text-emerald-600"
+      blue: {
+        bg: "bg-blue-50",
+        text: "text-blue-700",
+        border: "border-blue-200",
+        hover: "hover:border-blue-300",
+        feature: "text-blue-600"
       },
-      teal: {
-        bg: "bg-teal-50",
-        text: "text-teal-700", 
-        border: "border-teal-200",
-        hover: "hover:border-teal-300",
-        feature: "text-teal-600"
+      indigo: {
+        bg: "bg-indigo-50",
+        text: "text-indigo-700", 
+        border: "border-indigo-200",
+        hover: "hover:border-indigo-300",
+        feature: "text-indigo-600"
       },
-      cyan: {
-        bg: "bg-cyan-50",
-        text: "text-cyan-700",
-        border: "border-cyan-200", 
-        hover: "hover:border-cyan-300",
-        feature: "text-cyan-600"
+      purple: {
+        bg: "bg-purple-50",
+        text: "text-purple-700",
+        border: "border-purple-200", 
+        hover: "hover:border-purple-300",
+        feature: "text-purple-600"
       }
     };
     return colors[color];

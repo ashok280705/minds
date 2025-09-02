@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import UserNavbar from "@/components/UserNavbar";
+import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 import PeriodNotifications from "@/components/PeriodNotifications";
 
@@ -34,7 +35,6 @@ export default function LayoutWrapper({ children }) {
   };
 
   if (!mounted) {
-    // SSR safe fallback (optional)
     return <main>{children}</main>;
   }
 
@@ -44,21 +44,33 @@ export default function LayoutWrapper({ children }) {
     pathname === "/auth/register" ||
     pathname === "/doctor/register" ||
     pathname === "/doctor-register" ||
-    pathname === "/doctor" ||
-    pathname.startsWith("/chat-room")||pathname.startsWith("/video-room");
+    pathname.startsWith("/chat-room") ||
+    pathname.startsWith("/video-room");
+
+  const showSidebar = !hideLayout && session?.user;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 text-gray-900">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-gray-900">
       {!hideLayout && (
-        <header className="sticky top-0 z-50 shadow bg-white">
+        <header className="sticky top-0 z-50 shadow-sm bg-white border-b border-blue-100">
           <UserNavbar />
         </header>
       )}
 
-      <main className="flex-1 w-full">{children}</main>
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        {showSidebar && <Sidebar />}
+        
+        {/* Main Content */}
+        <main className={`flex-1 ${showSidebar ? 'ml-0' : 'w-full'} min-h-screen bg-gradient-to-br from-slate-50 to-blue-50`}>
+          <div className="p-6">
+            {children}
+          </div>
+        </main>
+      </div>
 
       {!hideLayout && (
-        <footer className="bg-white shadow-inner ">
+        <footer className="bg-white shadow-inner border-t border-blue-100">
           <Footer />
         </footer>
       )}

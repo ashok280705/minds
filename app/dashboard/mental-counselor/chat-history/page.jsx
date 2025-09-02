@@ -29,18 +29,18 @@ export default function ChatHistoryPage() {
 
   if (selectedSession) {
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-emerald-800">Chat Session</h1>
+      <div className="w-full h-full">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-blue-800">Chat Session</h1>
           <button
             onClick={() => setSelectedSession(null)}
-            className="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600"
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
           >
             ← Back to History
           </button>
         </div>
-        <div className="bg-white border border-emerald-200 rounded-xl p-4 shadow">
-          <p className="text-sm text-emerald-600 mb-4">
+        <div className="bg-white border border-blue-200 rounded-xl p-6 shadow">
+          <p className="text-sm text-blue-600 mb-4">
             Session from {new Date(selectedSession.createdAt).toLocaleString()}
           </p>
           <div className="h-96 overflow-y-auto">
@@ -49,8 +49,8 @@ export default function ChatHistoryPage() {
                 key={idx}
                 className={`mb-2 whitespace-pre-wrap ${
                   msg.role === "assistant"
-                    ? "text-emerald-800 bg-emerald-50 p-2 rounded"
-                    : "text-emerald-600 text-right"
+                    ? "text-blue-800 bg-blue-50 p-2 rounded"
+                    : "text-blue-600 text-right"
                 } ${msg.isSuicidalDetection ? 'border-l-4 border-red-500' : ''}`}
               >
                 {msg.isSuicidalDetection && (
@@ -69,41 +69,41 @@ export default function ChatHistoryPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-3xl font-bold text-emerald-800">Chat History</h1>
+    <div className="w-full h-full">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold text-blue-800">Chat History</h1>
         <Link
           href="/dashboard/mental-counselor"
-          className="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600"
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
         >
           ← Back to Mental Dashboard
         </Link>
       </div>
       
-      <div className="bg-white border border-emerald-200 rounded-xl p-4 shadow">
-        <h2 className="text-xl font-semibold text-emerald-800 mb-3">Previous Sessions</h2>
+      <div className="bg-white border border-blue-200 rounded-xl p-6 shadow">
+        <h2 className="text-xl font-semibold text-blue-800 mb-4">Previous Sessions</h2>
         {chatHistory.length === 0 ? (
-          <p className="text-emerald-600">No previous sessions found.</p>
+          <p className="text-blue-600">No previous sessions found.</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {chatHistory.map((session, idx) => (
               <div
                 key={session._id}
-                className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 cursor-pointer"
+                className="flex items-center justify-between p-4 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition-colors"
                 onClick={() => setSelectedSession(session)}
               >
                 <div>
-                  <p className="font-medium text-emerald-800">
+                  <p className="font-medium text-blue-800">
                     Session {chatHistory.length - idx}
                   </p>
-                  <p className="text-sm text-emerald-600">
+                  <p className="text-sm text-blue-600">
                     {new Date(session.createdAt).toLocaleDateString()} - {session.messages.length} messages
                     {session.messages.some(m => m.isSuicidalDetection) && (
                       <span className="ml-2 text-red-600 text-xs">🚨 Crisis detected</span>
                     )}
                   </p>
                 </div>
-                <span className="text-emerald-500">→</span>
+                <span className="text-blue-500">→</span>
               </div>
             ))}
           </div>

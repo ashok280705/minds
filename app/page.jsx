@@ -58,7 +58,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-blue-900 overflow-hidden relative">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 text-emerald-900 overflow-hidden relative">
       <style jsx>{`
         .floating-shape {
           animation: float 20s ease-in-out infinite;
@@ -101,26 +101,26 @@ export default function HomePage() {
       `}</style>
 
       {/* Floating background shapes */}
-      <div className="floating-shape absolute w-72 h-72 bg-blue-200 rounded-full filter blur-3xl opacity-20 top-20 left-20" />
-      <div className="floating-shape absolute w-64 h-64 bg-indigo-200 rounded-full filter blur-3xl opacity-15 bottom-20 right-20" />
-      <div className="floating-shape absolute w-48 h-48 bg-slate-200 rounded-full filter blur-3xl opacity-20 bottom-32 left-10" />
+      <div className="floating-shape absolute w-72 h-72 bg-emerald-200 rounded-full filter blur-3xl opacity-20 top-20 left-20" />
+      <div className="floating-shape absolute w-64 h-64 bg-teal-200 rounded-full filter blur-3xl opacity-15 bottom-20 right-20" />
+      <div className="floating-shape absolute w-48 h-48 bg-cyan-200 rounded-full filter blur-3xl opacity-20 bottom-32 left-10" />
 
       {/* Header */}
-      <header className="fixed top-0 w-full px-8 py-4 bg-white/95 backdrop-blur-md shadow-lg z-50 border-b border-blue-100/50">
+      <header className="fixed top-0 w-full px-8 py-4 bg-white/95 backdrop-blur-md shadow-lg z-50 border-b border-emerald-100/50">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
           <div className="flex items-center space-x-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-lg">
-              <Heart className="text-white w-5 h-5" />
+            <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-lg">
+              <Brain className="text-white w-5 h-5" />
             </div>
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
-              Clarity Care 3.0
+            <div className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+              Minds
             </div>
           </div>
           <nav className="hidden md:flex space-x-8">
-            <a href="#home" className="text-blue-700 hover:text-blue-800 font-medium transition-colors">Home</a>
-            <a href="#services" className="text-blue-700 hover:text-blue-800 font-medium transition-colors">Services</a>
-            <a href="#about" className="text-blue-700 hover:text-blue-800 font-medium transition-colors">About</a>
-            <a href="#contact" className="text-blue-700 hover:text-blue-800 font-medium transition-colors">Contact</a>
+            <a href="#home" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Home</a>
+            <a href="#services" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Services</a>
+            <a href="#about" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">About</a>
+            <a href="#contact" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Contact</a>
           </nav>
         </div>
       </header>
@@ -138,18 +138,18 @@ export default function HomePage() {
             ref={heroTitleRef}
             className="animate-fade-in text-5xl md:text-7xl font-extrabold mb-8 leading-tight"
           >
-            Your AI-Powered
-            <span className="block bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Healthcare Platform
+            Your Safe Space for
+            <span className="block bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+              Mental Wellness
             </span>
           </h1>
           
           <p 
             ref={heroSubtitleRef}
-            className="animate-fade-in text-xl md:text-2xl mb-12 max-w-4xl mx-auto text-blue-700/80 leading-relaxed font-medium"
+            className="animate-fade-in text-xl md:text-2xl mb-12 max-w-4xl mx-auto text-emerald-700/80 leading-relaxed font-medium"
           >
-            Advanced AI healthcare platform combining mental health support, medical analysis, and comprehensive health management. 
-            Experience the future of healthcare today.
+            Connect with compassionate AI mental health support, licensed professionals, and comprehensive wellness tools. 
+            Take the first step towards better mental health today.
           </p>
           
           <div 
@@ -405,12 +405,12 @@ export default function HomePage() {
                 <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-lg">
                   <Brain className="text-white w-5 h-5" />
                 </div>
-                <div className="text-xl font-bold bg-gradient-to-r from-blue-700 to-indigo-600 bg-clip-text text-transparent">
-                  Clarity Care 3.0
+                <div className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
+                  Minds
                 </div>
               </div>
-              <p className="text-blue-700/70 text-sm leading-relaxed">
-                Empowering healthcare through advanced AI technology and professional medical support.
+              <p className="text-emerald-700/70 text-sm leading-relaxed">
+                Empowering mental wellness through compassionate AI support and professional care.
               </p>
             </div>
 
@@ -445,8 +445,8 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-emerald-100 pt-8 text-center">
-            <p className="text-blue-600/70 text-sm">
-              © {new Date().getFullYear()} Clarity Care 3.0 AI Healthcare Platform. Your health matters. All rights reserved.
+            <p className="text-emerald-600/70 text-sm">
+              © {new Date().getFullYear()} Minds Mental Wellness Platform. Your mental health matters. All rights reserved.
             </p>
           </div>
         </div>

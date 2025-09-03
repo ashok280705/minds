@@ -18,20 +18,11 @@ export async function POST(req) {
   try {
     await dbConnect();
 
-    const { userEmail, userId, escalationId, riskLevel } = await req.json();
-    
-    let user;
-    if (userEmail) {
-      user = await User.findOne({ email: userEmail });
-    } else if (userId) {
-      user = await User.findById(userId);
-    }
-    
+    const { userEmail } = await req.json();
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-
-    console.log(`🚨 ESCALATION TRIGGERED for user ${user.name} (${user.email}) - Risk Level: ${riskLevel || 'High'}`);
 
     // Check all doctors first
     const allDoctors = await Doctor.find({});
@@ -57,22 +48,11 @@ export async function POST(req) {
       }, { status: 200 });
     }
 
-    // Create or update escalation request
-    let escalationRequest;
-    if (escalationId) {
-      escalationRequest = await EscalationRequest.findByIdAndUpdate(
-        escalationId,
-        { doctorId: doctor._id, status: 'pending' },
-        { new: true }
-      );
-    } else {
-      escalationRequest = await EscalationRequest.create({
-        userId: user._id,
-        doctorId: doctor._id,
-        riskLevel: riskLevel || 'High',
-        status: 'pending'
-      });
-    }
+    // Create escalation request
+    const escalationRequest = await EscalationRequest.create({
+      userId: user._id,
+      doctorId: doctor._id,
+    });
 
     // Keep doctor online but track the request
     console.log('Doctor remains online for other potential requests');

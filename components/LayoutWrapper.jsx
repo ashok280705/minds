@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import ModernNavbar from "@/components/ModernNavbar";
 import Footer from "@/components/Footer";
 import PeriodNotifications from "@/components/PeriodNotifications";
-
+import Sidebar from "@/components/ModernSidebar";
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -44,7 +44,8 @@ export default function LayoutWrapper({ children }) {
     pathname === "/doctor/register" ||
     pathname === "/doctor-register" ||
     pathname.startsWith("/chat-room") ||
-    pathname.startsWith("/video-room");
+    pathname.startsWith("/video-room") ||
+    pathname.startsWith("/doctor");
 
   const showSidebar = !hideLayout && session?.user;
 

@@ -6,18 +6,11 @@ export async function GET(req) {
   try {
     await dbConnect();
     
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId');
-    
-    if (!userId) {
-      return NextResponse.json({ error: "User ID required" }, { status: 400 });
-    }
-
-    const chatHistory = await ChatHistory.find({ userId })
+    const sessions = await ChatHistory.find({})
       .sort({ createdAt: -1 })
-      .limit(10); // Get last 10 sessions
+      .limit(50);
 
-    return NextResponse.json({ chatHistory });
+    return NextResponse.json({ sessions });
   } catch (error) {
     console.error("Chat history fetch error:", error);
     return NextResponse.json({ error: "Failed to fetch chat history" }, { status: 500 });

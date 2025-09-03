@@ -9,14 +9,23 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Clarity Care 3.0 - AI Healthcare Platform",
-  description: "Professional AI-powered healthcare platform for mental wellness, medical analysis, and comprehensive health management",
+  title: "Minds - Mental Wellness Platform",
+  description: "Your comprehensive mental health companion with AI support, professional care, and wellness tools.",
+  keywords: "mental health, AI counselor, wellness, therapy, support",
+  authors: [{ name: "Minds Team" }],
+
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <meta name="theme-color" content="#10b981" />
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 text-gray-900`}
+      >
         
         <SessionWrapper>
            <LayoutWrapper>

@@ -3,8 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import UserNavbar from "@/components/UserNavbar";
-import Sidebar from "@/components/Sidebar";
+import ModernNavbar from "@/components/ModernNavbar";
 import Footer from "@/components/Footer";
 import PeriodNotifications from "@/components/PeriodNotifications";
 
@@ -50,10 +49,10 @@ export default function LayoutWrapper({ children }) {
   const showSidebar = !hideLayout && session?.user;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
       {!hideLayout && (
-        <header className="sticky top-0 z-50 shadow-sm bg-white border-b border-blue-100">
-          <UserNavbar />
+        <header className="sticky top-0 z-50">
+          <ModernNavbar />
         </header>
       )}
 

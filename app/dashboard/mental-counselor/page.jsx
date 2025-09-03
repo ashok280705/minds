@@ -1,11 +1,11 @@
 "use client";
 
-import ChatBot from "@/components/ChatBot";
+import ModernChatInterface from "@/components/ModernChatInterface";
 
 export default function MentalCounselorPage() {
   return (
-    <div className="w-full h-full">
-      <ChatBot />
+    <div className="h-screen">
+      <ModernChatInterface />
     </div>
   );
 }

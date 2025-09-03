@@ -84,6 +84,10 @@ export default function ModernDashboard() {
     router.push("/dashboard/pharmacy");
   };
 
+  const handleRoutineDoctorClick = () => {
+    router.push("/dashboard/routine-doctor");
+  };
+
   const services = [
     {
       id: 'counselor',
@@ -117,6 +121,17 @@ export default function ModernDashboard() {
       features: ['Trusted Medicines', 'Affordable Prices', 'Home Delivery', 'Prescription Tracking'],
       onClick: handlePharmacyClick,
       stats: { orders: 2, savings: '30%' }
+    },
+    {
+      id: 'routine-doctor',
+      title: 'Routine Doctor',
+      description: 'Connect with qualified doctors for routine checkups, consultations, and medical advice via chat or video call.',
+      icon: Users,
+      gradient: 'from-orange-400 to-red-500',
+      bgGradient: 'from-orange-50 to-red-50',
+      features: ['Chat Consultation', 'Video Calls', 'Send Notes', 'Quick Response'],
+      onClick: handleRoutineDoctorClick,
+      stats: { doctors: '24/7', response: '< 5min' }
     }
   ];
 
@@ -221,7 +236,7 @@ export default function ModernDashboard() {
         {/* Main Services */}
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Wellness Services</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}

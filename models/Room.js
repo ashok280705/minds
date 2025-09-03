@@ -8,13 +8,11 @@ const RoomSchema = new mongoose.Schema(
       unique: true,
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: true,
     },
     doctorId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Doctor",
+      type: String,
       required: true,
     },
     type: {
@@ -40,4 +38,9 @@ const RoomSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.models.Room || mongoose.model("Room", RoomSchema);
+// Force refresh the model
+if (mongoose.models.Room) {
+  delete mongoose.models.Room;
+}
+
+export default mongoose.model("Room", RoomSchema);

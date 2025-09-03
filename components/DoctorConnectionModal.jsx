@@ -60,7 +60,12 @@ export default function DoctorConnectionModal({
         if (data.connectionStatus === "accepted") {
           clearInterval(pollInterval);
           // Redirect to room
-          window.location.href = `/${connectionType}-room/${data.roomId || 'temp'}`;
+          if (data.roomId) {
+            window.location.href = `/${connectionType}-room/${data.roomId}`;
+          } else {
+            console.error('No roomId received from server');
+            alert('Failed to create room. Please try again.');
+          }
         } else if (data.connectionStatus === "rejected") {
           clearInterval(pollInterval);
           alert("Doctor declined the connection request.");

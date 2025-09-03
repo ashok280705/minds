@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
 import DoctorFeedback from "@/components/DoctorFeedback";
+import RoutineDoctorPanel from "@/components/RoutineDoctorPanel";
 
 import DoctorNavbar from "@/components/DoctorNavbar";
 
@@ -200,45 +201,59 @@ export default function DoctorPage() {
         </div>
 
         {/* Main Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Patient Requests - Takes 2 columns */}
-          <div className="lg:col-span-2">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-emerald-100">
-              <div className="p-6 border-b border-emerald-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-xl font-semibold text-emerald-800 flex items-center gap-3">
-                      <div className="p-2 bg-gradient-to-r from-red-100 to-pink-100 rounded-full">
-                        <span className="text-red-500 text-xl">🚨</span>
-                      </div>
-                      Patient Requests
-                    </h3>
-                    <p className="text-sm text-emerald-600 mt-2">Emergency and connection requests from patients</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-emerald-600">Priority Queue</p>
-                    <p className="text-lg font-semibold text-emerald-800">{stats.totalRequests} waiting</p>
-                  </div>
+        <div className="space-y-8">
+          {/* Emergency Requests */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-red-100">
+            <div className="p-6 border-b border-red-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-red-800 flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-red-100 to-pink-100 rounded-full">
+                      <span className="text-red-500 text-xl">🚨</span>
+                    </div>
+                    Emergency Requests
+                  </h3>
+                  <p className="text-sm text-red-600 mt-2">High priority mental health emergencies</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-red-600">Priority Queue</p>
+                  <p className="text-lg font-semibold text-red-800">{stats.totalRequests} waiting</p>
                 </div>
               </div>
-              <DoctorEscalationPanel inline={true} />
             </div>
+            <DoctorEscalationPanel inline={true} />
           </div>
 
-          {/* Patient Feedback - Takes 1 column */}
-          <div className="lg:col-span-1">
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-yellow-100 h-full">
-              <div className="p-6 border-b border-yellow-100">
-                <h3 className="text-xl font-semibold text-yellow-800 flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full">
-                    <span className="text-yellow-500 text-xl">⭐</span>
-                  </div>
-                  Patient Feedback
-                </h3>
-                <p className="text-sm text-yellow-600 mt-2">Your session ratings</p>
+          {/* Routine Doctor Requests */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100">
+            <div className="p-6 border-b border-orange-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-semibold text-orange-800 flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-full">
+                      <span className="text-orange-500 text-xl">🩺</span>
+                    </div>
+                    Routine Consultations
+                  </h3>
+                  <p className="text-sm text-orange-600 mt-2">General healthcare consultation requests</p>
+                </div>
               </div>
-              <DoctorFeedback doctorId={session?.user?.id} />
             </div>
+            <RoutineDoctorPanel doctorId={session?.user?.id} doctorName={session?.user?.name} inline={true} />
+          </div>
+
+          {/* Patient Feedback */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-yellow-100">
+            <div className="p-6 border-b border-yellow-100">
+              <h3 className="text-xl font-semibold text-yellow-800 flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full">
+                  <span className="text-yellow-500 text-xl">⭐</span>
+                </div>
+                Patient Feedback
+              </h3>
+              <p className="text-sm text-yellow-600 mt-2">Your session ratings</p>
+            </div>
+            <DoctorFeedback doctorId={session?.user?.id} />
           </div>
         </div>
 

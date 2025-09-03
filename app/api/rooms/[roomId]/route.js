@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
   try {
     await dbConnect();
     
-    const { roomId } = params;
+    const { roomId } =await  params;
     
     const room = await Room.findOne({ roomId })
       .populate('userId', 'name email')

@@ -20,8 +20,8 @@ export async function GET(req, { params }) {
     let roomId = null;
     if (escalationRequest.connectionStatus === "accepted") {
       const room = await Room.findOne({
-        userId: escalationRequest.userId,
-        doctorId: escalationRequest.doctorId
+        userId: escalationRequest.userId.toString(),
+        doctorId: escalationRequest.doctorId._id.toString()
       }).sort({ createdAt: -1 });
       roomId = room?.roomId;
     }

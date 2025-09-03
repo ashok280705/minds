@@ -129,8 +129,8 @@ export default function ModernSidebar() {
       icon: Phone,
       description: "Virtual Doctor Consultations",
       dropdown: [
-        { href: "/dashboard/telemedicine/private", label: "Private Doctor" },
-        { href: "/dashboard/telemedicine/routine", label: "Routine Doctor" }
+        { href: "/dashboard/mental-counselor", label: "Mental Health" },
+        { href: "/dashboard/routine-doctor", label: "Routine Doctor" }
       ]
     },
     { 

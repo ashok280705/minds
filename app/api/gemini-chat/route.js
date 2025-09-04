@@ -2,14 +2,39 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import RiskAnalyzer from "../../../lib/riskAnalyzer.js";
 import escalationService from "../../../lib/escalationService.js";
+import FeatureSuggestionEngine from "../../../lib/featureSuggestionEngine.js";
+import User from "../../../models/User.js";
+import connectDB from "../../../lib/mongodb.js";
+import { getServerSession } from "next-auth/next";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const riskAnalyzer = new RiskAnalyzer();
+const suggestionEngine = new FeatureSuggestionEngine();
 
 export async function POST(req) {
   try {
+    const session = await getServerSession();
     const { messages, userId } = await req.json();
     const userMessage = messages[messages.length - 1]?.content || "";
+    
+    // Get user profile for personalized suggestions
+    let userProfile = {};
+    if (session?.user?.email) {
+      try {
+        await connectDB();
+        const user = await User.findOne({ email: session.user.email });
+        if (user) {
+          userProfile = {
+            name: user.name,
+            gender: user.gender,
+            language: user.language,
+            age: user.birthdate ? Math.floor((Date.now() - user.birthdate) / (365.25 * 24 * 60 * 60 * 1000)) : null
+          };
+        }
+      } catch (dbError) {
+        console.error('Failed to fetch user profile:', dbError);
+      }
+    }
 
     const systemPrompt = `
 You are a deeply empathetic AI mental health counselor who truly cares about each person.
@@ -25,10 +50,11 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
     const userInput = messages.map(m => `${m.role}: ${m.content}`).join("\n");
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // Multi-agent processing: Gemini + Risk Analyzer
-    const [geminiResult, riskAnalysis] = await Promise.all([
+    // Multi-agent processing: Gemini + Risk Analyzer + Feature Suggestions
+    const [geminiResult, riskAnalysis, featureSuggestions] = await Promise.all([
       model.generateContent(`${systemPrompt}\n${userInput}`),
-      riskAnalyzer.analyzeRisk(userMessage)
+      riskAnalyzer.analyzeRisk(userMessage),
+      suggestionEngine.processUserInput(userMessage, userProfile)
     ]);
     
     const reply = geminiResult.response.text();
@@ -110,6 +136,11 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
         level: riskAnalysis.risk_level,
         confidence: riskAnalysis.confidence,
         method: riskAnalysis.method
+      },
+      featureSuggestions: {
+        message: featureSuggestions.message,
+        suggestions: featureSuggestions.suggestions,
+        context: featureSuggestions.context
       }
     });
 

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Genie Manual Test</title>
+</head>
+<body>
+    <h1>🧞♂️ Genie Manual Test</h1>
+    
+    <button onclick="testAPI()">Test Gemini API</button>
+    <button onclick="testTTS()">Test TTS</button>
+    <button onclick="testSTT()">Test STT</button>
+    <button onclick="testFull()">Test Full Flow</button>
+    
+    <div id="results"></div>
+
+    <script>
+        const log = (msg) => {
+            console.log(msg);
+            document.getElementById('results').innerHTML += '<p>' + msg + '</p>';
+        };
+
+        // Test Gemini API
+        async function testAPI() {
+            log('🧪 Testing Gemini API...');
+            try {
+                const response = await fetch('/api/genie-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: 'Hello, are you working?' })
+                });
+                const data = await response.json();
+                log('✅ API Response: ' + JSON.stringify(data));
+            } catch (error) {
+                log('❌ API Error: ' + error.message);
+            }
+        }
+
+        // Test TTS
+        function testTTS() {
+            log('🔊 Testing TTS...');
+            const utterance = new SpeechSynthesisUtterance('Hey! I am Genie. How can I assist you?');
+            utterance.onstart = () => log('🔊 TTS Started');
+            utterance.onend = () => log('🔊 TTS Ended');
+            utterance.onerror = (e) => log('🔊 TTS Error: ' + e.error);
+            speechSynthesis.speak(utterance);
+        }
+
+        // Test STT
+        function testSTT() {
+            log('🎤 Testing STT...');
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    log('🎤 You said: ' + transcript);
+                };
+                recognition.onerror = (e) => log('🎤 STT Error: ' + e.error);
+                recognition.onstart = () => log('🎤 STT Started - Speak now!');
+                recognition.start();
+            } else {
+                log('❌ STT not supported');
+            }
+        }
+
+        // Test Full Flow
+        async function testFull() {
+            log('🧞♂️ Testing Full Flow...');
+            
+            // 1. Test API
+            const response = await fetch('/api/genie-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: 'Hello Genie' })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                log('✅ API works: ' + data.response);
+                
+                // 2. Test TTS
+                const utterance = new SpeechSynthesisUtterance(data.response);
+                utterance.onend = () => log('✅ Full flow completed!');
+                speechSynthesis.speak(utterance);
+            } else {
+                log('❌ API failed: ' + data.error);
+            }
+        }
+
+        log('🚀 Manual test page loaded. Click buttons to test each component.');
+    </script>
+</body>
+</html>

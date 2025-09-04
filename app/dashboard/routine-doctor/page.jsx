@@ -171,7 +171,7 @@ export default function RoutineDoctorPage() {
               disabled={!selectedOption || isSubmitting}
               className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
                 selectedOption && !isSubmitting
-                  ? "bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 shadow-lg hover:shadow-xl"
+                  ? "bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
             >

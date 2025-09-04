@@ -11,6 +11,8 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@headlessui/react": "^2.2.7",
+    "@picovoice/porcupine-web": "^3.0.3",
+    "@vapi-ai/web": "^2.3.10",
     "autoprefixer": "^10.4.21",
     "bcryptjs": "^3.0.2",
     "express": "^5.1.0",

@@ -4,7 +4,6 @@ import { useSession, signOut } from "next-auth/react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
 import DoctorFeedback from "@/components/DoctorFeedback";
 import RoutineDoctorPanel from "@/components/RoutineDoctorPanel";
-
 import DoctorNavbar from "@/components/DoctorNavbar";
 
 export default function DoctorPage() {
@@ -107,8 +106,8 @@ export default function DoctorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      {/* Enhanced Navbar */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Modern Navbar */}
       <DoctorNavbar 
         status={isOnline ? 'online' : 'offline'}
         doctorName={session.user.name}
@@ -116,29 +115,31 @@ export default function DoctorPage() {
         onLogout={handleLogout}
       />
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-              <span className="text-4xl">👩⚕️</span>
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl text-white">👩⚕️</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Dr. {session.user.name}</h1>
+                <p className="text-gray-600">Mental Health Professional</p>
+              </div>
             </div>
-            <h1 className="text-4xl font-bold mb-2">Welcome, Dr. {session.user.name}</h1>
-            <p className="text-xl text-emerald-100 mb-6">Your Mental Health Practice Dashboard</p>
-            <div className="flex items-center justify-center space-x-6">
+            <div className="flex items-center gap-6">
               <div className="text-center">
-                <p className="text-2xl font-bold">{stats.acceptedToday}</p>
-                <p className="text-emerald-100 text-sm">Patients Today</p>
+                <div className="text-2xl font-bold text-gray-900">{stats.acceptedToday}</div>
+                <div className="text-sm text-gray-500">Today</div>
               </div>
-              <div className="w-px h-12 bg-white/30"></div>
               <div className="text-center">
-                <p className="text-2xl font-bold">{stats.totalAccepted}</p>
-                <p className="text-emerald-100 text-sm">Total Helped</p>
+                <div className="text-2xl font-bold text-gray-900">{stats.totalAccepted}</div>
+                <div className="text-sm text-gray-500">Total</div>
               </div>
-              <div className="w-px h-12 bg-white/30"></div>
               <div className="text-center">
-                <p className="text-2xl font-bold">{stats.avgRating}⭐</p>
-                <p className="text-emerald-100 text-sm">Rating</p>
+                <div className="text-2xl font-bold text-gray-900">{stats.avgRating}⭐</div>
+                <div className="text-sm text-gray-500">Rating</div>
               </div>
             </div>
           </div>
@@ -146,197 +147,138 @@ export default function DoctorPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Quick Stats Cards */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Status Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-emerald-100 transform hover:scale-105 transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-emerald-600">Status</p>
-                <p className={`text-2xl font-bold ${isOnline ? 'text-green-600' : 'text-gray-600'}`}>
-                  {isOnline ? 'Available' : 'Offline'}
+                <p className="text-sm font-medium text-gray-600">Status</p>
+                <p className={`text-xl font-bold ${isOnline ? 'text-green-600' : 'text-gray-600'}`}>
+                  {isOnline ? 'Online' : 'Offline'}
                 </p>
               </div>
-              <div className={`p-3 rounded-full ${isOnline ? 'bg-green-100' : 'bg-gray-100'}`}>
-                <div className={`w-6 h-6 rounded-full ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Emergency Queue</p>
+                <p className="text-xl font-bold text-red-600">{stats.totalRequests}</p>
+              </div>
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <span className="text-red-600">🚨</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-blue-100 transform hover:scale-105 transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">Pending Requests</p>
-                <p className="text-2xl font-bold text-blue-800">{stats.totalRequests}</p>
+                <p className="text-sm font-medium text-gray-600">Active Sessions</p>
+                <p className="text-xl font-bold text-blue-600">{stats.activeChats}</p>
               </div>
-              <div className="p-3 rounded-full bg-blue-100">
-                <span className="text-2xl">📋</span>
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600">💬</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-purple-100 transform hover:scale-105 transition-all duration-300">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600">Active Sessions</p>
-                <p className="text-2xl font-bold text-purple-800">{stats.activeChats}</p>
+                <p className="text-sm font-medium text-gray-600">Hours Today</p>
+                <p className="text-xl font-bold text-purple-600">{stats.hoursToday}h</p>
               </div>
-              <div className="p-3 rounded-full bg-purple-100">
-                <span className="text-2xl">💬</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-xl border border-orange-100 transform hover:scale-105 transition-all duration-300">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-orange-600">Hours Today</p>
-                <p className="text-2xl font-bold text-orange-800">{stats.hoursToday}h</p>
-              </div>
-              <div className="p-3 rounded-full bg-orange-100">
-                <span className="text-2xl">⏰</span>
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span className="text-purple-600">⏰</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Dashboard Grid */}
-        <div className="space-y-8">
+        {/* Request Panels */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
           {/* Emergency Requests */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-red-100">
-            <div className="p-6 border-b border-red-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-semibold text-red-800 flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-red-100 to-pink-100 rounded-full">
-                      <span className="text-red-500 text-xl">🚨</span>
-                    </div>
-                    Emergency Requests
-                  </h3>
-                  <p className="text-sm text-red-600 mt-2">High priority mental health emergencies</p>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                  <span className="text-red-600 text-lg">🚨</span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm text-red-600">Priority Queue</p>
-                  <p className="text-lg font-semibold text-red-800">{stats.totalRequests} waiting</p>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Emergency Requests</h3>
+                  <p className="text-sm text-gray-600">High priority mental health cases</p>
                 </div>
               </div>
             </div>
             <DoctorEscalationPanel inline={true} />
           </div>
 
-          {/* Routine Doctor Requests */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100">
-            <div className="p-6 border-b border-orange-100">
-              <div className="flex items-center justify-between">
+          {/* Routine Consultations */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                  <span className="text-orange-600 text-lg">🩺</span>
+                </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-orange-800 flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-r from-orange-100 to-red-100 rounded-full">
-                      <span className="text-orange-500 text-xl">🩺</span>
-                    </div>
-                    Routine Consultations
-                  </h3>
-                  <p className="text-sm text-orange-600 mt-2">General healthcare consultation requests</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Routine Consultations</h3>
+                  <p className="text-sm text-gray-600">General healthcare requests</p>
                 </div>
               </div>
             </div>
             <RoutineDoctorPanel doctorId={session?.user?.id} doctorName={session?.user?.name} inline={true} />
           </div>
-
-          {/* Patient Feedback */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-yellow-100">
-            <div className="p-6 border-b border-yellow-100">
-              <h3 className="text-xl font-semibold text-yellow-800 flex items-center gap-3">
-                <div className="p-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-full">
-                  <span className="text-yellow-500 text-xl">⭐</span>
-                </div>
-                Patient Feedback
-              </h3>
-              <p className="text-sm text-yellow-600 mt-2">Your session ratings</p>
-            </div>
-            <DoctorFeedback doctorId={session?.user?.id} />
-          </div>
         </div>
 
-        {/* Performance Analytics */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gradient-to-br from-emerald-400 to-teal-500 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all duration-300">
+        {/* Patient Feedback */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <span className="text-yellow-600 text-lg">⭐</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Patient Feedback</h3>
+                <p className="text-sm text-gray-600">Recent session ratings and reviews</p>
+              </div>
+            </div>
+          </div>
+          <DoctorFeedback doctorId={session?.user?.id} />
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-xl text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-emerald-100 text-sm font-medium">Total Accepted</p>
+                <p className="text-blue-100 text-sm font-medium">Total Patients Helped</p>
                 <p className="text-3xl font-bold">{stats.totalAccepted}</p>
-                <p className="text-emerald-100 text-xs mt-1">All time record</p>
               </div>
-              <div className="text-4xl opacity-80">🏆</div>
+              <div className="text-3xl opacity-80">🏆</div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-400 to-indigo-500 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all duration-300">
+          <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-xl text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm font-medium">Patient Rating</p>
+                <p className="text-green-100 text-sm font-medium">Average Rating</p>
                 <p className="text-3xl font-bold">{stats.avgRating}⭐</p>
-                <p className="text-blue-100 text-xs mt-1">Excellent feedback</p>
               </div>
-              <div className="text-4xl opacity-80">🌟</div>
+              <div className="text-3xl opacity-80">🌟</div>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-purple-400 to-pink-500 p-6 rounded-2xl shadow-xl text-white transform hover:scale-105 transition-all duration-300">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-xl text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-purple-100 text-sm font-medium">Impact Score</p>
+                <p className="text-purple-100 text-sm font-medium">Success Rate</p>
                 <p className="text-3xl font-bold">94%</p>
-                <p className="text-purple-100 text-xs mt-1">Success rate</p>
               </div>
-              <div className="text-4xl opacity-80">💝</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Professional Guidelines */}
-        <div className="mt-8 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl p-8 shadow-lg">
-          <div className="flex items-start space-x-4">
-            <div className="p-3 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full shadow-lg">
-              <span className="text-white text-2xl">👩⚕️</span>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold text-emerald-800 mb-4">Professional Workflow</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">1</div>
-                    <p className="text-emerald-700 text-sm">Toggle status to "Available" to receive requests</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-teal-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">2</div>
-                    <p className="text-emerald-700 text-sm">Emergency requests appear first - click "Accept & Help"</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-cyan-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">3</div>
-                    <p className="text-emerald-700 text-sm">Patient selects communication method (chat/video)</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">4</div>
-                    <p className="text-emerald-700 text-sm">Connection requests appear for final acceptance</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">5</div>
-                    <p className="text-emerald-700 text-sm">Both parties redirected to secure session room</p>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-pink-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">6</div>
-                    <p className="text-emerald-700 text-sm">Provide compassionate mental health support</p>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 p-4 bg-white/70 rounded-xl border border-emerald-200">
-                <p className="text-emerald-800 text-sm font-medium flex items-center">
-                  <span className="mr-2">🔒</span>
-                  All sessions are end-to-end encrypted and HIPAA compliant for patient privacy
-                </p>
-              </div>
+              <div className="text-3xl opacity-80">💝</div>
             </div>
           </div>
         </div>

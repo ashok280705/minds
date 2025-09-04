@@ -16,31 +16,36 @@ export const authOptions = {
         isDoctor: { label: "Doctor Login", type: "text" },
       },
       async authorize(credentials) {
-        await dbConnect();
-        let account;
+        try {
+          await dbConnect();
+          let account;
 
-        if (credentials.isDoctor === "true") {
-          account = await Doctor.findOne({ email: credentials.email });
-        } else {
-          account = await User.findOne({ email: credentials.email });
+          if (credentials.isDoctor === "true") {
+            account = await Doctor.findOne({ email: credentials.email });
+          } else {
+            account = await User.findOne({ email: credentials.email });
+          }
+
+          if (!account) throw new Error("No account found");
+          if (!account.password) throw new Error("Password is required");
+          if (!credentials.password) throw new Error("Password is required");
+
+          const isValid = await bcrypt.compare(
+            credentials.password,
+            account.password
+          );
+          if (!isValid) throw new Error("Invalid password");
+
+          return {
+            id: account._id.toString(),
+            name: account.name,
+            email: account.email,
+            isDoctor: credentials.isDoctor === "true",
+          };
+        } catch (error) {
+          console.error('Auth error:', error);
+          return null;
         }
-
-        if (!account) throw new Error("No account found");
-        if (!account.password) throw new Error("Password is required");
-        if (!credentials.password) throw new Error("Password is required");
-
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          account.password
-        );
-        if (!isValid) throw new Error("Invalid password");
-
-        return {
-          id: account._id.toString(),
-          name: account.name,
-          email: account.email,
-          isDoctor: credentials.isDoctor === "true",
-        };
       },
     }),
 
@@ -55,19 +60,24 @@ export const authOptions = {
 
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account.provider === "google") {
-        await dbConnect();
-        const existingUser = await User.findOne({ email: user.email });
+      try {
+        if (account?.provider === "google") {
+          await dbConnect();
+          const existingUser = await User.findOne({ email: user.email });
 
-        if (!existingUser) {
-          await User.create({
-            name: user.name,
-            email: user.email,
-            googleId: profile.sub, // Save Google ID!
-          });
+          if (!existingUser) {
+            await User.create({
+              name: user.name,
+              email: user.email,
+              googleId: profile?.sub,
+            });
+          }
         }
+        return true;
+      } catch (error) {
+        console.error('SignIn error:', error);
+        return true; // Allow sign in even if DB fails
       }
-      return true;
     },
 
     async session({ session, token }) {
@@ -94,8 +104,20 @@ export const authOptions = {
     error: "/auth/login",
   },
 
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  
   debug: process.env.NODE_ENV === "development",
   secret: process.env.NEXTAUTH_SECRET,
+  
+  // Add error handling
+  events: {
+    async error(message) {
+      console.error('NextAuth error:', message);
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

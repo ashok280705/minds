@@ -7,6 +7,7 @@ import ModernNavbar from "@/components/ModernNavbar";
 import Footer from "@/components/Footer";
 import PeriodNotifications from "@/components/PeriodNotifications";
 import Sidebar from "@/components/ModernSidebar";
+import VapiGenie from "@/components/VapiGenie";
 export default function LayoutWrapper({ children }) {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -77,6 +78,70 @@ export default function LayoutWrapper({ children }) {
       
       {/* Period Notifications for Female Users */}
       {!hideLayout && userGender === "female" && <PeriodNotifications />}
+      
+      {/* Hey Genie Voice Assistant */}
+      {!hideLayout && <VapiGenie />}
+      
+      {/* Genie Test Script */}
+      {!hideLayout && (
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Console test functions for Genie
+              window.testGenieAPI = async (query = "Hello, how are you?") => {
+                console.log('🧪 Testing Gemini API...');
+                try {
+                  const response = await fetch('/api/genie-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: query })
+                  });
+                  const data = await response.json();
+                  console.log('✅ API Response:', data);
+                  return data;
+                } catch (error) {
+                  console.error('❌ API Error:', error);
+                }
+              };
+              
+              window.testTTS = (text = "Hey! I am Genie. How can I assist you?") => {
+                console.log('🔊 Testing TTS...');
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.onstart = () => console.log('🔊 TTS Started');
+                utterance.onend = () => console.log('🔊 TTS Ended');
+                speechSynthesis.speak(utterance);
+              };
+              
+              console.log('🧞♂️ Genie test functions loaded!');
+              console.log('Try: testGenieAPI("your question") or testTTS("hello")');
+              
+              // Gemini direct test
+              window.testGeminiDirect = async (prompt = "Hello, how are you?") => {
+                console.log('🧪 Testing Gemini:', prompt);
+                try {
+                  const response = await fetch('/api/genie-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: prompt })
+                  });
+                  const data = await response.json();
+                  console.log('📊 Gemini Response:', data);
+                  if (data.success) {
+                    const utterance = new SpeechSynthesisUtterance(data.response);
+                    speechSynthesis.speak(utterance);
+                  }
+                  return data;
+                } catch (error) {
+                  console.error('❌ Gemini Error:', error);
+                }
+              };
+              
+              // Auto-test Gemini
+              setTimeout(() => testGeminiDirect('Hello Genie, test response'), 3000);
+            `
+          }}
+        />
+      )}
     </div>
   );
 }

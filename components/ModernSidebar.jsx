@@ -139,12 +139,7 @@ export default function ModernSidebar() {
       icon: MapPin,
       description: "Hospitals & Pharmacies"
     },
-    { 
-      href: "/dashboard/symptom-checker", 
-      label: "Symptom Checker", 
-      icon: Thermometer,
-      description: "AI Health Assessment"
-    },
+
     { 
       href: "/dashboard/appointment-scheduler", 
       label: "Appointments", 

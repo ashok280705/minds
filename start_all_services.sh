@@ -105,6 +105,21 @@ RISK_ANALYZER_PID=$!
 cd ..
 echo "✅ Risk Analyzer started (PID: $RISK_ANALYZER_PID) - Port 5001"
 
+# Start Scans Analyzer in background
+echo "🔬 Starting Medical Scans Analyzer with AI Models..."
+cd scans-analyzer
+python3 -m venv venv 2>/dev/null || true
+source venv/bin/activate
+echo "  📦 Installing dependencies..."
+pip install -r requirements.txt > ../logs/scans-setup.log 2>&1
+echo "  🤖 Loading AI models (this may take a moment)..."
+python app.py > ../logs/scans-analyzer.log 2>&1 &
+SCANS_ANALYZER_PID=$!
+cd ..
+echo "✅ Scans Analyzer started (PID: $SCANS_ANALYZER_PID) - Port 5003"
+echo "  📊 AI Models: Chest X-Ray, Skin Lesion, Brain MRI + Advanced CV"
+echo "  🔍 Supported: MRI, X-Ray, Chest, Kidney, Heart, Skin, Liver"
+
 # Wait for risk analyzer to start
 sleep 3
 
@@ -143,6 +158,7 @@ echo ""
 echo "🌍 Access Points:"
 echo "   • Main Application: http://localhost:3000"
 echo "   • Risk Analyzer API: http://localhost:5001"
+echo "   • Scans Analyzer API: http://localhost:5003"
 echo "   • Health Check: http://localhost:5001/health"
 echo ""
 echo "🎉 All services are starting..."
@@ -164,9 +180,16 @@ cleanup() {
         echo "✅ Risk Analyzer stopped"
     fi
     
+    # Kill scans analyzer
+    if [ ! -z "$SCANS_ANALYZER_PID" ]; then
+        kill $SCANS_ANALYZER_PID 2>/dev/null
+        echo "✅ Scans Analyzer stopped"
+    fi
+    
     # Kill any remaining processes on our ports
     kill_port 3000
     kill_port 5001
+    kill_port 5003
     kill_port 3001
     
     # Clean up log files

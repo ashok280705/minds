@@ -67,13 +67,9 @@ export default function ModernSidebar() {
     },
     { 
       href: "/dashboard/mental-counselor", 
-      label: "AI Counselor", 
+      label: "Mental Health Counsellor", 
       icon: Brain,
-      description: "Chat with AI Assistant",
-      dropdown: [
-        { href: "/dashboard/mental-counselor", label: "Start Chat" },
-        { href: "/dashboard/mental-counselor/chat-history", label: "Chat History" }
-      ]
+      description: "Chat with AI Assistant"
     },
 
     { 
@@ -88,6 +84,12 @@ export default function ModernSidebar() {
       label: "Reports Analyzer", 
       icon: FileText,
       description: "Medical Report Analysis"
+    },
+    { 
+      href: "/personal-documents", 
+      label: "Personal Documents", 
+      icon: FileUser,
+      description: "Manage Your Documents"
     },
     { 
       href: "/dashboard/pharmacy", 
@@ -106,38 +108,22 @@ export default function ModernSidebar() {
       description: "Scan & Analyze Prescriptions"
     },
     { 
-      href: "/personal-documents", 
-      label: "Personal Documents", 
-      icon: FileUser,
-      description: "Secure Medical Records"
-    },
-    { 
       href: "/dashboard/emergency-sos", 
       label: "Emergency SOS", 
       icon: AlertTriangle,
       description: "Accident & Crisis Support"
     },
     { 
-      href: "/dashboard/health-monitor", 
-      label: "Health Monitor", 
-      icon: Stethoscope,
-      description: "Vital Signs & Symptoms"
-    },
-    { 
-      href: "/dashboard/telemedicine", 
-      label: "Telemedicine", 
+      href: "/dashboard/routine-doctor", 
+      label: "Routine Doctor", 
       icon: Phone,
-      description: "Virtual Doctor Consultations",
-      dropdown: [
-        { href: "/dashboard/mental-counselor", label: "Mental Health" },
-        { href: "/dashboard/routine-doctor", label: "Routine Doctor" }
-      ]
+      description: "Virtual Doctor Consultations"
     },
     { 
       href: "/dashboard/nearby-services", 
       label: "Nearby Services", 
       icon: MapPin,
-      description: "Hospitals & Pharmacies"
+      description: "Hospitals & Ambulance"
     },
 
     { 
@@ -145,12 +131,6 @@ export default function ModernSidebar() {
       label: "Appointments", 
       icon: Clock,
       description: "Schedule & Manage Visits"
-    },
-    { 
-      href: "/dashboard/personal-doctor", 
-      label: "Personal Doctor", 
-      icon: UserCheck,
-      description: "Your Assigned Physician"
     },
     { 
       href: "/dashboard/scans-analyzer", 
@@ -175,21 +155,18 @@ export default function ModernSidebar() {
       label: "Profile", 
       icon: User,
       description: "Account Settings"
-    },
-    { 
-      href: "/settings", 
-      label: "Settings", 
-      icon: Settings,
-      description: "App Preferences"
     }
   ];
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: "/" });
+  const handleSignOut = async () => {
+    await signOut({ 
+      callbackUrl: "/",
+      redirect: true 
+    });
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-80'} min-h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col relative`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col relative`}>
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}

@@ -59,6 +59,18 @@ export const authOptions = {
   ],
 
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // If logging out, redirect to home
+      if (url.includes('signout') || url === baseUrl || url === '/') {
+        return baseUrl;
+      }
+      // If signing in, redirect to dashboard
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+      return `${baseUrl}/dashboard`;
+    },
+
     async signIn({ user, account, profile }) {
       try {
         if (account?.provider === "google") {
@@ -76,14 +88,20 @@ export const authOptions = {
         return true;
       } catch (error) {
         console.error('SignIn error:', error);
-        return true; // Allow sign in even if DB fails
+        return true;
       }
     },
 
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.isDoctor = token.isDoctor || false;
-      session.user.googleId = token.googleId || null; // ✅ Add Google ID!
+      session.user.googleId = token.googleId || null;
+      
+      // Redirect doctors to doctor dashboard
+      if (token.isDoctor && typeof window !== 'undefined') {
+        window.location.href = '/doctor';
+      }
+      
       return session;
     },
 
@@ -92,7 +110,7 @@ export const authOptions = {
         token.id = user.id || token.id;
         token.isDoctor = user.isDoctor || false;
         if (profile?.sub) {
-          token.googleId = profile.sub; // ✅ Save Google ID!
+          token.googleId = profile.sub;
         }
       }
       return token;
@@ -106,7 +124,7 @@ export const authOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   
   debug: process.env.NODE_ENV === "development",

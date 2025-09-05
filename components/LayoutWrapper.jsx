@@ -61,7 +61,7 @@ export default function LayoutWrapper({ children }) {
       <div className="flex flex-1">
         {/* Sidebar */}
         {showSidebar && (
-          <div className="w-64 flex-shrink-0">
+          <div className="flex-shrink-0">
             <Sidebar />
           </div>
         )}

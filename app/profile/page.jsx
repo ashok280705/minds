@@ -35,7 +35,7 @@ export default function ProfilePage() {
   if (status === "loading") return;
 
   if (!session?.user) {
-    router.push("/login");
+    router.push("/auth/login");
   } else {
     (async () => {
       try {

@@ -22,8 +22,11 @@ export default function ModernNavbar() {
   const [showProfile, setShowProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    signOut({ callbackUrl: "/auth/login" });
+  const handleLogout = async () => {
+    await signOut({ 
+      callbackUrl: "/",
+      redirect: true 
+    });
   };
 
   return (

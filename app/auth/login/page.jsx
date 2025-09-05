@@ -68,8 +68,10 @@ export default function LoginPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, status: "online" }),
           });
+          router.push("/doctor");
+        } else {
+          router.push("/dashboard");
         }
-        router.push(isDoctor ? "/doctor" : "/dashboard");
       }
     } catch (err) {
       console.error(err);

@@ -6,6 +6,11 @@ const ChatHistorySchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  userEmail: {
+    type: String,
+    required: true,
+    index: true
+  },
   messages: [{
     role: {
       type: String,

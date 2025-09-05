@@ -200,7 +200,7 @@ export default function ModernChatInterface({ onSessionSave }) {
   }, [session?.user?.id]);
 
   const saveChatSession = async (messages) => {
-    if (!session?.user?.id || messages.length < 2) return;
+    if (!session?.user?.email || messages.length < 2) return;
     
     try {
       await fetch('/api/chat-history', {
@@ -208,6 +208,7 @@ export default function ModernChatInterface({ onSessionSave }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: session.user.id,
+          userEmail: session.user.email,
           messages: messages.map(msg => ({
             ...msg,
             timestamp: new Date()

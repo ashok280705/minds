@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Auth Flow</title>
+</head>
+<body>
+    <h1>Test Personal Documents Auth Flow</h1>
+    
+    <div>
+        <h2>Step 1: Login</h2>
+        <button onclick="testLogin()">Login as test@example.com</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>Step 2: Upload Document</h2>
+        <button onclick="testUpload()">Upload Test Document</button>
+        <div id="uploadResult"></div>
+    </div>
+    
+    <div>
+        <h2>Step 3: Get Documents</h2>
+        <button onclick="testGetDocs()">Get Documents</button>
+        <div id="docsResult"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+        
+        async function testLogin() {
+            console.log('🔑 Testing login...');
+            
+            try {
+                const response = await fetch('/api/documents/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const text = await response.text();
+                console.log('Login response:', text);
+                
+                if (text) {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        authToken = data.token;
+                        localStorage.setItem('docToken', authToken);
+                        document.getElementById('loginResult').innerHTML = '✅ Login successful';
+                        console.log('Token stored:', authToken.substring(0, 20) + '...');
+                    } else {
+                        document.getElementById('loginResult').innerHTML = '❌ Login failed: ' + data.error;
+                    }
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('loginResult').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        async function testUpload() {
+            const token = authToken || localStorage.getItem('docToken');
+            console.log('📤 Testing upload with token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
+            
+            if (!token) {
+                document.getElementById('uploadResult').innerHTML = '❌ No token - login first';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/documents/files', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        fileName: 'test-document.pdf',
+                        fileType: 'application/pdf',
+                        fileSize: 2048
+                    })
+                });
+                
+                console.log('Upload response status:', response.status);
+                const text = await response.text();
+                console.log('Upload response:', text);
+                
+                if (response.ok && text) {
+                    const data = JSON.parse(text);
+                    document.getElementById('uploadResult').innerHTML = '✅ Upload successful: ' + data.document.fileName;
+                } else {
+                    document.getElementById('uploadResult').innerHTML = '❌ Upload failed: ' + response.status + ' - ' + text;
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                document.getElementById('uploadResult').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        async function testGetDocs() {
+            const token = authToken || localStorage.getItem('docToken');
+            console.log('📋 Testing get docs with token:', token ? token.substring(0, 20) + '...' : 'NO TOKEN');
+            
+            if (!token) {
+                document.getElementById('docsResult').innerHTML = '❌ No token - login first';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/documents/files', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                console.log('Get docs response status:', response.status);
+                const text = await response.text();
+                console.log('Get docs response:', text);
+                
+                if (response.ok && text) {
+                    const data = JSON.parse(text);
+                    document.getElementById('docsResult').innerHTML = `✅ Found ${data.documents.length} documents`;
+                } else {
+                    document.getElementById('docsResult').innerHTML = '❌ Get docs failed: ' + response.status + ' - ' + text;
+                }
+            } catch (error) {
+                console.error('Get docs error:', error);
+                document.getElementById('docsResult').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

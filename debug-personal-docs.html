@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Personal Docs</title>
+</head>
+<body>
+    <h1>Debug Personal Documents API</h1>
+    
+    <div>
+        <h2>Test Registration</h2>
+        <button onclick="testRegister()">Test Register</button>
+        <div id="registerResult"></div>
+    </div>
+    
+    <div>
+        <h2>Test Login</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <script>
+        async function testRegister() {
+            console.log('🧪 Testing Registration...');
+            
+            try {
+                const response = await fetch('/api/documents/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Debug User',
+                        email: 'debug@test.com',
+                        password: 'debug123',
+                        phone: '1234567890'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                const text = await response.text();
+                console.log('Raw response:', text);
+                
+                if (text) {
+                    const data = JSON.parse(text);
+                    console.log('📝 Register Response:', data);
+                    document.getElementById('registerResult').innerHTML = JSON.stringify(data, null, 2);
+                } else {
+                    console.log('Empty response');
+                    document.getElementById('registerResult').innerHTML = 'Empty response from server';
+                }
+            } catch (error) {
+                console.error('❌ Register Error:', error);
+                document.getElementById('registerResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        async function testLogin() {
+            console.log('🧪 Testing Login...');
+            
+            try {
+                const response = await fetch('/api/documents/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'debug@test.com',
+                        password: 'debug123'
+                    })
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                const text = await response.text();
+                console.log('Raw response:', text);
+                
+                if (text) {
+                    const data = JSON.parse(text);
+                    console.log('🔑 Login Response:', data);
+                    document.getElementById('loginResult').innerHTML = JSON.stringify(data, null, 2);
+                } else {
+                    console.log('Empty response');
+                    document.getElementById('loginResult').innerHTML = 'Empty response from server';
+                }
+            } catch (error) {
+                console.error('❌ Login Error:', error);
+                document.getElementById('loginResult').innerHTML = 'Error: ' + error.message;
+            }
+        }
+        
+        // Test existing user
+        async function testExistingLogin() {
+            console.log('🧪 Testing Existing User Login...');
+            
+            try {
+                const response = await fetch('/api/documents/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'darshan@gmail.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('🔑 Existing Login Response:', data);
+            } catch (error) {
+                console.error('❌ Existing Login Error:', error);
+            }
+        }
+        
+        // Auto test on load
+        setTimeout(() => {
+            console.log('🚀 Auto-testing existing user...');
+            testExistingLogin();
+        }, 1000);
+    </script>
+</body>
+</html>

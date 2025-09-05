@@ -48,14 +48,24 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
 `;
 
     const userInput = messages.map(m => `${m.role}: ${m.content}`).join("\n");
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Multi-agent processing: Gemini + Risk Analyzer + Feature Suggestions
-    const [geminiResult, riskAnalysis, featureSuggestions] = await Promise.all([
-      model.generateContent(`${systemPrompt}\n${userInput}`),
-      riskAnalyzer.analyzeRisk(userMessage),
-      suggestionEngine.processUserInput(userMessage, userProfile)
-    ]);
+    // Simplified processing: Only Gemini (no heavy ML models)
+    const geminiResult = await model.generateContent(`${systemPrompt}\n${userInput}`);
+    
+    // Mock lightweight risk analysis
+    const riskAnalysis = {
+      risk_level: userMessage.toLowerCase().includes('suicide') || userMessage.toLowerCase().includes('kill myself') ? 'Suicidal' : 'Low',
+      confidence: 0.8,
+      method: 'keyword-based'
+    };
+    
+    // Mock feature suggestions
+    const featureSuggestions = {
+      message: 'Try our platform features for support',
+      suggestions: [{ name: 'AI Counselor', route: '/dashboard/mental-counselor' }],
+      context: 'mental-health'
+    };
     
     const reply = geminiResult.response.text();
     const textLower = reply.toLowerCase();
@@ -90,14 +100,34 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
       "heart racing", "terrified", "scared of myself"
     ];
 
-    // Use BioClinicalBERT risk analysis for escalation decision
+    // Check both user message and AI reply for crisis indicators
+    const userMessageLower = userMessage.toLowerCase();
     const escalate = riskAnalysis.risk_level === "Suicidal" || 
-                    crisisKeywords.some(kw => textLower.includes(kw));
+                    crisisKeywords.some(kw => userMessageLower.includes(kw)) ||
+                    crisisKeywords.some(kw => textLower.includes(kw)) ||
+                    userMessageLower.includes('die') ||
+                    userMessageLower.includes('suicide') ||
+                    userMessageLower.includes('kill myself');
     
     // Trigger escalation if high risk detected
-    if (escalate && userId) {
+    if (escalate) {
       try {
-        await escalationService.triggerEscalation(userId, riskAnalysis, userMessage);
+        const escalationData = {
+          userId: userId || session?.user?.id || 'anonymous',
+          symptoms: userMessage,
+          severity: 'critical',
+          riskLevel: 'high',
+          timestamp: new Date().toISOString()
+        };
+        
+        // Send to escalation API
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/escalate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(escalationData)
+        });
+        
+        console.log('🚨 CRISIS ESCALATION TRIGGERED:', escalationData);
       } catch (escalationError) {
         console.error('Escalation trigger failed:', escalationError);
       }

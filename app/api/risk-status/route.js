@@ -1,23 +1,34 @@
-import { NextResponse } from "next/server";
-import RiskAnalyzer from "../../../lib/riskAnalyzer.js";
+import { NextResponse } from 'next/server';
 
-const riskAnalyzer = new RiskAnalyzer();
-
-export async function GET() {
+export async function POST(request) {
   try {
-    const isHealthy = await riskAnalyzer.checkHealth();
+    const { symptoms, severity, duration } = await request.json();
+    
+    // Simple risk analysis logic
+    let riskLevel = 'low';
+    let requiresDoctor = false;
+    
+    const highRiskSymptoms = ['chest pain', 'difficulty breathing', 'severe headache', 'high fever', 'blood'];
+    const mediumRiskSymptoms = ['persistent cough', 'fatigue', 'nausea', 'dizziness'];
+    
+    const symptomsLower = symptoms.toLowerCase();
+    
+    if (highRiskSymptoms.some(symptom => symptomsLower.includes(symptom)) || severity === 'severe') {
+      riskLevel = 'high';
+      requiresDoctor = true;
+    } else if (mediumRiskSymptoms.some(symptom => symptomsLower.includes(symptom)) || severity === 'moderate') {
+      riskLevel = 'medium';
+      requiresDoctor = duration > 7;
+    }
     
     return NextResponse.json({
-      status: isHealthy ? "healthy" : "unavailable",
-      service: "Risk Analyzer",
-      timestamp: new Date().toISOString()
+      riskLevel,
+      requiresDoctor,
+      recommendation: requiresDoctor 
+        ? 'Please consult with a doctor immediately' 
+        : 'Monitor symptoms and rest'
     });
   } catch (error) {
-    return NextResponse.json({
-      status: "error",
-      service: "Risk Analyzer", 
-      error: error.message,
-      timestamp: new Date().toISOString()
-    }, { status: 500 });
+    return NextResponse.json({ error: 'Risk analysis failed' }, { status: 500 });
   }
 }

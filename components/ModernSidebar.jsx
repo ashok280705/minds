@@ -96,7 +96,7 @@ export default function ModernSidebar() {
       description: "Medicine & Prescriptions",
       dropdown: [
         { href: "/dashboard/pharmacy/online", label: "Online Pharmacy" },
-        { href: "/dashboard/pharmacy/physical", label: "Physical Pharmacy" }
+        { href: "/dashboard/pharmacy/physical", label: "Nearby Pharmacies" }
       ]
     },
     { 
@@ -106,10 +106,10 @@ export default function ModernSidebar() {
       description: "Scan & Analyze Prescriptions"
     },
     { 
-      href: "/dashboard/personal-docs", 
+      href: "/personal-documents", 
       label: "Personal Documents", 
       icon: FileUser,
-      description: "Medical Records & History"
+      description: "Secure Medical Records"
     },
     { 
       href: "/dashboard/emergency-sos", 

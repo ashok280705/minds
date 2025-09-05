@@ -157,7 +157,11 @@ export default function VapiGenie() {
           setIsConnected(false);
           setStatus('waiting');
           // Restart wake word detection
-          setTimeout(startBrowserWakeWord, 1000);
+          setTimeout(() => {
+            if (!isConnected) {
+              startBrowserWakeWord();
+            }
+          }, 1000);
         });
         
         vapiRef.current.on('speech-start', () => {
@@ -177,13 +181,21 @@ export default function VapiGenie() {
         });
         
         vapiRef.current.on('error', (error) => {
-          if (error.message && error.message.includes('Meeting has ended')) {
-            console.log('📞 Call ended normally');
+          console.log('📞 Vapi event (handling gracefully):', error?.message || 'Unknown');
+          if (error?.message?.includes('Meeting has ended') || error?.message?.includes('Call ended')) {
+            // Normal call end - not an error
             setIsConnected(false);
             setStatus('waiting');
-            setTimeout(startWakeWordDetection, 1000);
+            setTimeout(() => {
+              if (!isConnected) {
+                startBrowserWakeWord();
+              }
+            }, 1000);
           } else {
-            console.error('❌ Vapi error:', error);
+            console.error('❌ Actual Vapi error:', error);
+            setIsConnected(false);
+            setStatus('waiting');
+            setTimeout(() => startBrowserWakeWord(), 2000);
           }
         });
       }
@@ -227,12 +239,12 @@ export default function VapiGenie() {
     if (vapiRef.current && isConnected) {
       try {
         vapiRef.current.stop();
-        setIsConnected(false);
-        setStatus('inactive');
       } catch (error) {
-        console.log('Stop call error (ignoring):', error.message);
+        console.log('Stop call (expected):', error?.message || 'Call ended');
+      } finally {
         setIsConnected(false);
-        setStatus('inactive');
+        setStatus('waiting');
+        setTimeout(() => startBrowserWakeWord(), 1000);
       }
     }
   };

@@ -48,7 +48,7 @@ export default function LayoutWrapper({ children }) {
     pathname.startsWith("/video-room") ||
     pathname.startsWith("/doctor");
 
-  const showSidebar = !hideLayout && session?.user;
+  const showSidebar = !hideLayout;
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">
@@ -60,10 +60,14 @@ export default function LayoutWrapper({ children }) {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        {showSidebar && <Sidebar />}
+        {showSidebar && (
+          <div className="w-64 flex-shrink-0">
+            <Sidebar />
+          </div>
+        )}
         
         {/* Main Content */}
-        <main className={`flex-1 ${showSidebar ? 'ml-0' : 'w-full'} min-h-screen bg-gradient-to-br from-slate-50 to-blue-50`}>
+        <main className={`flex-1 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50`}>
           <div className="p-6">
             {children}
           </div>

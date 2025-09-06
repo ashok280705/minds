@@ -16,13 +16,55 @@ export default function OnlinePharmacy() {
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderHistory, setOrderHistory] = useState([]);
   const [showOrderHistory, setShowOrderHistory] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
 
   const categories = ['all', 'tablets', 'capsules', 'syrup', 'injection', 'ointment'];
 
   useEffect(() => {
     fetchProducts();
     fetchOrderHistory();
+    getCurrentLocation();
   }, []);
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const coords = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setLocation(coords);
+          getAddressFromCoords(coords);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setDeliveryAddress('Location access denied. Please enter address manually.');
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    }
+  };
+
+  const getAddressFromCoords = async (coords) => {
+    try {
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=AIzaSyCftzu45fiNKClUtg3I0LTmn1JHLMd_5wQ`);
+      const data = await response.json();
+      if (data.results && data.results[0]) {
+        setDeliveryAddress(data.results[0].formatted_address);
+      } else {
+        setDeliveryAddress(`Lat: ${coords.lat.toFixed(6)}, Lng: ${coords.lng.toFixed(6)}`);
+      }
+    } catch (error) {
+      console.error('Error getting address:', error);
+      setDeliveryAddress(`Lat: ${coords.lat.toFixed(6)}, Lng: ${coords.lng.toFixed(6)}`);
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -113,7 +155,9 @@ export default function OnlinePharmacy() {
       const orderData = {
         items: cart,
         total: getTotalCartPrice(),
-        orderDate: new Date().toISOString()
+        orderDate: new Date().toISOString(),
+        deliveryAddress: deliveryAddress,
+        location: location
       };
       
       const response = await fetch('/api/pharmacy/orders', {
@@ -308,6 +352,22 @@ export default function OnlinePharmacy() {
                     ))}
                   </div>
                   <div className="border-t pt-4 mb-4">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-black mb-2">Delivery Address:</label>
+                      <textarea
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        className="w-full p-2 border-2 border-black rounded-lg text-black text-sm"
+                        rows="3"
+                        placeholder="Enter your delivery address"
+                      />
+                      <button
+                        onClick={getCurrentLocation}
+                        className="mt-2 text-sm bg-blue-100 text-blue-800 px-3 py-1 rounded-lg border border-blue-300 hover:bg-blue-200"
+                      >
+                        📍 Use Current Location
+                      </button>
+                    </div>
                     <div className="flex justify-between font-semibold text-lg text-black">
                       <span>Total: ₹{getTotalCartPrice()}</span>
                     </div>

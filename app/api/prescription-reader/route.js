@@ -1,42 +1,70 @@
 import { NextResponse } from "next/server";
 
-export async function POST(req) {
+export async function POST(request) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file');
-    
-    if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    const formData = await request.formData();
+    const image = formData.get('image');
+
+    if (!image) {
+      return NextResponse.json({
+        success: false,
+        error: "No image provided"
+      }, { status: 400 });
     }
 
     // Forward to prescription reader service
-    const prescriptionFormData = new FormData();
-    prescriptionFormData.append('file', file);
+    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5003';
+    
+    const serviceFormData = new FormData();
+    serviceFormData.append('image', image);
 
-    const response = await fetch('http://localhost:5002/analyze', {
+    const response = await fetch(`${prescriptionServiceUrl}/analyze-prescription`, {
       method: 'POST',
-      body: prescriptionFormData
+      body: serviceFormData
     });
 
-    const data = await response.json();
-    
     if (!response.ok) {
-      return NextResponse.json({ error: data.error || "Analysis failed" }, { status: response.status });
+      throw new Error(`Prescription service error: ${response.status}`);
     }
 
-    return NextResponse.json(data);
+    const result = await response.json();
+    
+    return NextResponse.json({
+      success: true,
+      ...result
+    });
+
   } catch (error) {
     console.error('Prescription reader error:', error);
-    return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
+    
+    // Fallback analysis if service is down
+    return NextResponse.json({
+      success: true,
+      extracted_text: "Prescription analysis service is currently unavailable. Please try again later.",
+      classification: "service unavailable",
+      confidence: 0.0,
+      is_prescription: false,
+      fallback: true
+    });
   }
 }
 
 export async function GET() {
   try {
-    const response = await fetch('http://localhost:5002/health');
-    const data = await response.json();
-    return NextResponse.json(data);
+    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5003';
+    const response = await fetch(`${prescriptionServiceUrl}/health`);
+    
+    if (response.ok) {
+      const data = await response.json();
+      return NextResponse.json(data);
+    } else {
+      throw new Error('Service unavailable');
+    }
   } catch (error) {
-    return NextResponse.json({ error: "Service unavailable" }, { status: 500 });
+    return NextResponse.json({
+      status: 'unavailable',
+      service: 'prescription-reader',
+      error: error.message
+    }, { status: 503 });
   }
 }

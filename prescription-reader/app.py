@@ -1,268 +1,343 @@
 from flask import Flask, request, jsonify, render_template_string
 from flask_cors import CORS
-import cv2
-import numpy as np
-import pytesseract
-import re
-import json
+import os
+import torch
 from PIL import Image
+from transformers import VisionEncoderDecoderModel, DonutProcessor, pipeline
 import io
 import base64
+import json
 
 app = Flask(__name__)
 CORS(app)
 
-class PrescriptionReader:
-    def __init__(self):
-        self.medicine_patterns = [
-            r'([A-Za-z]+(?:\s+[A-Za-z]+)*)\s+(\d+(?:\.\d+)?)\s*(mg|g|ml|tablet|cap)',
-            r'([A-Za-z]+)\s+(\d+)\s*(mg|g|ml)',
-            r'Tab\.\s*([A-Za-z]+)\s+(\d+)\s*(mg|g)'
-        ]
-        
-    def preprocess_image(self, image):
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-        kernel = np.ones((1,1), np.uint8)
-        thresh = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-        return thresh
-    
-    def extract_text(self, image):
-        processed = self.preprocess_image(image)
-        text = pytesseract.image_to_string(processed, config='--psm 6')
-        return text
-    
-    def extract_medicines(self, text):
-        medicines = []
-        lines = text.split('\n')
-        
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-                
-            for pattern in self.medicine_patterns:
-                matches = re.findall(pattern, line, re.IGNORECASE)
-                for match in matches:
-                    medicine = {
-                        'name': match[0].strip(),
-                        'dosage': f"{match[1]}{match[2]}",
-                        'frequency': self.extract_frequency(line),
-                        'duration': self.extract_duration(line)
-                    }
-                    medicines.append(medicine)
-        
-        return medicines
-    
-    def extract_frequency(self, text):
-        freq_patterns = [
-            r'(\d+-\d+-\d+)',
-            r'(once daily|twice daily|thrice daily)',
-            r'(bid|tid|qid)',
-            r'(\d+\s*times?\s*(?:a\s*)?day)'
-        ]
-        
-        for pattern in freq_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                return match.group(1)
-        return "As directed"
-    
-    def extract_duration(self, text):
-        duration_patterns = [
-            r'(?:for\s+)?(\d+\s*days?)',
-            r'(?:for\s+)?(\d+\s*weeks?)',
-            r'(?:x\s+)?(\d+\s*days?)',
-            r'(\d+\s*days?)'
-        ]
-        
-        for pattern in duration_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                return match.group(1)
-        return "As needed"
-    
-    def extract_patient_info(self, text):
-        patient_name = ""
-        doctor_name = ""
-        date = ""
-        
-        # Extract patient name
-        name_patterns = [
-            r'(?:patient|name):\s*([A-Za-z\s]+)',
-            r'Mr\.?\s+([A-Za-z\s]+)',
-            r'Mrs\.?\s+([A-Za-z\s]+)',
-            r'Ms\.?\s+([A-Za-z\s]+)'
-        ]
-        
-        for pattern in name_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                patient_name = match.group(1).strip()
-                break
-        
-        # Extract doctor name
-        doc_patterns = [
-            r'Dr\.?\s+([A-Za-z\s]+)',
-            r'Doctor:\s*([A-Za-z\s]+)'
-        ]
-        
-        for pattern in doc_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
-            if match:
-                doctor_name = match.group(1).strip()
-                break
-        
-        # Extract date
-        date_patterns = [
-            r'(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})',
-            r'(\d{1,2}\s+[A-Za-z]+\s+\d{2,4})'
-        ]
-        
-        for pattern in date_patterns:
-            match = re.search(pattern, text)
-            if match:
-                date = match.group(1)
-                break
-        
-        return {
-            'patient_name': patient_name,
-            'doctor_name': doctor_name,
-            'date': date
-        }
-    
-    def process_prescription(self, image):
-        text = self.extract_text(image)
-        medicines = self.extract_medicines(text)
-        patient_info = self.extract_patient_info(text)
-        
-        return {
-            'raw_text': text,
-            'patient_info': patient_info,
-            'medications': medicines,
-            'extracted_fields': len(medicines)
-        }
+# Global variables for models
+processor = None
+donut_model = None
+classifier = None
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
-reader = PrescriptionReader()
+def initialize_models():
+    """Initialize the OCR and classification models"""
+    global processor, donut_model, classifier
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    donut_model_path = os.path.join(current_dir, "model")
+    
+    try:
+        if os.path.exists(donut_model_path):
+            print("Loading Donut OCR model...")
+            processor = DonutProcessor.from_pretrained(donut_model_path)
+            donut_model = VisionEncoderDecoderModel.from_pretrained(donut_model_path)
+            donut_model.to(device)
+            donut_model.eval()
+            print("✅ Donut model loaded successfully")
+        else:
+            print("❌ Model not found. Please run: python model_download.py")
+            return False
+            
+        print("Loading classification model...")
+        classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli", device=0 if device == "cuda" else -1)
+        print("✅ Classification model loaded successfully")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error loading models: {e}")
+        return False
+
+def extract_text_from_image(image):
+    """Extract text from image using Donut OCR model"""
+    if processor is None or donut_model is None:
+        return "Models not loaded"
+        
+    try:
+        image = image.convert("RGB")
+        encoding = processor(images=image, return_tensors="pt").to(device)
+        
+        with torch.no_grad():
+            generated_ids = donut_model.generate(
+                encoding.pixel_values, 
+                max_length=512, 
+                num_beams=1,
+                early_stopping=True,
+                decoder_start_token_id=processor.tokenizer.convert_tokens_to_ids("<s_ocr>")
+            )
+        
+        generated_text = processor.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
+        return generated_text
+        
+    except Exception as e:
+        print(f"OCR Error: {e}")
+        return f"Error extracting text: {str(e)}"
+
+def extract_medicine_info(text):
+    """Extract medicine name, dosage, and frequency from prescription text"""
+    import re
+    
+    medicines = []
+    
+    # Clean the text first
+    text = re.sub(r'Ph\.[+]\d+.*|Web:.*|Email:.*', '', text)  # Remove contact info
+    text = re.sub(r'[−-]', '-', text)  # Normalize dashes
+    
+    # Split by common separators and process each potential medicine
+    parts = re.split(r'[.,;]|(?=\b[A-Z][a-z]+)', text)
+    
+    for part in parts:
+        part = part.strip()
+        if len(part) < 3:  # Skip very short parts
+            continue
+            
+        # Skip non-medicine text
+        if any(skip in part.lower() for skip in ['web:', 'email:', 'ph.', 'www.', '.com', 'massage']):
+            continue
+            
+        # Look for medicine patterns
+        # Pattern 1: Medicine name followed by dosage and frequency
+        pattern1 = r'([A-Za-z][A-Za-z0-9]*(?:[A-Za-z]+)?)\s*([0-9]+\s*mg|[0-9]+mg)\s*(.*)'
+        match1 = re.search(pattern1, part, re.IGNORECASE)
+        
+        if match1:
+            name = match1.group(1).strip()
+            dosage = match1.group(2).strip()
+            freq_part = match1.group(3).strip()
+            
+            # Clean medicine name
+            name = re.sub(r'^(Tat\.|Tab\.)', '', name).strip()
+            
+            # Extract frequency pattern (like "1-0-1 x5days" or "before meals")
+            frequency = 'As directed'
+            if re.search(r'\d+\s*-\s*\d+\s*-\s*\d+', freq_part):
+                freq_match = re.search(r'(\d+\s*-\s*\d+\s*-\s*\d+.*?)(?=\s|$)', freq_part)
+                if freq_match:
+                    frequency = freq_match.group(1).strip()
+            elif 'before' in freq_part.lower():
+                frequency = 'Before meals'
+            elif 'after' in freq_part.lower():
+                frequency = 'After meals'
+            elif 'daily' in freq_part.lower():
+                frequency = 'Daily'
+            elif freq_part:
+                frequency = freq_part[:30]  # Limit length
+                
+            medicines.append({
+                'name': name,
+                'dosage': dosage,
+                'frequency': frequency
+            })
+            
+        else:
+            # Pattern 2: Look for standalone medicine names
+            medicine_match = re.search(r'\b([A-Z][a-z]+(?:[A-Z][a-z]*)*(?:\d+)?)\b', part)
+            if medicine_match:
+                name = medicine_match.group(1)
+                
+                # Skip common non-medicine words
+                if name.lower() in ['before', 'after', 'meals', 'days', 'week', 'paint', 'massage', 'gum']:
+                    continue
+                    
+                # Look for dosage in the same part
+                dosage_match = re.search(r'(\d+\s*mg|\d+mg)', part, re.IGNORECASE)
+                dosage = dosage_match.group(1) if dosage_match else 'Not specified'
+                
+                # Look for frequency
+                frequency = 'As directed'
+                if re.search(r'\d+\s*-\s*\d+\s*-\s*\d+', part):
+                    freq_match = re.search(r'(\d+\s*-\s*\d+\s*-\s*\d+.*?)(?=\s|$)', part)
+                    if freq_match:
+                        frequency = freq_match.group(1).strip()
+                elif 'before' in part.lower():
+                    frequency = 'Before meals'
+                elif 'after' in part.lower():
+                    frequency = 'After meals'
+                    
+                medicines.append({
+                    'name': name,
+                    'dosage': dosage,
+                    'frequency': frequency
+                })
+    
+    # Remove duplicates and clean up
+    seen = set()
+    unique_medicines = []
+    for med in medicines:
+        key = med['name'].lower()
+        if key not in seen and len(med['name']) > 2:
+            seen.add(key)
+            unique_medicines.append(med)
+    
+    return unique_medicines if unique_medicines else [{'name': 'No medicines found', 'dosage': '-', 'frequency': '-'}]
+
+def classify_prescription(text):
+    """Classify if text is from a medical prescription"""
+    if not text or classifier is None:
+        return "unknown", 0.0
+    
+    try:
+        candidate_labels = ["medical prescription", "not medical prescription"]
+        result = classifier(text, candidate_labels)
+        
+        predicted_label = result["labels"][0]
+        confidence = result["scores"][0]
+        
+        # Medical keywords for heuristic check
+        medical_keywords = [
+            "prescribed", "take", "mg", "ml", "capsules", "dosage",
+            "dr.", "doctor", "patient", "medications", "apply", "signature",
+            "clinic", "pharmacy", "rx", "dose", "medicine", "drug", "tablet"
+        ]
+        
+        text_lower = text.lower()
+        has_medical_keywords = any(keyword in text_lower for keyword in medical_keywords)
+        
+        # Adjust prediction based on heuristics
+        if predicted_label == "not medical prescription" and has_medical_keywords:
+            predicted_label = "medical prescription"
+            confidence = max(confidence, 0.75)
+        elif predicted_label == "medical prescription" and not has_medical_keywords:
+            predicted_label = "not medical prescription"
+            confidence = max(confidence, 0.75)
+        
+        return predicted_label, confidence
+        
+    except Exception as e:
+        print(f"Classification Error: {e}")
+        return "error", 0.0
 
 @app.route('/')
-def index():
-    return render_template_string('''
+def home():
+    """Simple web interface for testing"""
+    html = """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Prescription Reader</title>
+        <title>Prescription Reader OCR</title>
         <style>
             body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
             .upload-area { border: 2px dashed #ccc; padding: 40px; text-align: center; margin: 20px 0; }
             .result { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 5px; }
-            .medicine { background: white; padding: 10px; margin: 10px 0; border-left: 4px solid #007bff; }
             button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
             button:hover { background: #0056b3; }
         </style>
     </head>
     <body>
-        <h1>🏥 Prescription Reader</h1>
+        <h1>🔍 Prescription Reader OCR</h1>
+        <p>Upload a prescription image to extract text and analyze it.</p>
+        
         <div class="upload-area">
-            <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            <button onclick="document.getElementById('fileInput').click()">Upload Prescription Image</button>
-            <p>Supports: JPG, PNG, PDF images</p>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <button onclick="document.getElementById('imageInput').click()">Choose Image</button>
+            <p>Or drag and drop an image here</p>
         </div>
-        <div id="result"></div>
+        
+        <button onclick="analyzeImage()" id="analyzeBtn" style="display: none;">Analyze Prescription</button>
+        
+        <div id="results" class="result" style="display: none;">
+            <h3>Results:</h3>
+            <div id="resultContent"></div>
+        </div>
         
         <script>
-            document.getElementById('fileInput').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+            let selectedFile = null;
+            
+            document.getElementById('imageInput').addEventListener('change', function(e) {
+                selectedFile = e.target.files[0];
+                if (selectedFile) {
+                    document.getElementById('analyzeBtn').style.display = 'block';
+                }
+            });
+            
+            function analyzeImage() {
+                if (!selectedFile) return;
                 
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('image', selectedFile);
                 
-                document.getElementById('result').innerHTML = '<p>Processing...</p>';
+                document.getElementById('resultContent').innerHTML = 'Analyzing...';
+                document.getElementById('results').style.display = 'block';
                 
-                fetch('/analyze', {
+                fetch('/analyze-prescription', {
                     method: 'POST',
                     body: formData
                 })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.error) {
-                        document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + data.error + '</p>';
-                        return;
+                    if (data.success) {
+                        document.getElementById('resultContent').innerHTML = `
+                            <h4>Extracted Text:</h4>
+                            <p>${data.extracted_text}</p>
+                            <h4>Classification:</h4>
+                            <p><strong>${data.classification}</strong> (Confidence: ${(data.confidence * 100).toFixed(1)}%)</p>
+                        `;
+                    } else {
+                        document.getElementById('resultContent').innerHTML = `<p style="color: red;">Error: ${data.error}</p>`;
                     }
-                    
-                    let html = '<div class="result">';
-                    html += '<h3>📋 Extracted Information</h3>';
-                    
-                    // Patient Info
-                    if (data.patient_info.patient_name || data.patient_info.doctor_name || data.patient_info.date) {
-                        html += '<h4>Patient Details:</h4>';
-                        if (data.patient_info.patient_name) html += '<p><strong>Patient:</strong> ' + data.patient_info.patient_name + '</p>';
-                        if (data.patient_info.doctor_name) html += '<p><strong>Doctor:</strong> ' + data.patient_info.doctor_name + '</p>';
-                        if (data.patient_info.date) html += '<p><strong>Date:</strong> ' + data.patient_info.date + '</p>';
-                    }
-                    
-                    // Medications
-                    if (data.medications.length > 0) {
-                        html += '<h4>💊 Medications (' + data.medications.length + '):</h4>';
-                        data.medications.forEach(med => {
-                            html += '<div class="medicine">';
-                            html += '<strong>' + med.name + '</strong> - ' + med.dosage + '<br>';
-                            html += 'Frequency: ' + med.frequency + '<br>';
-                            html += 'Duration: ' + med.duration;
-                            html += '</div>';
-                        });
-                    }
-                    
-                    // Raw text
-                    html += '<h4>📝 Raw Extracted Text:</h4>';
-                    html += '<pre style="background: white; padding: 10px; border-radius: 5px; white-space: pre-wrap;">' + data.raw_text + '</pre>';
-                    
-                    html += '</div>';
-                    document.getElementById('result').innerHTML = html;
                 })
                 .catch(error => {
-                    document.getElementById('result').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+                    document.getElementById('resultContent').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
                 });
-            });
+            }
         </script>
     </body>
     </html>
-    ''')
+    """
+    return html
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/analyze-prescription', methods=['POST'])
 def analyze_prescription():
+    """API endpoint to analyze prescription images"""
     try:
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file uploaded'}), 400
+        if 'image' not in request.files:
+            return jsonify({'success': False, 'error': 'No image provided'}), 400
         
-        file = request.files['file']
+        file = request.files['image']
         if file.filename == '':
-            return jsonify({'error': 'No file selected'}), 400
+            return jsonify({'success': False, 'error': 'No image selected'}), 400
         
-        # Read image
+        # Read and process image
         image_bytes = file.read()
-        nparr = np.frombuffer(image_bytes, np.uint8)
-        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        image = Image.open(io.BytesIO(image_bytes))
         
-        if image is None:
-            return jsonify({'error': 'Invalid image format'}), 400
+        # Extract text using OCR
+        extracted_text = extract_text_from_image(image)
         
-        # Process prescription
-        result = reader.process_prescription(image)
+        # Extract structured medicine information
+        medicines = extract_medicine_info(extracted_text)
+        
+        # Classify the text
+        classification, confidence = classify_prescription(extracted_text)
         
         return jsonify({
             'success': True,
-            'filename': file.filename,
-            **result
+            'medicines': medicines,
+            'classification': classification,
+            'confidence': confidence,
+            'is_prescription': classification == "medical prescription"
         })
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/health')
 def health():
-    return jsonify({'status': 'healthy', 'service': 'prescription-reader'})
+    """Health check endpoint"""
+    model_status = "loaded" if (processor is not None and donut_model is not None and classifier is not None) else "not loaded"
+    return jsonify({
+        'status': 'healthy',
+        'service': 'prescription-reader',
+        'models': model_status,
+        'device': device
+    })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002, debug=True)
+    print("🔍 Starting Prescription Reader OCR Service...")
+    
+    # Initialize models
+    if initialize_models():
+        print("✅ All models loaded successfully!")
+        print("🚀 Starting Flask server on port 5003...")
+        app.run(host='0.0.0.0', port=5003, debug=True)
+    else:
+        print("❌ Failed to load models. Please run: python model_download.py")
+        print("💡 Or check if the model files exist in the 'model' directory")

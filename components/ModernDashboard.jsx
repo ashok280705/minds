@@ -19,7 +19,8 @@ import {
   TrendingUp,
   Award,
   Star,
-  CheckCircle
+  CheckCircle,
+  Droplets
 } from "lucide-react";
 import PeriodStatusWidget from "@/components/PeriodStatusWidget";
 
@@ -88,6 +89,10 @@ export default function ModernDashboard() {
     router.push("/dashboard/routine-doctor");
   };
 
+  const handleBloodBankClick = () => {
+    router.push("/dashboard/blood-bank");
+  };
+
   const services = [
     {
       id: 'counselor',
@@ -132,6 +137,17 @@ export default function ModernDashboard() {
       features: ['Chat Consultation', 'Video Calls', 'Send Notes', 'Quick Response'],
       onClick: handleRoutineDoctorClick,
       stats: { doctors: '24/7', response: '< 5min' }
+    },
+    {
+      id: 'blood-bank',
+      title: 'Blood Bank Services',
+      description: 'Find nearby blood banks, check blood availability, request blood donations, and track your medicines.',
+      icon: Droplets,
+      gradient: 'from-red-400 to-rose-500',
+      bgGradient: 'from-red-50 to-rose-50',
+      features: ['Nearby Blood Banks', 'Stock Availability', 'Blood Requests', 'Medicine Tracker'],
+      onClick: handleBloodBankClick,
+      stats: { banks: '15+', availability: '24/7' }
     }
   ];
 

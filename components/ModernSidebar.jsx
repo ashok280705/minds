@@ -30,7 +30,8 @@ import {
   Thermometer,
   Clock,
   UserCheck,
-  ScanLine
+  ScanLine,
+  Droplets
 } from "lucide-react";
 
 export default function ModernSidebar() {
@@ -123,14 +124,21 @@ export default function ModernSidebar() {
       href: "/dashboard/nearby-services", 
       label: "Nearby Services", 
       icon: MapPin,
-      description: "Hospitals & Ambulance"
+      description: "Hospitals & Ambulance",
+      dropdown: [
+        { href: "/dashboard/nearby-services", label: "Nearby Hospitals" },
+        { href: "/dashboard/blood-bank", label: "Find Blood Banks" }
+      ]
     },
-
     { 
-      href: "/dashboard/appointment-scheduler", 
-      label: "Appointments", 
-      icon: Clock,
-      description: "Schedule & Manage Visits"
+      href: "/dashboard/blood-bank", 
+      label: "Blood Bank Services", 
+      icon: Droplets,
+      description: "Blood Donation & Medicine Tracking",
+      dropdown: [
+        { href: "/dashboard/blood-bank", label: "Blood Bank" },
+        { href: "/dashboard/blood-bank/medicines", label: "My Medicines" }
+      ]
     },
     { 
       href: "/dashboard/scans-analyzer", 

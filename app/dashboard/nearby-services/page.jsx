@@ -23,7 +23,8 @@ export default function NearbyServices() {
     hospital: { label: 'Hospitals', icon: Cross, color: 'red' },
     cemetery: { label: 'Graveyards', icon: Building2, color: 'gray' },
     ambulance: { label: 'Live Ambulances', icon: Cross, color: 'orange' },
-    clinic: { label: 'Clinics', icon: Cross, color: 'blue' }
+    clinic: { label: 'Clinics', icon: Cross, color: 'blue' },
+    blood_bank: { label: 'Blood Banks', icon: Cross, color: 'red' }
   };
 
   useEffect(() => {
@@ -116,6 +117,7 @@ export default function NearbyServices() {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          console.log('Current location:', coords);
           setLocation(coords);
           updateMapCenter(coords);
           addCurrentLocationMarker(coords);
@@ -123,9 +125,25 @@ export default function NearbyServices() {
         },
         (error) => {
           console.error('Error getting location:', error);
+          // Fallback to Mumbai coordinates if location fails
+          const fallbackCoords = { lat: 19.0760, lng: 72.8777 };
+          setLocation(fallbackCoords);
+          updateMapCenter(fallbackCoords);
+          addCurrentLocationMarker(fallbackCoords);
+          findNearbyServices(fallbackCoords, radius, serviceType);
           setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0
         }
       );
+    } else {
+      // Fallback if geolocation not supported
+      const fallbackCoords = { lat: 19.0760, lng: 72.8777 };
+      setLocation(fallbackCoords);
+      setLoading(false);
     }
   };
 

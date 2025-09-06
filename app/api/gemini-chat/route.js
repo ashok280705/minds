@@ -2,39 +2,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import RiskAnalyzer from "../../../lib/riskAnalyzer.js";
 import escalationService from "../../../lib/escalationService.js";
-import FeatureSuggestionEngine from "../../../lib/featureSuggestionEngine.js";
-import User from "../../../models/User.js";
-import connectDB from "../../../lib/mongodb.js";
-import { getServerSession } from "next-auth/next";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const riskAnalyzer = new RiskAnalyzer();
-const suggestionEngine = new FeatureSuggestionEngine();
 
 export async function POST(req) {
   try {
-    const session = await getServerSession();
     const { messages, userId } = await req.json();
     const userMessage = messages[messages.length - 1]?.content || "";
-    
-    // Get user profile for personalized suggestions
-    let userProfile = {};
-    if (session?.user?.email) {
-      try {
-        await connectDB();
-        const user = await User.findOne({ email: session.user.email });
-        if (user) {
-          userProfile = {
-            name: user.name,
-            gender: user.gender,
-            language: user.language,
-            age: user.birthdate ? Math.floor((Date.now() - user.birthdate) / (365.25 * 24 * 60 * 60 * 1000)) : null
-          };
-        }
-      } catch (dbError) {
-        console.error('Failed to fetch user profile:', dbError);
-      }
-    }
 
     const systemPrompt = `
 You are a deeply empathetic AI mental health counselor who truly cares about each person.
@@ -48,24 +23,13 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
 `;
 
     const userInput = messages.map(m => `${m.role}: ${m.content}`).join("\n");
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    // Simplified processing: Only Gemini (no heavy ML models)
-    const geminiResult = await model.generateContent(`${systemPrompt}\n${userInput}`);
-    
-    // Mock lightweight risk analysis
-    const riskAnalysis = {
-      risk_level: userMessage.toLowerCase().includes('suicide') || userMessage.toLowerCase().includes('kill myself') ? 'Suicidal' : 'Low',
-      confidence: 0.8,
-      method: 'keyword-based'
-    };
-    
-    // Mock feature suggestions
-    const featureSuggestions = {
-      message: 'Try our platform features for support',
-      suggestions: [{ name: 'AI Counselor', route: '/dashboard/mental-counselor' }],
-      context: 'mental-health'
-    };
+    // Multi-agent processing: Gemini + Risk Analyzer
+    const [geminiResult, riskAnalysis] = await Promise.all([
+      model.generateContent(`${systemPrompt}\n${userInput}`),
+      riskAnalyzer.analyzeRisk(userMessage)
+    ]);
     
     const reply = geminiResult.response.text();
     const textLower = reply.toLowerCase();
@@ -100,34 +64,14 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
       "heart racing", "terrified", "scared of myself"
     ];
 
-    // Check both user message and AI reply for crisis indicators
-    const userMessageLower = userMessage.toLowerCase();
+    // Use BioClinicalBERT risk analysis for escalation decision
     const escalate = riskAnalysis.risk_level === "Suicidal" || 
-                    crisisKeywords.some(kw => userMessageLower.includes(kw)) ||
-                    crisisKeywords.some(kw => textLower.includes(kw)) ||
-                    userMessageLower.includes('die') ||
-                    userMessageLower.includes('suicide') ||
-                    userMessageLower.includes('kill myself');
+                    crisisKeywords.some(kw => textLower.includes(kw));
     
     // Trigger escalation if high risk detected
-    if (escalate) {
+    if (escalate && userId) {
       try {
-        const escalationData = {
-          userId: userId || session?.user?.id || 'anonymous',
-          symptoms: userMessage,
-          severity: 'critical',
-          riskLevel: 'high',
-          timestamp: new Date().toISOString()
-        };
-        
-        // Send to escalation API
-        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/escalate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(escalationData)
-        });
-        
-        console.log('🚨 CRISIS ESCALATION TRIGGERED:', escalationData);
+        await escalationService.triggerEscalation(userId, riskAnalysis, userMessage);
       } catch (escalationError) {
         console.error('Escalation trigger failed:', escalationError);
       }
@@ -166,11 +110,6 @@ Always respond with heart, empathy, and genuine care. Make them feel heard and v
         level: riskAnalysis.risk_level,
         confidence: riskAnalysis.confidence,
         method: riskAnalysis.method
-      },
-      featureSuggestions: {
-        message: featureSuggestions.message,
-        suggestions: featureSuggestions.suggestions,
-        context: featureSuggestions.context
       }
     });
 

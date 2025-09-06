@@ -10,6 +10,10 @@ export default function PhysicalPharmacy() {
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
   const [radius, setRadius] = useState(5000);
   const [selectedRoute, setSelectedRoute] = useState(null);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationSteps, setNavigationSteps] = useState([]);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [watchId, setWatchId] = useState(null);
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const directionsServiceRef = useRef(null);
@@ -96,9 +100,24 @@ export default function PhysicalPharmacy() {
         },
         (error) => {
           console.error('Error getting location:', error);
+          // Use default location if geolocation fails
+          const defaultCoords = { lat: 28.6139, lng: 77.2090 }; // Delhi
+          setLocation(defaultCoords);
+          findNearbyPharmacies(defaultCoords);
           setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000
         }
       );
+    } else {
+      // Geolocation not supported, use default location
+      const defaultCoords = { lat: 28.6139, lng: 77.2090 };
+      setLocation(defaultCoords);
+      findNearbyPharmacies(defaultCoords);
+      setLoading(false);
     }
   };
 
@@ -225,8 +244,77 @@ export default function PhysicalPharmacy() {
     }, (result, status) => {
       if (status === 'OK') {
         directionsRendererRef.current.setDirections(result);
+        const steps = result.routes[0].legs[0].steps;
+        setNavigationSteps(steps);
       }
     });
+  };
+
+  const startNavigation = (pharmacy) => {
+    setIsNavigating(true);
+    setSelectedRoute(pharmacy);
+    setCurrentStep(0);
+    
+    // Start watching user's location for live navigation
+    if (navigator.geolocation) {
+      const id = navigator.geolocation.watchPosition(
+        (position) => {
+          const newLocation = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setLocation(newLocation);
+          updateMapCenter(newLocation);
+          addCurrentLocationMarker(newLocation);
+          
+          // Update route with new location
+          updateNavigationRoute(newLocation, pharmacy);
+        },
+        (error) => {
+          console.error('Navigation error:', error);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 1000
+        }
+      );
+      setWatchId(id);
+    }
+  };
+
+  const updateNavigationRoute = (currentLocation, destination) => {
+    if (!directionsServiceRef.current || !directionsRendererRef.current) return;
+    
+    directionsServiceRef.current.route({
+      origin: currentLocation,
+      destination: destination.geometry.location,
+      travelMode: window.google.maps.TravelMode.DRIVING
+    }, (result, status) => {
+      if (status === 'OK') {
+        directionsRendererRef.current.setDirections(result);
+        const steps = result.routes[0].legs[0].steps;
+        setNavigationSteps(steps);
+        
+        // Check if we're close to destination (within 50 meters)
+        const distance = result.routes[0].legs[0].distance.value;
+        if (distance < 50) {
+          stopNavigation();
+          alert('You have arrived at your destination!');
+        }
+      }
+    });
+  };
+
+  const stopNavigation = () => {
+    setIsNavigating(false);
+    setNavigationSteps([]);
+    setCurrentStep(0);
+    
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+      setWatchId(null);
+    }
   };
 
   const getDirections = (pharmacy) => {
@@ -277,6 +365,39 @@ export default function PhysicalPharmacy() {
             </div>
           )}
 
+          {/* Navigation Status */}
+          {isNavigating && (
+            <div className="bg-blue-600 text-white p-4 rounded-xl mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Navigation className="w-6 h-6 animate-pulse" />
+                  <div>
+                    <h3 className="font-semibold">Navigating to {selectedRoute?.name}</h3>
+                    <p className="text-blue-100 text-sm">Live navigation active</p>
+                  </div>
+                </div>
+                <button
+                  onClick={stopNavigation}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Stop Navigation
+                </button>
+              </div>
+              
+              {navigationSteps.length > 0 && currentStep < navigationSteps.length && (
+                <div className="mt-4 p-3 bg-blue-700 rounded-lg">
+                  <p className="text-sm font-medium mb-1">Next Turn:</p>
+                  <p className="text-blue-100" dangerouslySetInnerHTML={{ 
+                    __html: navigationSteps[currentStep]?.instructions || 'Continue straight' 
+                  }} />
+                  <p className="text-xs text-blue-200 mt-1">
+                    Distance: {navigationSteps[currentStep]?.distance?.text || 'N/A'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Map Section */}
           <div className="bg-gray-100 rounded-xl overflow-hidden mb-8 relative">
             {location ? (
@@ -287,13 +408,13 @@ export default function PhysicalPharmacy() {
                     getPharmacyMapUrl()
                   }
                   width="100%"
-                  height="400"
+                  height={isNavigating ? "500" : "400"}
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
-                <div ref={mapRef} className="absolute top-0 left-0 w-full h-[400px] pointer-events-none" />
+                <div ref={mapRef} className={`absolute top-0 left-0 w-full ${isNavigating ? 'h-[500px]' : 'h-[400px]'} pointer-events-none`} />
               </>
             ) : (
               <div className="p-6 flex items-center justify-center h-[400px]">
@@ -361,11 +482,25 @@ export default function PhysicalPharmacy() {
                     Show Route
                   </button>
                   
+                  {selectedRoute && !isNavigating && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startNavigation(pharmacy);
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    >
+                      <Navigation className="w-4 h-4" />
+                      Start Navigation
+                    </button>
+                  )}
+                  
                   {selectedRoute && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedRoute(null);
+                        if (isNavigating) stopNavigation();
                       }}
                       className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
                     >
@@ -379,10 +514,10 @@ export default function PhysicalPharmacy() {
                       e.stopPropagation();
                       getDirections(pharmacy);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                    className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
                   >
                     <Navigation className="w-4 h-4" />
-                    Navigate
+                    Open in Maps
                   </button>
                   
                   {pharmacy.formatted_phone_number && (

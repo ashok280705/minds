@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Vapi Genie</title>
+</head>
+<body>
+    <h1>Vapi Genie Test</h1>
+    <button id="testBtn">Test Vapi Call</button>
+    <div id="status">Ready</div>
+    
+    <script type="module">
+        import Vapi from 'https://cdn.skypack.dev/@vapi-ai/web';
+        
+        const vapi = new Vapi('a4e52b1b-a945-4d62-92ba-69a11ee1e534');
+        const statusDiv = document.getElementById('status');
+        
+        vapi.on('call-start', () => {
+            statusDiv.textContent = 'Call started ✅';
+        });
+        
+        vapi.on('call-end', () => {
+            statusDiv.textContent = 'Call ended 📞';
+        });
+        
+        vapi.on('error', (error) => {
+            statusDiv.textContent = 'Error: ' + error.message;
+            console.error('Vapi error:', error);
+        });
+        
+        document.getElementById('testBtn').onclick = async () => {
+            try {
+                statusDiv.textContent = 'Starting call...';
+                await vapi.start('eb36ab39-e5bb-4d29-9dc8-06dc0c2e9da6');
+            } catch (error) {
+                statusDiv.textContent = 'Failed: ' + error.message;
+                console.error('Start error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

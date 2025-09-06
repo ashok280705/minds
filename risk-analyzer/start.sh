@@ -14,8 +14,8 @@ source venv/bin/activate
 
 # Install dependencies
 echo "Installing dependencies..."
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Start the Flask service
 echo "Starting Flask service on port 5000..."
-python app.py
+python3 app.py

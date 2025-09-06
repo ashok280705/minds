@@ -5,247 +5,160 @@ import Vapi from '@vapi-ai/web';
 import { PorcupineWorker } from '@picovoice/porcupine-web';
 
 export default function VapiGenie() {
-  const [status, setStatus] = useState('waiting');
+  const [status, setStatus] = useState('initializing');
   const [isConnected, setIsConnected] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   
   const vapiRef = useRef(null);
   const porcupineRef = useRef(null);
-  const recognitionRef = useRef(null);
 
   useEffect(() => {
-    console.log('🧞♂️ Starting Vapi Genie with Porcupine...');
-    
-    // Initialize Porcupine wake word detection
-    initializePorcupine();
+    console.log('🧞♂️ Starting Genie: Porcupine + Vapi + Gemini');
+    initializeGenie();
     
     return () => {
+      if (porcupineRef.current) {
+        porcupineRef.current.terminate();
+      }
       if (vapiRef.current) {
         try {
           vapiRef.current.stop();
-        } catch (e) {
-          console.log('Cleanup error:', e);
-        }
-      }
-      if (porcupineRef.current) {
-        porcupineRef.current.terminate();
+        } catch (e) {}
       }
     };
   }, []);
   
-  const initializePorcupine = async () => {
-    console.log('🔊 Skipping Porcupine - using enhanced browser detection...');
-    
-    // Skip Porcupine and use enhanced browser wake word
-    startEnhancedWakeWord();
-  };
-  
-  const startEnhancedWakeWord = async () => {
+  const initializeGenie = async () => {
     try {
-      // Request microphone permission
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log('✅ Microphone permission granted');
-      console.log('✅ Vapi Server Started');
-      console.log('✅ Enhanced Wake Word Detection Ready');
-      console.log('✅ Listening for "Hey Genie"...');
+      // Initialize Vapi first
+      await initializeVapi();
       
-      startBrowserWakeWord();
+      // Then initialize Porcupine wake word
+      await initializePorcupine();
       
     } catch (error) {
-      console.error('❌ Microphone access denied:', error);
-      alert('Please allow microphone access for Genie to work!');
+      console.error('❌ Genie initialization failed:', error);
+      setStatus('error');
+    }
+  };
+  
+  const initializeVapi = async () => {
+    try {
+      console.log('🔧 Initializing Vapi...');
+      
+      const publicKey = 'a4e52b1b-a945-4d62-92ba-69a11ee1e534';
+      vapiRef.current = new Vapi(publicKey);
+      
+      // Set up Vapi event listeners
+      vapiRef.current.on('call-start', () => {
+        console.log('✅ Vapi call started - Genie is listening');
+        setIsConnected(true);
+        setStatus('listening');
+      });
+      
+      vapiRef.current.on('call-end', () => {
+        console.log('📞 Vapi call ended - Back to wake word detection');
+        setIsConnected(false);
+        setStatus('waiting');
+      });
+      
+      vapiRef.current.on('speech-start', () => {
+        console.log('🎤 User speaking...');
+        setStatus('listening');
+      });
+      
+      vapiRef.current.on('speech-end', () => {
+        console.log('🧠 Processing with Gemini...');
+        setStatus('processing');
+      });
+      
+      vapiRef.current.on('message', (message) => {
+        if (message.type === 'transcript' && message.transcriptType === 'final') {
+          console.log('📝 User said:', message.transcript);
+        }
+      });
+      
+      vapiRef.current.on('error', (error) => {
+        console.error('❌ Vapi error:', error);
+        setIsConnected(false);
+        setStatus('waiting');
+      });
+      
+      console.log('✅ Vapi initialized');
+      
+    } catch (error) {
+      console.error('❌ Vapi initialization failed:', error);
+      throw error;
+    }
+  };
+  
+  const initializePorcupine = async () => {
+    try {
+      console.log('🔊 Initializing Porcupine wake word detection...');
+      
+      // Request microphone permission
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      porcupineRef.current = await PorcupineWorker.create(
+        'a4e52b1b-a945-4d62-92ba-69a11ee1e534', // Your public key
+        ['/hey--genie_en_mac_v3_0_0/hey--genie_en_mac_v3_0_0.ppn'], // Your custom wake word file
+        (keywordIndex) => {
+          console.log('✅ "HEY GENIE" WAKE WORD DETECTED! Starting Vapi...');
+          startVapiConversation();
+        }
+      );
+      
+      console.log('✅ Porcupine initialized - Say "Hey Genie" to activate');
+      setStatus('waiting');
+      
+    } catch (error) {
+      console.error('❌ Porcupine initialization failed:', error);
+      // Fallback to browser wake word if Porcupine fails
+      console.log('🔄 Falling back to browser wake word detection...');
+      startBrowserWakeWord();
     }
   };
   
   const startBrowserWakeWord = () => {
-    if (isListening || recognitionRef.current) return;
-    
     try {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
+      const recognition = new SpeechRecognition();
       
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
-      recognitionRef.current.lang = 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
       
-      recognitionRef.current.onstart = () => {
-        console.log('🎤 READY - Say "Genie"');
-        setIsListening(true);
-        setStatus('waiting');
-      };
-      
-      recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        console.log('🎤 HEARD:', transcript);
+      recognition.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
+        console.log('🎤 Browser heard:', transcript);
         
-        // Check for wake words in the transcript
-        const wakeWords = ['genie', 'jini', 'jini se', 'genius', 'jenny', 'hello', 'hey genie'];
-        let wakeWordFound = false;
-        
-        for (const word of wakeWords) {
-          if (transcript.includes(word)) {
-            console.log('✅ WAKE WORD "' + word + '" DETECTED!');
-            wakeWordFound = true;
-            break;
-          }
-        }
-        
-        if (wakeWordFound) {
-          console.log('✅ 🎉 ACTIVATING GENIE!');
-          cleanup();
-          startVapiCall();
-          return;
-        }
-        
-        console.log('❌ No wake word found, continuing to listen...');
-        cleanup();
-        setTimeout(startBrowserWakeWord, 1000);
-      };
-      
-      recognitionRef.current.onerror = (event) => {
-        if (event.error !== 'aborted') {
-          console.log('Recognition error:', event.error);
-        }
-        cleanup();
-        setTimeout(startBrowserWakeWord, 3000);
-      };
-      
-      recognitionRef.current.onend = () => {
-        cleanup();
-        if (!isConnected && status === 'waiting') {
-          setTimeout(startBrowserWakeWord, 2000);
+        if (transcript.includes('genie') || transcript.includes('hey genie')) {
+          console.log('✅ Browser wake word detected! Starting Vapi...');
+          recognition.stop();
+          startVapiConversation();
         }
       };
       
-      recognitionRef.current.start();
+      recognition.start();
+      setStatus('waiting');
+      console.log('✅ Browser wake word active - Say "Hey Genie"');
       
     } catch (error) {
-      console.error('Recognition setup failed:', error);
-      cleanup();
-      setTimeout(startBrowserWakeWord, 5000);
-    }
-  };
-  
-  const cleanup = () => {
-    setIsListening(false);
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-      } catch (e) {}
-      recognitionRef.current = null;
+      console.error('❌ Browser wake word failed:', error);
+      setStatus('error');
     }
   };
 
-  const startVapiCall = async () => {
-    console.log('🚀 Starting Vapi call...');
-    
+  const startVapiConversation = async () => {
     try {
-      // Initialize Vapi if not already done
-      if (!vapiRef.current) {
-        const publicKey = 'c38384c7-317c-41f9-8831-77904c95adef';
-        vapiRef.current = new Vapi(publicKey);
-        
-        // Set up event listeners
-        vapiRef.current.on('call-start', () => {
-          console.log('✅ Vapi call started');
-          setIsConnected(true);
-          setStatus('listening');
-        });
-        
-        vapiRef.current.on('call-end', () => {
-          console.log('📞 Vapi call ended');
-          setIsConnected(false);
-          setStatus('waiting');
-          // Restart wake word detection
-          setTimeout(() => {
-            if (!isConnected) {
-              startBrowserWakeWord();
-            }
-          }, 1000);
-        });
-        
-        vapiRef.current.on('speech-start', () => {
-          console.log('🎤 User speaking');
-          setStatus('listening');
-        });
-        
-        vapiRef.current.on('speech-end', () => {
-          console.log('🎤 User stopped speaking');
-          setStatus('processing');
-        });
-        
-        vapiRef.current.on('message', (message) => {
-          if (message.type === 'transcript' && message.transcriptType === 'final') {
-            console.log('📝 User said:', message.transcript);
-          }
-        });
-        
-        vapiRef.current.on('error', (error) => {
-          console.log('📞 Vapi event (handling gracefully):', error?.message || 'Unknown');
-          if (error?.message?.includes('Meeting has ended') || error?.message?.includes('Call ended')) {
-            // Normal call end - not an error
-            setIsConnected(false);
-            setStatus('waiting');
-            setTimeout(() => {
-              if (!isConnected) {
-                startBrowserWakeWord();
-              }
-            }, 1000);
-          } else {
-            console.error('❌ Actual Vapi error:', error);
-            setIsConnected(false);
-            setStatus('waiting');
-            setTimeout(() => startBrowserWakeWord(), 2000);
-          }
-        });
-      }
-      
+      console.log('🚀 Starting Vapi conversation...');
       setStatus('connecting');
       
-      const assistantConfig = {
-        model: {
-          provider: 'openai',
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are Genie, a helpful AI assistant for mental health support. Respond briefly and helpfully.'
-            }
-          ]
-        },
-        voice: {
-          provider: 'playht',
-          voiceId: 'jennifer'
-        },
-        transcriber: {
-          provider: 'deepgram',
-          model: 'nova-2',
-          language: 'en-US'
-        },
-        firstMessage: 'Hey! I am Genie. How can I assist you?'
-      };
-      
-      await vapiRef.current.start(assistantConfig);
+      // Start Vapi call with your assistant
+      await vapiRef.current.start('eb36ab39-e5bb-4d29-9dc8-06dc0c2e9da6');
       
     } catch (error) {
-      console.error('❌ Failed to start Vapi call:', error);
+      console.error('❌ Failed to start Vapi conversation:', error);
       setStatus('waiting');
-      setTimeout(startWakeWordDetection, 2000);
-    }
-  };
-
-  const stopVapiCall = () => {
-    console.log('🛑 Stopping Vapi call...');
-    if (vapiRef.current && isConnected) {
-      try {
-        vapiRef.current.stop();
-      } catch (error) {
-        console.log('Stop call (expected):', error?.message || 'Call ended');
-      } finally {
-        setIsConnected(false);
-        setStatus('waiting');
-        setTimeout(() => startBrowserWakeWord(), 1000);
-      }
     }
   };
 
@@ -254,7 +167,9 @@ export default function VapiGenie() {
       case 'listening': return 'bg-green-500 animate-pulse';
       case 'processing': return 'bg-yellow-500 animate-spin';
       case 'connecting': return 'bg-blue-500 animate-bounce';
-      case 'waiting': return 'bg-black';
+      case 'waiting': return 'bg-purple-600';
+      case 'initializing': return 'bg-gray-500 animate-pulse';
+      case 'error': return 'bg-red-500';
       default: return 'bg-gray-400';
     }
   };
@@ -262,32 +177,30 @@ export default function VapiGenie() {
   const getStatusText = () => {
     switch (status) {
       case 'listening': return 'Listening...';
-      case 'processing': return 'Processing...';
+      case 'processing': return 'Thinking...';
       case 'connecting': return 'Connecting...';
       case 'waiting': return 'Say "Hey Genie"';
+      case 'initializing': return 'Starting...';
+      case 'error': return 'Error';
       default: return 'Ready';
     }
   };
 
   return (
-    <>
-      {/* Status Indicator */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className={`w-8 h-8 rounded-full transition-all shadow-lg flex items-center justify-center ${getStatusColor()}`}>
-          <span className="text-white text-lg">
-            {status === 'listening' ? '🎤' :
-             status === 'processing' ? '🧠' :
-             status === 'connecting' ? '📞' :
-             status === 'error' ? '❌' :
-             '🧞'}
-          </span>
-        </div>
-        <div className="absolute top-9 right-0 text-xs text-gray-600 whitespace-nowrap">
-          {getStatusText()}
-        </div>
+    <div className="fixed top-4 right-4 z-50">
+      <div className="w-10 h-10 rounded-full bg-black shadow-lg flex items-center justify-center transition-all">
+        <span className="text-white text-lg">
+          {status === 'listening' ? '🎤' :
+           status === 'processing' ? '🧠' :
+           status === 'connecting' ? '📞' :
+           status === 'initializing' ? '⚙️' :
+           status === 'error' ? '❌' :
+           '🧞'}
+        </span>
       </div>
-
-
-    </>
+      <div className="absolute top-12 right-0 text-xs text-gray-600 whitespace-nowrap bg-white px-2 py-1 rounded shadow">
+        {getStatusText()}
+      </div>
+    </div>
   );
 }

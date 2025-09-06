@@ -23,8 +23,7 @@ export default function NearbyServices() {
     hospital: { label: 'Hospitals', icon: Cross, color: 'red' },
     cemetery: { label: 'Graveyards', icon: Building2, color: 'gray' },
     ambulance: { label: 'Live Ambulances', icon: Cross, color: 'orange' },
-    clinic: { label: 'Clinics', icon: Cross, color: 'blue' },
-    blood_bank: { label: 'Blood Banks', icon: Cross, color: 'red' }
+    clinic: { label: 'Clinics', icon: Cross, color: 'blue' }
   };
 
   useEffect(() => {

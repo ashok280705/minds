@@ -68,9 +68,7 @@ export default function LayoutWrapper({ children }) {
         
         {/* Main Content */}
         <main className={`flex-1 min-h-screen bg-gradient-to-br from-slate-50 to-blue-50`}>
-          <div className="p-6">
-            {children}
-          </div>
+          {children}
         </main>
       </div>
 

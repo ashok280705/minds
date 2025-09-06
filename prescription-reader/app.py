@@ -77,93 +77,116 @@ def extract_medicine_info(text):
     
     medicines = []
     
-    # Clean the text first
-    text = re.sub(r'Ph\.[+]\d+.*|Web:.*|Email:.*', '', text)  # Remove contact info
-    text = re.sub(r'[−-]', '-', text)  # Normalize dashes
+    # Common medicine names database (partial list for validation)
+    known_medicines = {
+        'paracetamol', 'acetaminophen', 'ibuprofen', 'aspirin', 'amoxicillin', 'azithromycin',
+        'ciprofloxacin', 'metformin', 'atorvastatin', 'amlodipine', 'lisinopril', 'omeprazole',
+        'pantoprazole', 'ranitidine', 'cetirizine', 'loratadine', 'prednisolone', 'dexamethasone',
+        'insulin', 'metoprolol', 'atenolol', 'furosemide', 'hydrochlorothiazide', 'warfarin',
+        'clopidogrel', 'simvastatin', 'rosuvastatin', 'levothyroxine', 'gabapentin', 'tramadol',
+        'morphine', 'codeine', 'diazepam', 'alprazolam', 'sertraline', 'fluoxetine', 'citalopram',
+        'amitriptyline', 'duloxetine', 'venlafaxine', 'risperidone', 'quetiapine', 'olanzapine',
+        'haloperidol', 'chlorpromazine', 'lithium', 'carbamazepine', 'phenytoin', 'valproate',
+        'levetiracetam', 'topiramate', 'lamotrigine', 'baclofen', 'cyclobenzaprine', 'tizanidine',
+        'albuterol', 'salbutamol', 'ipratropium', 'budesonide', 'fluticasone', 'montelukast',
+        'digoxin', 'verapamil', 'diltiazem', 'nifedipine', 'losartan', 'valsartan', 'telmisartan',
+        'spironolactone', 'eplerenone', 'bisoprolol', 'carvedilol', 'propranolol', 'timolol',
+        'doxycycline', 'tetracycline', 'erythromycin', 'clarithromycin', 'vancomycin', 'gentamicin',
+        'tobramycin', 'amikacin', 'ceftriaxone', 'cefuroxime', 'cephalexin', 'penicillin',
+        'ampicillin', 'piperacillin', 'meropenem', 'imipenem', 'ertapenem', 'levofloxacin',
+        'moxifloxacin', 'norfloxacin', 'ofloxacin', 'trimethoprim', 'sulfamethoxazole', 'nitrofurantoin',
+        'metronidazole', 'tinidazole', 'fluconazole', 'itraconazole', 'ketoconazole', 'terbinafine',
+        'acyclovir', 'valacyclovir', 'oseltamivir', 'ribavirin', 'interferon', 'hydroxychloroquine',
+        'chloroquine', 'mefloquine', 'doxorubicin', 'cyclophosphamide', 'methotrexate', 'vincristine',
+        'paclitaxel', 'carboplatin', 'cisplatin', 'tamoxifen', 'anastrozole', 'letrozole'
+    }
     
-    # Split by common separators and process each potential medicine
-    parts = re.split(r'[.,;]|(?=\b[A-Z][a-z]+)', text)
+    # Medicine name suffixes that indicate pharmaceutical compounds
+    medicine_suffixes = {
+        'cillin', 'mycin', 'floxacin', 'zole', 'pril', 'sartan', 'statin', 'olol', 'pine', 
+        'ide', 'ine', 'ate', 'one', 'zine', 'pam', 'done', 'lone', 'sone', 'tide', 'mide',
+        'fen', 'sal', 'mol', 'tol', 'nol', 'dine', 'sine', 'tine', 'rine', 'mine', 'line'
+    }
     
-    for part in parts:
-        part = part.strip()
-        if len(part) < 3:  # Skip very short parts
-            continue
+    # Clean the text - remove non-medical content
+    text = re.sub(r'Ph\.[+]\d+.*|Web:.*|Email:.*|www\..*|@.*\.com', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'Dr\.?\s+[A-Z][a-z]+.*|Doctor.*|Clinic.*|Hospital.*', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'Smile|Designing|Teeth|Whitening|Dental|Implants|General|Dentistry', '', text, flags=re.IGNORECASE)
+    
+    # Look for medicine patterns with strict validation
+    patterns = [
+        # Pattern 1: Tab/Cap/Syp followed by medicine name and dosage
+        r'(?:Tab\.?|Cap\.?|Syp\.?)\s*([A-Z][a-z]+(?:[A-Z][a-z]*)*)\s*(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g))',
+        # Pattern 2: Medicine name followed by dosage
+        r'\b([A-Z][a-z]{3,}(?:[A-Z][a-z]+)*)\s*(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g))\b',
+        # Pattern 3: Known medicine names (exact match)
+        r'\b(' + '|'.join(known_medicines) + r')\b'
+    ]
+    
+    for pattern in patterns:
+        matches = re.finditer(pattern, text, re.IGNORECASE)
+        for match in matches:
+            name = match.group(1).strip()
             
-        # Skip non-medicine text
-        if any(skip in part.lower() for skip in ['web:', 'email:', 'ph.', 'www.', '.com', 'massage']):
-            continue
+            # Validate medicine name
+            name_lower = name.lower()
             
-        # Look for medicine patterns
-        # Pattern 1: Medicine name followed by dosage and frequency
-        pattern1 = r'([A-Za-z][A-Za-z0-9]*(?:[A-Za-z]+)?)\s*([0-9]+\s*mg|[0-9]+mg)\s*(.*)'
-        match1 = re.search(pattern1, part, re.IGNORECASE)
-        
-        if match1:
-            name = match1.group(1).strip()
-            dosage = match1.group(2).strip()
-            freq_part = match1.group(3).strip()
+            # Check if it's a known medicine or has valid suffix
+            is_valid_medicine = (
+                name_lower in known_medicines or
+                any(name_lower.endswith(suffix) for suffix in medicine_suffixes) or
+                (len(name) >= 6 and re.match(r'^[A-Z][a-z]+(?:[A-Z][a-z]+)*$', name))
+            )
             
-            # Clean medicine name
-            name = re.sub(r'^(Tat\.|Tab\.)', '', name).strip()
+            # Skip if not a valid medicine name
+            if not is_valid_medicine:
+                continue
             
-            # Extract frequency pattern (like "1-0-1 x5days" or "before meals")
+            # Skip partial words or common non-medicine terms
+            if (name_lower.startswith(('designin', 'whitenin', 'smilin', 'teethin')) or
+                name_lower in {'smile', 'design', 'teeth', 'white', 'dental', 'general'}):
+                continue
+            
+            # Extract dosage
+            dosage = 'Not specified'
+            if len(match.groups()) >= 2 and match.group(2):
+                dosage = match.group(2).strip()
+            else:
+                # Look for dosage nearby
+                context = text[max(0, match.start()-30):match.end()+30]
+                dosage_match = re.search(r'(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g))', context, re.IGNORECASE)
+                if dosage_match:
+                    dosage = dosage_match.group(1)
+            
+            # Extract frequency
             frequency = 'As directed'
-            if re.search(r'\d+\s*-\s*\d+\s*-\s*\d+', freq_part):
-                freq_match = re.search(r'(\d+\s*-\s*\d+\s*-\s*\d+.*?)(?=\s|$)', freq_part)
+            context = text[max(0, match.start()-50):match.end()+100]
+            
+            freq_patterns = [
+                (r'(\d+\s*-\s*\d+\s*-\s*\d+(?:\s*x\s*\d+\s*days?)?)', 'frequency_pattern'),
+                (r'(once\s+daily|twice\s+daily|thrice\s+daily|OD|BD|TDS)', 'daily_pattern'),
+                (r'(before\s+meals?|after\s+meals?|with\s+meals?)', 'meal_pattern'),
+                (r'(\d+\s*times?\s*(?:a\s*)?day)', 'times_pattern')
+            ]
+            
+            for freq_pattern, _ in freq_patterns:
+                freq_match = re.search(freq_pattern, context, re.IGNORECASE)
                 if freq_match:
                     frequency = freq_match.group(1).strip()
-            elif 'before' in freq_part.lower():
-                frequency = 'Before meals'
-            elif 'after' in freq_part.lower():
-                frequency = 'After meals'
-            elif 'daily' in freq_part.lower():
-                frequency = 'Daily'
-            elif freq_part:
-                frequency = freq_part[:30]  # Limit length
-                
+                    break
+            
             medicines.append({
                 'name': name,
                 'dosage': dosage,
                 'frequency': frequency
             })
-            
-        else:
-            # Pattern 2: Look for standalone medicine names
-            medicine_match = re.search(r'\b([A-Z][a-z]+(?:[A-Z][a-z]*)*(?:\d+)?)\b', part)
-            if medicine_match:
-                name = medicine_match.group(1)
-                
-                # Skip common non-medicine words
-                if name.lower() in ['before', 'after', 'meals', 'days', 'week', 'paint', 'massage', 'gum']:
-                    continue
-                    
-                # Look for dosage in the same part
-                dosage_match = re.search(r'(\d+\s*mg|\d+mg)', part, re.IGNORECASE)
-                dosage = dosage_match.group(1) if dosage_match else 'Not specified'
-                
-                # Look for frequency
-                frequency = 'As directed'
-                if re.search(r'\d+\s*-\s*\d+\s*-\s*\d+', part):
-                    freq_match = re.search(r'(\d+\s*-\s*\d+\s*-\s*\d+.*?)(?=\s|$)', part)
-                    if freq_match:
-                        frequency = freq_match.group(1).strip()
-                elif 'before' in part.lower():
-                    frequency = 'Before meals'
-                elif 'after' in part.lower():
-                    frequency = 'After meals'
-                    
-                medicines.append({
-                    'name': name,
-                    'dosage': dosage,
-                    'frequency': frequency
-                })
     
-    # Remove duplicates and clean up
+    # Remove duplicates and return
     seen = set()
     unique_medicines = []
     for med in medicines:
         key = med['name'].lower()
-        if key not in seen and len(med['name']) > 2:
+        if key not in seen and len(med['name']) >= 4:  # Minimum 4 characters
             seen.add(key)
             unique_medicines.append(med)
     
@@ -183,9 +206,11 @@ def classify_prescription(text):
         
         # Medical keywords for heuristic check
         medical_keywords = [
-            "prescribed", "take", "mg", "ml", "capsules", "dosage",
+            "prescribed", "take", "mg", "ml", "mcg", "capsules", "tablets", "dosage",
             "dr.", "doctor", "patient", "medications", "apply", "signature",
-            "clinic", "pharmacy", "rx", "dose", "medicine", "drug", "tablet"
+            "clinic", "pharmacy", "rx", "dose", "medicine", "drug", "tablet",
+            "syrup", "injection", "ointment", "cream", "drops", "inhaler",
+            "morning", "evening", "daily", "twice", "thrice", "before meals", "after meals"
         ]
         
         text_lower = text.lower()

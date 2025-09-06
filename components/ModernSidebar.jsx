@@ -23,7 +23,9 @@ import {
   Shield,
   Scan,
   FileUser,
-  AlertTriangle,
+  Newspaper,
+  Building,
+  Leaf,
   Stethoscope,
   Phone,
   MapPin,
@@ -109,10 +111,22 @@ export default function ModernSidebar() {
       description: "Scan & Analyze Prescriptions"
     },
     { 
-      href: "/dashboard/emergency-sos", 
-      label: "Emergency SOS", 
-      icon: AlertTriangle,
-      description: "Accident & Crisis Support"
+      href: "/dashboard/health-news", 
+      label: "Health News", 
+      icon: Newspaper,
+      description: "Latest Healthcare Updates"
+    },
+    { 
+      href: "/dashboard/government-schemes", 
+      label: "Government Schemes", 
+      icon: Building,
+      description: "Healthcare Programs & Policies"
+    },
+    { 
+      href: "/dashboard/ayurveda", 
+      label: "Ayurveda", 
+      icon: Leaf,
+      description: "AYUSH Natural Remedies"
     },
     { 
       href: "/dashboard/routine-doctor", 
@@ -124,11 +138,7 @@ export default function ModernSidebar() {
       href: "/dashboard/nearby-services", 
       label: "Nearby Services", 
       icon: MapPin,
-      description: "Hospitals & Ambulance",
-      dropdown: [
-        { href: "/dashboard/nearby-services", label: "Nearby Hospitals" },
-        { href: "/dashboard/blood-bank", label: "Find Blood Banks" }
-      ]
+      description: "Hospitals & Ambulance"
     },
     { 
       href: "/dashboard/blood-bank", 

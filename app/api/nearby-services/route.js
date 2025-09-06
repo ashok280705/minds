@@ -14,8 +14,7 @@ export async function POST(req) {
     const placeTypes = {
       hospital: 'hospital',
       cemetery: 'cemetery',
-      clinic: 'doctor',
-      blood_bank: 'hospital'
+      clinic: 'doctor'
     };
 
     const placeType = placeTypes[type] || 'hospital';

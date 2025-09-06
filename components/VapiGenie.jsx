@@ -100,20 +100,18 @@ export default function VapiGenie() {
       
       porcupineRef.current = await PorcupineWorker.create(
         'a4e52b1b-a945-4d62-92ba-69a11ee1e534', // Your public key
-        ['/hey--genie_en_mac_v3_0_0/hey--genie_en_mac_v3_0_0.ppn'], // Your custom wake word file
+        ['Porcupine'], // Built-in keyword
         (keywordIndex) => {
-          console.log('✅ "HEY GENIE" WAKE WORD DETECTED! Starting Vapi...');
+          console.log('✅ "PORCUPINE" WAKE WORD DETECTED! Starting Vapi...');
           startVapiConversation();
         }
       );
       
-      console.log('✅ Porcupine initialized - Say "Hey Genie" to activate');
+      console.log('✅ Porcupine initialized - Say "Porcupine" to activate');
       setStatus('waiting');
       
     } catch (error) {
-      console.error('❌ Porcupine initialization failed:', error);
-      // Fallback to browser wake word if Porcupine fails
-      console.log('🔄 Falling back to browser wake word detection...');
+      // Silent fallback to browser wake word
       startBrowserWakeWord();
     }
   };
@@ -131,7 +129,7 @@ export default function VapiGenie() {
         const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase();
         console.log('🎤 Browser heard:', transcript);
         
-        if (transcript.includes('genie') || transcript.includes('hey genie')) {
+        if (transcript.includes('genie') || transcript.includes('hey genie') || transcript.includes('jini')) {
           console.log('✅ Browser wake word detected! Starting Vapi...');
           recognition.stop();
           startVapiConversation();

@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: python-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port=$PORT --server.address=0.0.0.0
+    envVars:
+      - key: HUGGINGFACE_API_TOKEN
+        value: your-huggingface-token

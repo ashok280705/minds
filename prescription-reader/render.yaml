@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: prescription-reader
+    env: python
+    buildCommand: |
+      apt-get update && apt-get install -y tesseract-ocr libgl1-mesa-glx
+      pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: PORT
+        value: 5002

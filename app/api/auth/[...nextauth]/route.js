@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User"
 import Doctor from "@/models/Doctor";
+import Pharmacist from "@/models/Pharmacist";
 import bcrypt from "bcryptjs";
 
 export const authOptions = {
@@ -14,6 +15,7 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         isDoctor: { label: "Doctor Login", type: "text" },
+        isPharmacist: { label: "Pharmacist Login", type: "text" },
       },
       async authorize(credentials) {
         await dbConnect();
@@ -21,6 +23,8 @@ export const authOptions = {
 
         if (credentials.isDoctor === "true") {
           account = await Doctor.findOne({ email: credentials.email });
+        } else if (credentials.isPharmacist === "true") {
+          account = await Pharmacist.findOne({ email: credentials.email });
         } else {
           account = await User.findOne({ email: credentials.email });
         }
@@ -40,6 +44,7 @@ export const authOptions = {
           name: account.name,
           email: account.email,
           isDoctor: credentials.isDoctor === "true",
+          isPharmacist: credentials.isPharmacist === "true",
         };
       },
     }),
@@ -73,7 +78,8 @@ export const authOptions = {
     async session({ session, token }) {
       session.user.id = token.id;
       session.user.isDoctor = token.isDoctor || false;
-      session.user.googleId = token.googleId || null; // ✅ Add Google ID!
+      session.user.isPharmacist = token.isPharmacist || false;
+      session.user.googleId = token.googleId || null;
       return session;
     },
 
@@ -81,8 +87,9 @@ export const authOptions = {
       if (user) {
         token.id = user.id || token.id;
         token.isDoctor = user.isDoctor || false;
+        token.isPharmacist = user.isPharmacist || false;
         if (profile?.sub) {
-          token.googleId = profile.sub; // ✅ Save Google ID!
+          token.googleId = profile.sub;
         }
       }
       return token;

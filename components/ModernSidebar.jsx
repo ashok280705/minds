@@ -84,12 +84,7 @@ export default function ModernSidebar() {
       description: "Menstrual Health Tracking",
       locked: userGender !== "female"
     },
-    { 
-      href: "/dashboard/reports-analyzer", 
-      label: "Reports Analyzer", 
-      icon: FileText,
-      description: "Medical Report Analysis"
-    },
+
     { 
       href: "/personal-documents", 
       label: "Personal Documents", 
@@ -102,8 +97,9 @@ export default function ModernSidebar() {
       icon: Pill,
       description: "Medicine & Prescriptions",
       dropdown: [
-        { href: "/dashboard/pharmacy/online", label: "Online Pharmacy" },
-        { href: "/dashboard/pharmacy/physical", label: "Nearby Pharmacies" }
+        { href: "/dashboard/pharmacy/online", label: "Clarity Pharm" },
+        { href: "/dashboard/pharmacy/physical", label: "Nearby Pharmacies" },
+        { href: "/dashboard/pharmacy/offline", label: "Offline Pharmacy" }
       ]
     },
     { 
@@ -111,6 +107,12 @@ export default function ModernSidebar() {
       label: "Prescription Reader", 
       icon: Scan,
       description: "Scan & Analyze Prescriptions"
+    },
+    { 
+      href: "/dashboard/doctor", 
+      label: "Doctor Dashboard", 
+      icon: Stethoscope,
+      description: "Medical Professional Portal"
     },
     { 
       href: "/dashboard/health-news", 
@@ -164,21 +166,7 @@ export default function ModernSidebar() {
         { href: "/dashboard/blood-bank/medicines", label: "My Medicines" }
       ]
     },
-    { 
-      href: "/dashboard/scans-analyzer", 
-      label: "Scans Analyzer", 
-      icon: ScanLine,
-      description: "Medical Scan Analysis",
-      dropdown: [
-        { href: "/dashboard/scans-analyzer/mri", label: "MRI Scans" },
-        { href: "/dashboard/scans-analyzer/xray", label: "X-Ray" },
-        { href: "/dashboard/scans-analyzer/chest", label: "Chest Scan" },
-        { href: "/dashboard/scans-analyzer/kidney", label: "Kidney Scan" },
-        { href: "/dashboard/scans-analyzer/heart", label: "Heart Scan" },
-        { href: "/dashboard/scans-analyzer/skin", label: "Skin Analysis" },
-        { href: "/dashboard/scans-analyzer/liver", label: "Liver Scan" }
-      ]
-    }
+
   ];
 
   const bottomLinks = [

@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
+import { Stethoscope, Pill } from "lucide-react";
 import DoctorEscalationPanel from "@/components/DoctorEscalationPanel";
 import DoctorFeedback from "@/components/DoctorFeedback";
 import RoutineDoctorPanel from "@/components/RoutineDoctorPanel";
@@ -107,6 +109,8 @@ export default function DoctorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+
+
       {/* Modern Navbar */}
       <DoctorNavbar 
         status={isOnline ? 'online' : 'offline'}

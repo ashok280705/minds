@@ -68,8 +68,8 @@ export default function DoctorLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1">{children}</main>
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      <main className="flex-1 w-full">{children}</main>
       <DoctorFooter />
     </div>
   );

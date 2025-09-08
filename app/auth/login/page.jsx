@@ -14,13 +14,14 @@ import {
   Heart,
   Brain,
   Sparkles,
+  Pill,
 } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isDoctor, setIsDoctor] = useState(false);
+  const [userType, setUserType] = useState("patient");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -56,19 +57,22 @@ export default function LoginPage() {
         redirect: false,
         email,
         password,
-        isDoctor: isDoctor.toString(),
+        isDoctor: (userType === "doctor").toString(),
+        isPharmacist: (userType === "pharmacist").toString(),
       });
 
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        if (isDoctor) {
+        if (userType === "doctor") {
           await fetch("/api/doctor/status", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, status: "online" }),
           });
           router.push("/doctor");
+        } else if (userType === "pharmacist") {
+          router.push("/dashboard/pharmacist");
         } else {
           router.push("/dashboard");
         }
@@ -82,8 +86,8 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    if (isDoctor) {
-      setError("Doctors must use email & password only.");
+    if (userType !== "patient") {
+      setError("Only patients can use Google login.");
       return;
     }
     await signIn("google", { callbackUrl: "/dashboard" });
@@ -253,14 +257,14 @@ export default function LoginPage() {
 
           <div ref={formRef} className="animate-in">
             {/* User Type Toggle */}
-            <div className="flex items-center justify-center gap-0.5 mb-3 sm:mb-4 p-0.5 bg-gray-100 rounded-lg">
+            <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4 p-1">
               <button
                 type="button"
-                onClick={() => setIsDoctor(false)}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-300 ${
-                  !isDoctor
-                    ? "bg-white text-blue-600 shadow-md transform scale-105"
-                    : "text-gray-600 hover:text-blue-600"
+                onClick={() => setUserType("patient")}
+                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                  userType === "patient"
+                    ? "bg-white text-blue-600 shadow-md"
+                    : "bg-gray-50 text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <User className="w-3 h-3" />
@@ -268,15 +272,27 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setIsDoctor(true)}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-300 ${
-                  isDoctor
-                    ? "bg-white text-blue-600 shadow-md transform scale-105"
-                    : "text-gray-600 hover:text-blue-600"
+                onClick={() => setUserType("doctor")}
+                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                  userType === "doctor"
+                    ? "bg-white text-blue-600 shadow-md"
+                    : "bg-gray-50 text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <Stethoscope className="w-3 h-3" />
                 Doctor
+              </button>
+              <button
+                type="button"
+                onClick={() => setUserType("pharmacist")}
+                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                  userType === "pharmacist"
+                    ? "bg-white text-green-600 shadow-md"
+                    : "bg-gray-50 text-gray-600 hover:text-green-600"
+                }`}
+              >
+                <Pill className="w-3 h-3" />
+                Pharmacist
               </button>
             </div>
 
@@ -334,14 +350,16 @@ export default function LoginPage() {
                 )}
                 {loading
                   ? "Signing In..."
-                  : isDoctor
+                  : userType === "doctor"
                   ? "Sign In as Doctor"
+                  : userType === "pharmacist"
+                  ? "Sign In as Pharmacist"
                   : "Sign In"}
               </button>
             </form>
 
             {/* Google Login for Patients Only */}
-            {!isDoctor && (
+            {userType === "patient" && (
               <>
                 <div className="flex items-center my-3 sm:my-4">
                   <div className="flex-1 border-t border-gray-200"></div>
@@ -362,16 +380,18 @@ export default function LoginPage() {
               </>
             )}
 
-            {/* Sign Up Link */}
-            <p className="text-center text-gray-600 mt-3 sm:mt-4 text-[10px] sm:text-xs">
-              {isDoctor ? "New doctor?" : "Don't have an account?"}{" "}
-              <a
-                href={isDoctor ? "/doctor-register" : "/auth/register"}
-                className="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-200 hover:underline"
-              >
-                {isDoctor ? "Register here" : "Create account"}
-              </a>
-            </p>
+            {/* Sign Up Links */}
+            <div className="text-center mt-3 sm:mt-4">
+              <p className="text-gray-600 text-[10px] sm:text-xs">
+                {userType === "doctor" ? "New doctor?" : userType === "pharmacist" ? "New pharmacist?" : "Don't have an account?"}{" "}
+                <a
+                  href={userType === "doctor" ? "/doctor-register" : userType === "pharmacist" ? "/pharmacist-register" : "/auth/register"}
+                  className="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-200 hover:underline"
+                >
+                  {userType === "doctor" ? "Register here" : userType === "pharmacist" ? "Register here" : "Create account"}
+                </a>
+              </p>
+            </div>
 
             {/* Mental Health Message */}
             <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-blue-100">

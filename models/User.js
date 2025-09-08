@@ -42,6 +42,19 @@ const UserSchema = new mongoose.Schema(
       enum: ["en", "hi", "mr"],
       default: "en",
     },
+    isPharmacist: {
+      type: Boolean,
+      default: false,
+    },
+    pharmacistDetails: {
+      licenseNumber: String,
+      pharmacyName: String,
+      address: String,
+      isVerified: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,

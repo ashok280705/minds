@@ -39,16 +39,22 @@ export default function LayoutWrapper({ children }) {
   }
 
   const hideLayout =
+    !session ||
     pathname === "/" ||
     pathname === "/auth/login" ||
     pathname === "/auth/register" ||
     pathname === "/doctor/register" ||
     pathname === "/doctor-register" ||
+    pathname === "/pharmacist-register" ||
     pathname.startsWith("/chat-room") ||
     pathname.startsWith("/video-room") ||
-    pathname.startsWith("/doctor");
+    pathname.startsWith("/doctor") ||
+    pathname === "/doctor" ||
+    pathname.startsWith("/dashboard/pharmacist");
 
   const showSidebar = !hideLayout;
+  
+
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900">

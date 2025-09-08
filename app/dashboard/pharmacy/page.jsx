@@ -15,7 +15,7 @@ export default function PharmacyDashboard() {
             <p className="text-gray-600">Find medicines online or locate nearby pharmacies</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Physical Pharmacy Card */}
             <Link href="/dashboard/pharmacy/physical">
               <div className="group bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-8 text-white cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
@@ -37,6 +37,31 @@ export default function PharmacyDashboard() {
                 </div>
                 <div className="flex items-center text-sm text-blue-100">
                   <span>• Direct navigation support</span>
+                </div>
+              </div>
+            </Link>
+
+            {/* Offline Medicine Checker Card */}
+            <Link href="/dashboard/pharmacy/offline">
+              <div className="group bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-8 text-white cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <div className="flex items-center justify-between mb-6">
+                  <Pill className="w-12 h-12" />
+                  <MapPin className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
+                </div>
+                
+                <h2 className="text-2xl font-bold mb-3">Medicine Availability Checker</h2>
+                <p className="text-purple-100 mb-4">
+                  Check which nearby pharmacies have your medicine in stock before traveling
+                </p>
+                
+                <div className="flex items-center text-sm text-purple-100">
+                  <span>• Real-time stock checking</span>
+                </div>
+                <div className="flex items-center text-sm text-purple-100">
+                  <span>• SMS service for offline use</span>
+                </div>
+                <div className="flex items-center text-sm text-purple-100">
+                  <span>• Reserve medicines online</span>
                 </div>
               </div>
             </Link>

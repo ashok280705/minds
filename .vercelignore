@@ -1,0 +1,19 @@
+# Python backends (not deployed to Vercel)
+python-backend/
+risk-analyzer/
+scans-analyzer/
+prescription-reader/
+
+# Development files
+.env.local
+logs/
+data/
+
+# Large files
+porcupine/
+hey--genie_en_mac_v3_0_0/
+
+# Test files
+test-*.js
+test-*.html
+*.test.js

@@ -14,6 +14,7 @@
     "@huggingface/inference": "^4.7.1",
     "@picovoice/porcupine-web": "^3.0.3",
     "@vapi-ai/web": "^2.3.10",
+    "@tailwindcss/postcss": "^4",
     "autoprefixer": "^10.4.21",
     "bcryptjs": "^3.0.2",
     "canvas": "^3.2.0",
@@ -36,15 +37,14 @@
     "sharp": "^0.34.3",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4",
     "tesseract.js": "^6.0.1",
     "twilio": "^5.8.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
     "@types/react": "19.1.11",
     "eslint": "^9",
-    "eslint-config-next": "15.4.5",
-    "tailwindcss": "^4"
+    "eslint-config-next": "15.4.5"
   }
 }

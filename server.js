@@ -3,7 +3,7 @@ const next = require("next");
 const { initIO } = require("./lib/socket");
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "localhost";
+const hostname = dev ? "localhost" : "0.0.0.0";
 const port = process.env.PORT || 3000;
 
 const app = next({ dev, hostname, port });
@@ -17,9 +17,8 @@ app.prepare().then(() => {
   global._io = io; // ✅ So you can use it in API routes
   
   // Initialize escalation service with Socket.IO
-  import('./lib/escalationService.js').then(({ default: escalationService }) => {
-    escalationService.setSocketIO(io);
-  });
+  const escalationService = require('./lib/escalationService');
+  escalationService.setSocketIO(io);
 
   httpServer.listen(port, hostname, () => {
     console.log(`> Ready on http://${hostname}:${port}`);

@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: minds-frontend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_CLIENT_ID
+        value: 1013365918137-1fdfbk0rc288qn0ioq75ffbl1inlhqva.apps.googleusercontent.com
+      - key: GOOGLE_CLIENT_SECRET
+        value: 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
+      - key: MONGODB_ATLAS_URI
+        value: mongodb+srv://progamerz9764:refinify1432@refinify.jovjgcc.mongodb.net/minds?retryWrites=true&w=majority
+      - key: NEXTAUTH_SECRET
+        value: piaPfUg5y+NP+5wf+O+IwI3hwJQN20X8/sttLvCblGg=
+      - key: NEXTAUTH_URL
+        value: https://minds-frontend.onrender.com
+      - key: GEMINI_API_KEY
+        value: AIzaSyCUD3MXSMK6Z9Klkt-D1volQBh6MLhzEEM
+      - key: TWILIO_SID
+        value: AC8f131f83252238a3e144e34e99c741c4
+      - key: TWILIO_AUTH
+        value: 9dfd48233734ff5a3d8c5f977f4ffb58
+      - key: TWILIO_WHATSAPP_NUMBER
+        value: whatsapp:+14155238886
+      - key: VAPI_PRIVATE_KEY
+        value: 5e5a3fb5-0b7d-41b0-81ef-d3dfddbed249
+      - key: VAPI_PUBLIC_KEY
+        value: a4e52b1b-a945-4d62-92ba-69a11ee1e534
+      - key: NEXT_PUBLIC_VAPI_PUBLIC_KEY
+        value: a4e52b1b-a945-4d62-92ba-69a11ee1e534
+      - key: NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+        value: AIzaSyCftzu45fiNKClUtg3I0LTmn1JHLMd_5wQ

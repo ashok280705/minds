@@ -10,7 +10,6 @@ import {
   MessageSquare, 
   Lock, 
   Heart, 
-  Stethoscope, 
   UserCheck,
   Shield,
   FileText,
@@ -58,7 +57,6 @@ export default function Sidebar() {
       title: "Medical Services",
       items: [
         { href: "/dashboard/health-advisor", label: "Health Report Advisor", icon: FileText },
-        { href: "/doctor", label: "Doctor Consultation", icon: Stethoscope },
         { href: "/dashboard/blood-bank", label: "Blood Bank Services", icon: Droplets },
         { href: "/dashboard/blood-bank/medicines", label: "My Medicines", icon: Pill },
       ]

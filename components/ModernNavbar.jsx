@@ -40,7 +40,7 @@ export default function ModernNavbar() {
             </div>
             <div className="hidden sm:block">
               <span className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-                Minds
+                Clarity Care
               </span>
             </div>
           </Link>

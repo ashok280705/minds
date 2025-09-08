@@ -46,13 +46,13 @@ export default function Ayurveda() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 text-black p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-orange-600 mb-4">
             🌿 AYUSH Knowledge Base
           </h1>
-          <p className="text-gray-700">Discover Ayurvedic, Yoga, Unani, Siddha & Homeopathy remedies</p>
+          <p className="text-gray-700 dark:text-gray-300">Discover Ayurvedic, Yoga, Unani, Siddha & Homeopathy remedies</p>
         </div>
 
         {/* Warning Banner */}

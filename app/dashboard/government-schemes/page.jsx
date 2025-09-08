@@ -45,13 +45,13 @@ export default function GovernmentSchemes() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-black p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-4">
             🏛️ Government Health Schemes
           </h1>
-          <p className="text-gray-700">Discover government healthcare schemes and programs in India</p>
+          <p className="text-gray-700 dark:text-gray-300">Discover government healthcare schemes and programs in India</p>
         </div>
 
         <div className="flex items-center gap-4 mb-8">

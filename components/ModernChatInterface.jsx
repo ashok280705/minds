@@ -67,10 +67,12 @@ export default function ModernChatInterface({ onSessionSave }) {
     { text: "I feel overwhelmed", emoji: "😵" }
   ];
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom only for new messages, not on load
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    if (messages.length > 1) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages.length]);
 
   // Initialize speech recognition and synthesis
   useEffect(() => {

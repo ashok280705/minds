@@ -44,10 +44,10 @@ export default function DoctorNavbar({ status, doctorName, onLogout, onStatusCha
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-                Doctor Dashboard
+                Clarity Care - Doctor Dashboard
               </h1>
               <p className="text-xs text-emerald-600/70 font-medium">
-                Mental Health Professional Portal
+                Healthcare Professional Portal
               </p>
             </div>
           </div>

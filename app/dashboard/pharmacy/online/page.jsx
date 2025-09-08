@@ -199,29 +199,29 @@ export default function OnlinePharmacy() {
   const getTotalCartPrice = () => cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl shadow-xl p-6 mb-8 border border-green-200">
+        <div className="bg-white rounded-2xl shadow-xl p-6 mb-8 border border-gray-200">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-black">Online Pharmacy</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Online Pharmacy</h1>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowOrderHistory(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-black rounded-xl hover:bg-purple-700 font-semibold shadow-lg border-2 border-black mr-2"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded-xl hover:bg-purple-600 font-semibold shadow-lg transition-colors"
               >
                 Order History
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 text-black rounded-xl hover:bg-gray-900 font-semibold shadow-lg border-2 border-black"
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 font-semibold shadow-lg transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Add Product
               </button>
               <button
                 onClick={() => setShowCart(true)}
-                className="relative p-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 border-2 border-black"
+                className="relative p-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {getTotalCartItems() > 0 && (
@@ -242,13 +242,13 @@ export default function OnlinePharmacy() {
                 placeholder="Search products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800"
               />
             </div>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-blue-500 text-black"
+              className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-800"
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -263,7 +263,7 @@ export default function OnlinePharmacy() {
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-black">Loading products...</p>
+            <p className="mt-4 text-gray-600">Loading products...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -277,8 +277,8 @@ export default function OnlinePharmacy() {
                   )}
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-lg text-black mb-2">{product.name}</h3>
-                  <p className="text-sm text-black mb-2">{product.description}</p>
+                  <h3 className="font-semibold text-lg text-gray-800 mb-2">{product.name}</h3>
+                  <p className="text-sm text-gray-600 mb-2">{product.description}</p>
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xl font-bold text-green-600">₹{product.price}</span>
                     <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
@@ -288,19 +288,19 @@ export default function OnlinePharmacy() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => addToCart(product)}
-                      className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-xl hover:bg-blue-700 text-sm border-2 border-black"
+                      className="flex-1 bg-emerald-500 text-white py-2 px-3 rounded-xl hover:bg-emerald-600 text-sm transition-colors"
                     >
                       Add to Cart
                     </button>
                     <button
                       onClick={() => setEditingProduct(product)}
-                      className="p-2 text-black hover:text-blue-600 border-2 border-black rounded-xl"
+                      className="p-2 text-gray-600 hover:text-blue-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteProduct(product._id)}
-                      className="p-2 text-black hover:text-red-600 border-2 border-black rounded-xl"
+                      className="p-2 text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

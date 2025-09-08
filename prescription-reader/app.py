@@ -361,8 +361,8 @@ if __name__ == '__main__':
     # Initialize models
     if initialize_models():
         print("✅ All models loaded successfully!")
-        print("🚀 Starting Flask server on port 5003...")
-        app.run(host='0.0.0.0', port=5003, debug=True)
+        print("🚀 Starting Flask server on port 5009...")
+        app.run(host='0.0.0.0', port=5009, debug=True)
     else:
         print("❌ Failed to load models. Please run: python model_download.py")
         print("💡 Or check if the model files exist in the 'model' directory")

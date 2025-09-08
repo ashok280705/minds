@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { 
   Brain, 
   FileText, 
@@ -177,20 +178,21 @@ export default function ModernDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200 px-6 py-8">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                 Welcome back, {session?.user?.name?.split(' ')[0] || 'User'}! 👋
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 dark:text-gray-300 mt-2">
                 How are you feeling today? I'm here to support your mental wellness journey.
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full">
                 <Shield className="w-4 h-4 text-emerald-600" />
                 <span className="text-sm font-medium text-emerald-700">Secure & Private</span>
@@ -223,10 +225,10 @@ export default function ModernDashboard() {
               <button
                 key={index}
                 onClick={action.onClick}
-                className={`p-4 rounded-xl border-2 border-gray-200 hover:border-${action.color}-300 hover:bg-${action.color}-50 transition-all duration-200 text-left group`}
+                className="p-4 rounded-xl border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200 text-left group"
               >
-                <div className={`w-10 h-10 bg-${action.color}-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
-                  <action.icon className={`w-5 h-5 text-${action.color}-600`} />
+                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <action.icon className="w-5 h-5 text-emerald-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
                 <p className="text-sm text-gray-600">{action.description}</p>

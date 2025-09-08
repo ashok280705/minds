@@ -111,7 +111,7 @@ export default function ProfilePage() {
                 Complete Your Profile
               </h1>
               <p className="text-emerald-600/70 text-sm font-medium mb-4">
-                Help us personalize your mental wellness journey
+                Help us personalize your healthcare journey
               </p>
               <div className="flex items-center justify-center gap-4 text-xs text-emerald-600/60">
                 <div className="flex items-center gap-1">
@@ -227,19 +227,7 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                <SelectField
-                  label="Preferred Language"
-                  name="language"
-                  value={formData.language}
-                  onChange={handleChange}
-                  required
-                  icon={<Globe className="w-4 h-4" />}
-                  options={[
-                    { value: "en", label: "English" },
-                    { value: "hi", label: "हिंदी (Hindi)" },
-                    { value: "mr", label: "मराठी (Marathi)" },
-                  ]}
-                />
+
               </div>
 
               <div className="pt-6">

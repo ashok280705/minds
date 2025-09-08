@@ -54,14 +54,14 @@ export default function HealthNews() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white text-black p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-6">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
             📰 Healthcare News
           </h1>
-          <p className="text-gray-700">Stay updated with the latest healthcare and medical news</p>
+          <p className="text-gray-700 dark:text-gray-300">Stay updated with the latest healthcare and medical news</p>
         </div>
 
         {/* Category Filter Dropdown */}
@@ -73,7 +73,7 @@ export default function HealthNews() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-3 bg-white border-2 border-black rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
+            className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-xl text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
           >
             {categories.map((category) => (
               <option key={category.id} value={category.id}>

@@ -178,10 +178,10 @@ export default function LoginPage() {
         .gradient-bg {
           background: linear-gradient(
             -45deg,
-            #667eea,
-            #764ba2,
-            #f093fb,
-            #f5576c
+            #0ea5e9,
+            #06b6d4,
+            #10b981,
+            #3b82f6
           );
           background-size: 400% 400%;
           animation: gradient-shift 15s ease infinite;
@@ -209,17 +209,17 @@ export default function LoginPage() {
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
-        .mental-health-icon {
-          color: #8b5cf6;
-          filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.3));
+        .healthcare-icon {
+          color: #0ea5e9;
+          filter: drop-shadow(0 0 10px rgba(14, 165, 233, 0.3));
         }
       `}</style>
 
       <main className="min-h-screen flex items-center justify-center gradient-bg relative overflow-hidden">
         {/* Floating Background Elements */}
         <div className="floating-shape absolute top-16 left-4 w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-white/10 rounded-full blur-sm"></div>
-        <div className="floating-shape absolute top-32 right-8 w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-purple-300/20 rounded-full blur-sm"></div>
-        <div className="floating-shape absolute bottom-24 left-8 w-14 h-14 sm:w-18 sm:h-18 md:w-24 md:h-24 bg-pink-300/15 rounded-full blur-sm"></div>
+        <div className="floating-shape absolute top-32 right-8 w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-teal-300/20 rounded-full blur-sm"></div>
+        <div className="floating-shape absolute bottom-24 left-8 w-14 h-14 sm:w-18 sm:h-18 md:w-24 md:h-24 bg-emerald-300/15 rounded-full blur-sm"></div>
         <div className="floating-shape absolute bottom-16 right-4 w-12 h-12 sm:w-14 sm:h-14 md:w-18 md:h-18 bg-blue-300/20 rounded-full blur-sm"></div>
 
         {/* Sparkle Effects */}
@@ -227,10 +227,10 @@ export default function LoginPage() {
           <Sparkles className="sparkle-animation w-3 h-3 sm:w-4 sm:h-4 text-white/60" />
         </div>
         <div className="absolute top-1/3 right-1/3">
-          <Sparkles className="sparkle-animation w-2 h-2 sm:w-3 sm:h-3 text-purple-200/70" />
+          <Sparkles className="sparkle-animation w-2 h-2 sm:w-3 sm:h-3 text-teal-200/70" />
         </div>
         <div className="absolute bottom-1/3 left-1/3">
-          <Sparkles className="sparkle-animation w-4 h-4 sm:w-5 sm:h-5 text-pink-200/60" />
+          <Sparkles className="sparkle-animation w-4 h-4 sm:w-5 sm:h-5 text-emerald-200/60" />
         </div>
 
         {/* Main Login Container */}
@@ -239,10 +239,10 @@ export default function LoginPage() {
           <div ref={titleRef} className="animate-in text-center mb-3 sm:mb-4">
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
               <div className="relative">
-                <Brain className="mental-health-icon w-5 h-5 sm:w-6 sm:h-6" />
-                <Heart className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 text-pink-500" />
+                <Brain className="healthcare-icon w-5 h-5 sm:w-6 sm:h-6" />
+                <Heart className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-500" />
               </div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
                 Clarity Care
               </h1>
             </div>
@@ -259,8 +259,8 @@ export default function LoginPage() {
                 onClick={() => setIsDoctor(false)}
                 className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-300 ${
                   !isDoctor
-                    ? "bg-white text-purple-600 shadow-md transform scale-105"
-                    : "text-gray-600 hover:text-purple-600"
+                    ? "bg-white text-blue-600 shadow-md transform scale-105"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <User className="w-3 h-3" />
@@ -271,8 +271,8 @@ export default function LoginPage() {
                 onClick={() => setIsDoctor(true)}
                 className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-300 ${
                   isDoctor
-                    ? "bg-white text-purple-600 shadow-md transform scale-105"
-                    : "text-gray-600 hover:text-purple-600"
+                    ? "bg-white text-blue-600 shadow-md transform scale-105"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <Stethoscope className="w-3 h-3" />
@@ -286,7 +286,7 @@ export default function LoginPage() {
                 <label className="block text-gray-700 mb-1 font-medium text-xs sm:text-sm">
                   Email
                 </label>
-                <div className="input-focus relative border-2 border-gray-200 rounded-lg px-2.5 py-2.5 sm:py-3 focus-within:border-purple-400 transition-all duration-300">
+                <div className="input-focus relative border-2 border-gray-200 rounded-lg px-2.5 py-2.5 sm:py-3 focus-within:border-blue-400 transition-all duration-300">
                   <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <input
                     type="email"
@@ -303,7 +303,7 @@ export default function LoginPage() {
                 <label className="block text-gray-700 mb-1 font-medium text-xs sm:text-sm">
                   Password
                 </label>
-                <div className="input-focus relative border-2 border-gray-200 rounded-lg px-2.5 py-2.5 sm:py-3 focus-within:border-purple-400 transition-all duration-300">
+                <div className="input-focus relative border-2 border-gray-200 rounded-lg px-2.5 py-2.5 sm:py-3 focus-within:border-blue-400 transition-all duration-300">
                   <Lock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <input
                     type="password"
@@ -325,7 +325,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-hover w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg shadow-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                className="btn-hover w-full bg-gradient-to-r from-blue-600 to-teal-600 text-white flex items-center justify-center gap-1.5 py-2.5 sm:py-3 rounded-lg shadow-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
               >
                 {loading ? (
                   <div className="animate-spin w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-white border-t-transparent rounded-full"></div>
@@ -367,16 +367,16 @@ export default function LoginPage() {
               {isDoctor ? "New doctor?" : "Don't have an account?"}{" "}
               <a
                 href={isDoctor ? "/doctor-register" : "/auth/register"}
-                className="text-purple-600 font-semibold hover:text-purple-800 transition-colors duration-200 hover:underline"
+                className="text-blue-600 font-semibold hover:text-blue-800 transition-colors duration-200 hover:underline"
               >
                 {isDoctor ? "Register here" : "Create account"}
               </a>
             </p>
 
             {/* Mental Health Message */}
-            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
+            <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg border border-blue-100">
               <p className="text-center text-[10px] sm:text-xs text-gray-600 leading-tight">
-                <Heart className="inline w-3 h-3 text-pink-500 mr-0.5" />
+                <Heart className="inline w-3 h-3 text-emerald-500 mr-0.5" />
                 Your healthcare journey starts here. We're here to help.
               </p>
             </div>

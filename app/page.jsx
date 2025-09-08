@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Brain, Heart, Shield, Phone, Mail, Clock, Star, CheckCircle, ArrowRight, Sparkles, Users, Globe, MessageCircle } from 'lucide-react';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export default function HomePage() {
   const heroTitleRef = useRef(null);
@@ -106,7 +107,7 @@ export default function HomePage() {
       <div className="floating-shape absolute w-48 h-48 bg-cyan-200 rounded-full filter blur-3xl opacity-20 bottom-32 left-10" />
 
       {/* Header */}
-      <header className="fixed top-0 w-full px-8 py-4 bg-white/95 backdrop-blur-md shadow-lg z-50 border-b border-emerald-100/50">
+      <header className="sticky-navbar fixed top-0 w-full px-8 py-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md shadow-lg z-50 border-b border-emerald-100/50 dark:border-gray-700">
         <div className="flex justify-between items-center max-w-6xl mx-auto">
           <div className="flex items-center space-x-3">
             <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-lg">
@@ -116,12 +117,15 @@ export default function HomePage() {
               Clarity Care
             </div>
           </div>
-          <nav className="hidden md:flex space-x-8">
-            <a href="#home" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Home</a>
-            <a href="#services" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Services</a>
-            <a href="#about" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">About</a>
-            <a href="#contact" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Contact</a>
-          </nav>
+          <div className="flex items-center gap-4">
+            <nav className="hidden md:flex space-x-8">
+              <a href="#home" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Home</a>
+              <a href="#services" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Services</a>
+              <a href="#about" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">About</a>
+              <a href="#contact" className="text-emerald-700 hover:text-emerald-800 font-medium transition-colors">Contact</a>
+            </nav>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

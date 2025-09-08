@@ -113,7 +113,7 @@ export default function HomePage() {
               <Brain className="text-white w-5 h-5" />
             </div>
             <div className="text-2xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-              Minds
+              Clarity Care
             </div>
           </div>
           <nav className="hidden md:flex space-x-8">
@@ -301,7 +301,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="animate-on-scroll">
               <h2 className="text-4xl md:text-5xl font-bold text-emerald-800 mb-6">
-                Why Choose Minds?
+                Why Choose Clarity Care?
               </h2>
               <p className="text-xl text-emerald-700/80 mb-8 leading-relaxed">
                 We believe mental health care should be accessible, personalized, and effective. Our platform combines the latest in AI technology with human expertise to provide comprehensive support.
@@ -406,7 +406,7 @@ export default function HomePage() {
                   <Brain className="text-white w-5 h-5" />
                 </div>
                 <div className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-                  Minds
+                  Clarity Care
                 </div>
               </div>
               <p className="text-emerald-700/70 text-sm leading-relaxed">
@@ -424,7 +424,7 @@ export default function HomePage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  <span>support@minds.care</span>
+                  <span>support@claritycare.health</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
@@ -446,7 +446,7 @@ export default function HomePage() {
 
           <div className="border-t border-emerald-100 pt-8 text-center">
             <p className="text-emerald-600/70 text-sm">
-              © {new Date().getFullYear()} Minds Mental Wellness Platform. Your mental health matters. All rights reserved.
+              © {new Date().getFullYear()} Clarity Care Healthcare Platform. Your health matters. All rights reserved.
             </p>
           </div>
         </div>

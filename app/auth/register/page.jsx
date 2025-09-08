@@ -62,10 +62,10 @@ export default function SignUpPage() {
             </div>
             
             <h1 className="text-2xl font-bold text-emerald-800 mb-1">
-              Join <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Minds</span>
+              Join <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Clarity Care</span>
             </h1>
             <p className="text-emerald-600/70 text-sm font-medium mb-3">
-              Your journey to mental wellness starts here
+              Your journey to better health starts here
             </p>
             
             {/* Trust Indicators */}

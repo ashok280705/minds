@@ -243,11 +243,11 @@ export default function LoginPage() {
                 <Heart className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 text-pink-500" />
               </div>
               <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                MindCare
+                Clarity Care
               </h1>
             </div>
             <p className="text-gray-600 text-xs leading-tight">
-              Your safe space for mental wellness
+              Your comprehensive healthcare platform
             </p>
           </div>
 
@@ -377,7 +377,7 @@ export default function LoginPage() {
             <div className="mt-3 sm:mt-4 p-2.5 sm:p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100">
               <p className="text-center text-[10px] sm:text-xs text-gray-600 leading-tight">
                 <Heart className="inline w-3 h-3 text-pink-500 mr-0.5" />
-                Your mental health journey starts here. You're not alone.
+                Your healthcare journey starts here. We're here to help.
               </p>
             </div>
           </div>

@@ -26,6 +26,8 @@ import {
   Newspaper,
   Building,
   Leaf,
+  AlertTriangle,
+  Sparkles,
   Stethoscope,
   Phone,
   MapPin,
@@ -129,6 +131,18 @@ export default function ModernSidebar() {
       description: "AYUSH Natural Remedies"
     },
     { 
+      href: "/dashboard/emergency-sos", 
+      label: "Emergency SOS", 
+      icon: AlertTriangle,
+      description: "Accident & Crisis Support"
+    },
+    { 
+      href: "/dashboard/skin-care", 
+      label: "Personal Dermat", 
+      icon: Sparkles,
+      description: "Dermatology Consultation"
+    },
+    { 
       href: "/dashboard/routine-doctor", 
       label: "Routine Doctor", 
       icon: Phone,
@@ -206,9 +220,9 @@ export default function ModernSidebar() {
           {!isCollapsed && (
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent">
-                Minds
+                Clarity Care
               </h1>
-              <p className="text-xs text-gray-500">Mental Wellness Platform</p>
+              <p className="text-xs text-gray-500">Healthcare Platform</p>
             </div>
           )}
         </div>

@@ -143,9 +143,11 @@ export default function VideoRoom() {
         };
 
         // Initialize socket with unique connection
-        socketInstance = io({
+        const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
+        
+        socketInstance = io(socketUrl, {
           forceNew: true,
-          transports: ['websocket']
+          transports: ['websocket', 'polling']
         });
         setSocket(socketInstance);
         

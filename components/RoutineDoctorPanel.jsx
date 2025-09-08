@@ -43,8 +43,7 @@ export default function RoutineDoctorPanel({ doctorId, doctorName, inline = fals
 
       if (response.ok) {
         const data = await response.json();
-        window.open(`/${data.connectionType}-room/${data.roomId}`, '_blank');
-        fetchRequests();
+        window.location.href = `/${data.connectionType}-room/${data.roomId}`;
       }
     } catch (error) {
       console.error("Error accepting request:", error);

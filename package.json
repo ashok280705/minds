@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "dev:server": "node server.js",
-    "start:server": "NODE_ENV=production node server.js"
+    "start:server": "node start.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

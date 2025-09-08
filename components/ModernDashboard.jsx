@@ -178,60 +178,62 @@ export default function ModernDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen w-full max-w-full bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 overflow-x-hidden">
       {/* Header Section */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-8">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                 Welcome back, {session?.user?.name?.split(' ')[0] || 'User'}! 👋
               </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
+              <p className="text-gray-600 dark:text-gray-300 mt-2 text-sm sm:text-base">
                 How are you feeling today? I'm here to support your mental wellness journey.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <ThemeToggle />
-              <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-emerald-50 px-3 sm:px-4 py-2 rounded-full">
                 <Shield className="w-4 h-4 text-emerald-600" />
-                <span className="text-sm font-medium text-emerald-700">Secure & Private</span>
+                <span className="text-xs sm:text-sm font-medium text-emerald-700 hidden sm:inline">Secure & Private</span>
+                <span className="text-xs sm:text-sm font-medium text-emerald-700 sm:hidden">Secure</span>
               </div>
-              <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
+              <div className="flex items-center gap-2 bg-blue-50 px-3 sm:px-4 py-2 rounded-full">
                 <Heart className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-700">HIPAA Compliant</span>
+                <span className="text-xs sm:text-sm font-medium text-blue-700 hidden sm:inline">HIPAA Compliant</span>
+                <span className="text-xs sm:text-sm font-medium text-blue-700 sm:hidden">HIPAA</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-full sm:max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
 
         {/* Period Status Widget for Female Users */}
         {userGender === "female" && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Period Health Tracker</h2>
             <PeriodStatusWidget />
           </div>
         )}
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {quickActions.filter(action => !action.hidden).map((action, index) => (
               <button
                 key={index}
                 onClick={action.onClick}
-                className="p-4 rounded-xl border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200 text-left group"
+                className="p-3 sm:p-4 rounded-xl border-2 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200 text-left group"
               >
-                <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                  <action.icon className="w-5 h-5 text-emerald-600" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-110 transition-transform">
+                  <action.icon className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{action.title}</h3>
-                <p className="text-sm text-gray-600">{action.description}</p>
+                <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">{action.title}</h3>
+                <p className="text-xs sm:text-sm text-gray-600">{action.description}</p>
               </button>
             ))}
           </div>
@@ -239,8 +241,8 @@ export default function ModernDashboard() {
 
         {/* Main Services */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Wellness Services</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Your Wellness Services</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             {services.map((service) => (
               <ServiceCard key={service.id} service={service} />
             ))}
@@ -248,33 +250,33 @@ export default function ModernDashboard() {
         </div>
 
         {/* Achievements */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Your Achievements</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">Your Achievements</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             {achievements.map((achievement, index) => (
               <div
                 key={index}
-                className={`p-4 rounded-xl border-2 transition-all ${
+                className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                   achievement.earned
                     ? 'border-yellow-300 bg-yellow-50'
                     : 'border-gray-200 bg-gray-50'
                 }`}
               >
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center mb-2 sm:mb-3 ${
                   achievement.earned
                     ? 'bg-yellow-100'
                     : 'bg-gray-200'
                 }`}>
-                  <achievement.icon className={`w-5 h-5 ${
+                  <achievement.icon className={`w-4 h-4 sm:w-5 sm:h-5 ${
                     achievement.earned ? 'text-yellow-600' : 'text-gray-400'
                   }`} />
                 </div>
-                <h3 className={`font-semibold mb-1 ${
+                <h3 className={`font-semibold mb-1 text-sm sm:text-base ${
                   achievement.earned ? 'text-gray-900' : 'text-gray-500'
                 }`}>
                   {achievement.title}
                 </h3>
-                <p className={`text-sm ${
+                <p className={`text-xs sm:text-sm ${
                   achievement.earned ? 'text-gray-600' : 'text-gray-400'
                 }`}>
                   {achievement.description}
@@ -291,22 +293,22 @@ export default function ModernDashboard() {
         </div>
 
         {/* Motivational Section */}
-        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-8 text-white text-center">
-          <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-80" />
-          <h2 className="text-2xl font-bold mb-4">
+        <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 sm:p-8 text-white text-center">
+          <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 opacity-80" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
             You're doing great! 🌟
           </h2>
-          <p className="text-emerald-100 mb-6 max-w-2xl mx-auto">
+          <p className="text-emerald-100 mb-4 sm:mb-6 max-w-2xl mx-auto text-sm sm:text-base">
             Remember, taking care of your mental health is a journey, not a destination. 
             Every step you take towards wellness matters, and I'm here to support you every step of the way.
           </p>
           <button
             onClick={handleMentalCounselorClick}
-            className="bg-white text-emerald-600 px-6 py-3 rounded-xl font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2 mx-auto"
+            className="bg-white text-emerald-600 px-4 sm:px-6 py-2 sm:py-3 rounded-xl font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2 mx-auto text-sm sm:text-base"
           >
-            <MessageSquare className="w-5 h-5" />
+            <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
             Start a Session
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>
@@ -318,33 +320,33 @@ function ServiceCard({ service }) {
   return (
     <div
       onClick={service.onClick}
-      className="group cursor-pointer bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 transform hover:scale-[1.02]"
+      className="group cursor-pointer bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 transform hover:scale-[1.02]"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-14 h-14 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-          <service.icon className="text-white w-7 h-7" />
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${service.gradient} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+          <service.icon className="text-white w-6 h-6 sm:w-7 sm:h-7" />
         </div>
-        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
+        <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
       </div>
 
       {/* Content */}
-      <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
-      <p className="text-gray-600 mb-4 leading-relaxed">{service.description}</p>
+      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 sm:mb-3">{service.title}</h3>
+      <p className="text-gray-600 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">{service.description}</p>
 
       {/* Features */}
-      <div className="space-y-2 mb-4">
+      <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
         {service.features.map((feature, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <div className={`w-2 h-2 bg-gradient-to-r ${service.gradient} rounded-full`}></div>
-            <span className="text-sm font-medium text-gray-700">{feature}</span>
+          <div key={index} className="flex items-center gap-2 sm:gap-3">
+            <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gradient-to-r ${service.gradient} rounded-full`}></div>
+            <span className="text-xs sm:text-sm font-medium text-gray-700">{feature}</span>
           </div>
         ))}
       </div>
 
       {/* Stats */}
-      <div className={`bg-gradient-to-r ${service.bgGradient} rounded-xl p-3 border border-gray-100`}>
-        <div className="flex items-center justify-between text-sm">
+      <div className={`bg-gradient-to-r ${service.bgGradient} rounded-xl p-2.5 sm:p-3 border border-gray-100`}>
+        <div className="flex items-center justify-between text-xs sm:text-sm">
           {Object.entries(service.stats).map(([key, value], index) => (
             <div key={index} className="text-center">
               <p className="font-semibold text-gray-900">{value}</p>

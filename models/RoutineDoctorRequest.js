@@ -49,6 +49,10 @@ const RoutineDoctorRequestSchema = new mongoose.Schema({
   completedAt: {
     type: Date,
   },
+  passedBy: [{
+    doctorId: String,
+    passedAt: Date
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

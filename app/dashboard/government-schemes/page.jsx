@@ -45,8 +45,8 @@ export default function GovernmentSchemes() {
   }, [selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-3 sm:p-6 w-full overflow-x-hidden">
+      <div className="max-w-full sm:max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-4">
             🏛️ Government Health Schemes
@@ -54,15 +54,15 @@ export default function GovernmentSchemes() {
           <p className="text-gray-700 dark:text-gray-300">Discover government healthcare schemes and programs in India</p>
         </div>
 
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-black" />
-            <label className="text-lg font-semibold text-black">Filter by Scheme Type:</label>
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+            <label className="text-base sm:text-lg font-semibold text-black">Filter by Scheme Type:</label>
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-3 bg-white border-2 border-black rounded-xl text-black focus:ring-2 focus:ring-green-500 focus:border-green-500 min-w-[300px]"
+            className="px-3 sm:px-4 py-2 sm:py-3 bg-white border-2 border-black rounded-xl text-black focus:ring-2 focus:ring-green-500 focus:border-green-500 w-full sm:min-w-[300px] sm:w-auto"
           >
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -101,10 +101,10 @@ export default function GovernmentSchemes() {
               schemes.map((scheme, index) => (
                 <div
                   key={index}
-                  className="p-6 rounded-2xl bg-white backdrop-blur border-2 border-black hover:border-green-500 transition-all duration-300 group shadow-lg"
+                  className="p-4 sm:p-6 rounded-2xl bg-white backdrop-blur border-2 border-black hover:border-green-500 transition-all duration-300 group shadow-lg"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-xl font-semibold text-black group-hover:text-green-600 transition-colors flex-1 mr-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-black group-hover:text-green-600 transition-colors flex-1">
                       {scheme.title}
                     </h2>
                     <a

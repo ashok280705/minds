@@ -47,20 +47,20 @@ export default function DoctorFeedback({ doctorId }) {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
+    <div className="p-3 sm:p-6">
+      <div className="max-h-80 sm:max-h-96 overflow-y-auto space-y-3 sm:space-y-4 pr-1 sm:pr-2">
         {feedbacks.map((feedback) => (
-          <div key={feedback._id} className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <span className="font-medium text-gray-900">
+          <div key={feedback._id} className="bg-gray-50 rounded-lg p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-2">
+              <div className="flex items-center space-x-2 min-w-0">
+                <span className="font-medium text-gray-900 text-sm sm:text-base truncate">
                   {feedback.userId?.name || 'Anonymous'}
                 </span>
-                <div className="flex">
+                <div className="flex flex-shrink-0">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
                       key={star}
-                      className={`text-sm ${
+                      className={`text-xs sm:text-sm ${
                         feedback.rating >= star ? 'text-yellow-400' : 'text-gray-300'
                       }`}
                     >
@@ -69,7 +69,7 @@ export default function DoctorFeedback({ doctorId }) {
                   ))}
                 </div>
               </div>
-              <div className={`px-2 py-1 rounded-full text-xs ${
+              <div className={`px-2 py-1 rounded-full text-xs self-start ${
                 feedback.satisfied 
                   ? 'bg-green-100 text-green-800' 
                   : 'bg-red-100 text-red-800'
@@ -78,9 +78,9 @@ export default function DoctorFeedback({ doctorId }) {
               </div>
             </div>
             {feedback.comment && (
-              <p className="text-gray-600 text-sm mb-2">"{feedback.comment}"</p>
+              <p className="text-gray-600 text-xs sm:text-sm mb-2 break-words">"{feedback.comment}"</p>
             )}
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-gray-500">
               <span>{feedback.sessionType} session</span>
               <span>{new Date(feedback.createdAt).toLocaleDateString()}</span>
             </div>

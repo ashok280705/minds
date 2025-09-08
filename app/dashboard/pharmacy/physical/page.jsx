@@ -327,17 +327,17 @@ export default function PhysicalPharmacy() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <MapPin className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-800">NEARBY PHARMACIES</h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-3 sm:p-6">
+      <div className="max-w-full sm:max-w-6xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-800">NEARBY PHARMACIES</h1>
             </div>
             
-            <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700">Search Radius:</label>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <label className="text-xs sm:text-sm font-medium text-gray-700">Search Radius:</label>
               <select
                 value={radius}
                 onChange={(e) => {
@@ -348,7 +348,7 @@ export default function PhysicalPharmacy() {
                     findNearbyPharmacies(location, newRadius);
                   }
                 }}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="px-2 sm:px-3 py-1 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
                 <option value={2000}>2 km</option>
                 <option value={5000}>5 km</option>
@@ -367,27 +367,27 @@ export default function PhysicalPharmacy() {
 
           {/* Navigation Status */}
           {isNavigating && (
-            <div className="bg-blue-600 text-white p-4 rounded-xl mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Navigation className="w-6 h-6 animate-pulse" />
+            <div className="bg-blue-600 text-white p-3 sm:p-4 rounded-xl mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Navigation className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
                   <div>
-                    <h3 className="font-semibold">Navigating to {selectedRoute?.name}</h3>
-                    <p className="text-blue-100 text-sm">Live navigation active</p>
+                    <h3 className="text-sm sm:text-base font-semibold">Navigating to {selectedRoute?.name}</h3>
+                    <p className="text-blue-100 text-xs sm:text-sm">Live navigation active</p>
                   </div>
                 </div>
                 <button
                   onClick={stopNavigation}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-medium transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs sm:text-sm font-medium transition-colors"
                 >
                   Stop Navigation
                 </button>
               </div>
               
               {navigationSteps.length > 0 && currentStep < navigationSteps.length && (
-                <div className="mt-4 p-3 bg-blue-700 rounded-lg">
-                  <p className="text-sm font-medium mb-1">Next Turn:</p>
-                  <p className="text-blue-100" dangerouslySetInnerHTML={{ 
+                <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-700 rounded-lg">
+                  <p className="text-xs sm:text-sm font-medium mb-1">Next Turn:</p>
+                  <p className="text-blue-100 text-xs sm:text-sm" dangerouslySetInnerHTML={{ 
                     __html: navigationSteps[currentStep]?.instructions || 'Continue straight' 
                   }} />
                   <p className="text-xs text-blue-200 mt-1">
@@ -399,7 +399,7 @@ export default function PhysicalPharmacy() {
           )}
 
           {/* Map Section */}
-          <div className="bg-gray-100 rounded-xl overflow-hidden mb-8 relative">
+          <div className="bg-gray-100 rounded-xl overflow-hidden mb-6 sm:mb-8 relative">
             {location ? (
               <>
                 <iframe
@@ -408,53 +408,53 @@ export default function PhysicalPharmacy() {
                     getPharmacyMapUrl()
                   }
                   width="100%"
-                  height={isNavigating ? "500" : "400"}
+                  height={isNavigating ? (window.innerWidth < 640 ? "300" : "500") : (window.innerWidth < 640 ? "250" : "400")}
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                 />
-                <div ref={mapRef} className={`absolute top-0 left-0 w-full ${isNavigating ? 'h-[500px]' : 'h-[400px]'} pointer-events-none`} />
+                <div ref={mapRef} className={`absolute top-0 left-0 w-full ${isNavigating ? 'h-[300px] sm:h-[500px]' : 'h-[250px] sm:h-[400px]'} pointer-events-none`} />
               </>
             ) : (
-              <div className="p-6 flex items-center justify-center h-[400px]">
+              <div className="p-4 sm:p-6 flex items-center justify-center h-[250px] sm:h-[400px]">
                 <div className="text-center">
-                  <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Loading map...</p>
+                  <MapPin className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 text-sm sm:text-base">Loading map...</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Pharmacy List */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          <div className="space-y-3 sm:space-y-4">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 sm:mb-4">
               NEARBY PHARMACIES ({pharmacies.length})
             </h2>
             
             {pharmacies.map((pharmacy, index) => (
               <div
                 key={index}
-                className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`p-4 sm:p-6 rounded-xl border-2 cursor-pointer transition-all ${
                   selectedPharmacy === index
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
                 onClick={() => setSelectedPharmacy(index)}
               >
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="font-semibold text-lg text-gray-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-0 mb-3">
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-800">
                     {pharmacy.name}
                   </h3>
                   <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-xs sm:text-sm text-gray-600">
                       {pharmacy.rating || 'N/A'}
                     </span>
                   </div>
                 </div>
                 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-2 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     <span>{pharmacy.vicinity}</span>
@@ -470,41 +470,41 @@ export default function PhysicalPharmacy() {
                   )}
                 </div>
                 
-                <div className="flex gap-2 mt-4">
+                <div className="flex flex-wrap gap-2 mt-3 sm:mt-4">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       showRouteOnMap(pharmacy);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs sm:text-sm"
                   >
-                    <Navigation className="w-4 h-4" />
+                    <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
                     Show Route
                   </button>
                   
-                  {selectedRoute && !isNavigating && (
+                  {selectedRoute && selectedRoute.place_id === pharmacy.place_id && !isNavigating && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         startNavigation(pharmacy);
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm font-medium"
                     >
-                      <Navigation className="w-4 h-4" />
+                      <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
                       Start Navigation
                     </button>
                   )}
                   
-                  {selectedRoute && (
+                  {selectedRoute && selectedRoute.place_id === pharmacy.place_id && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedRoute(null);
                         if (isNavigating) stopNavigation();
                       }}
-                      className="flex items-center gap-2 px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm"
                     >
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
                       Clear Route
                     </button>
                   )}
@@ -514,19 +514,19 @@ export default function PhysicalPharmacy() {
                       e.stopPropagation();
                       getDirections(pharmacy);
                     }}
-                    className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                    className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-xs sm:text-sm"
                   >
-                    <Navigation className="w-4 h-4" />
+                    <Navigation className="w-3 h-3 sm:w-4 sm:h-4" />
                     Open in Maps
                   </button>
                   
                   {pharmacy.formatted_phone_number && (
                     <a
                       href={`tel:${pharmacy.formatted_phone_number}`}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                      className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs sm:text-sm"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      <Phone className="w-4 h-4" />
+                      <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
                       Call
                     </a>
                   )}
@@ -535,12 +535,12 @@ export default function PhysicalPharmacy() {
             ))}
             
             {!loading && pharmacies.length === 0 && (
-              <div className="text-center py-12">
-                <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">No pharmacies found nearby</p>
+              <div className="text-center py-8 sm:py-12">
+                <MapPin className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 text-sm sm:text-base">No pharmacies found nearby</p>
                 <button
                   onClick={getCurrentLocation}
-                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="mt-4 px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
                 >
                   Retry Search
                 </button>

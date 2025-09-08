@@ -381,22 +381,22 @@ export default function NearbyServices() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-3 sm:p-6 w-full overflow-x-hidden">
+      <div className="max-w-full sm:max-w-6xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 sm:mb-8 gap-4">
             <div className="flex items-center gap-3">
-              <MapPin className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-800">NEARBY SERVICES</h1>
+              <MapPin className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+              <h1 className="text-xl sm:text-3xl font-bold text-gray-800">NEARBY SERVICES</h1>
             </div>
             
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <label className="text-sm font-medium text-gray-700">Service Type:</label>
                 <select
                   value={serviceType}
                   onChange={(e) => setServiceType(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
                 >
                   {Object.entries(serviceTypes).map(([key, type]) => (
                     <option key={key} value={key}>{type.label}</option>
@@ -404,12 +404,12 @@ export default function NearbyServices() {
                 </select>
               </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
                 <label className="text-sm font-medium text-gray-700">Radius:</label>
                 <select
                   value={radius}
                   onChange={(e) => setRadius(parseInt(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-auto"
                 >
                   <option value={2000}>2 km</option>
                   <option value={5000}>5 km</option>
@@ -439,7 +439,8 @@ export default function NearbyServices() {
                     getServiceMapUrl()
                   }
                   width="100%"
-                  height="400"
+                  height="300"
+                  className="sm:h-[400px]"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"

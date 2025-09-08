@@ -15,7 +15,8 @@ export default function RoutineDoctorPanel({ doctorId, doctorName, inline = fals
 
   const fetchRequests = async () => {
     try {
-      const response = await fetch("/api/routine-doctor/requests");
+      const url = doctorId ? `/api/routine-doctor/requests?doctorId=${doctorId}` : "/api/routine-doctor/requests";
+      const response = await fetch(url);
       const data = await response.json();
       
       if (response.ok) {
@@ -55,7 +56,7 @@ export default function RoutineDoctorPanel({ doctorId, doctorName, inline = fals
       const response = await fetch("/api/routine-doctor/pass", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ requestId })
+        body: JSON.stringify({ requestId, doctorId })
       });
 
       if (response.ok) {
@@ -128,70 +129,73 @@ export default function RoutineDoctorPanel({ doctorId, doctorName, inline = fals
               return (
                 <div
                   key={request._id}
-                  className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4 hover:shadow-md transition-all duration-200"
+                  className="bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-xl p-3 sm:p-4 hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-orange-600" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-semibold text-gray-900 text-sm sm:text-base truncate">{request.userName}</h4>
+                            <p className="text-xs sm:text-sm text-gray-600 truncate">{request.userEmail}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">{request.userName}</h4>
-                          <p className="text-sm text-gray-600">{request.userEmail}</p>
-                        </div>
-                        <div className="ml-auto flex items-center gap-2">
-                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-2 sm:ml-auto">
+                          <div className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 rounded-full ${
                             request.connectionType === 'video' ? 'bg-green-100' : 'bg-blue-100'
                           }`}>
-                            <ConnectionIcon className={`w-4 h-4 ${
+                            <ConnectionIcon className={`w-3 h-3 sm:w-4 sm:h-4 ${
                               request.connectionType === 'video' ? 'text-green-600' : 'text-blue-600'
                             }`} />
-                            <span className={`text-sm font-medium capitalize ${
+                            <span className={`text-xs sm:text-sm font-medium capitalize ${
                               request.connectionType === 'video' ? 'text-green-700' : 'text-blue-700'
                             }`}>
                               {request.connectionType}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1 text-orange-600 text-sm">
-                            <Clock className="w-4 h-4" />
+                          <div className="flex items-center gap-1 text-orange-600 text-xs sm:text-sm">
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>{formatTimeAgo(request.timestamp)}</span>
                           </div>
                         </div>
                       </div>
 
                       {request.note && (
-                        <div className="bg-white/70 rounded-lg p-3 mb-3 border border-orange-100">
+                        <div className="bg-white/70 rounded-lg p-2 sm:p-3 mb-3 border border-orange-100">
                           <div className="flex items-start gap-2">
-                            <FileText className="w-4 h-4 text-gray-500 mt-0.5" />
-                            <div>
-                              <p className="text-sm font-medium text-gray-700 mb-1">Patient Note:</p>
-                              <p className="text-sm text-gray-600">{request.note}</p>
+                            <FileText className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-xs sm:text-sm font-medium text-gray-700 mb-1">Patient Note:</p>
+                              <p className="text-xs sm:text-sm text-gray-600 break-words">{request.note}</p>
                             </div>
                           </div>
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-gray-600">
                           <span>Request Type: Routine Consultation</span>
-                          <span>•</span>
+                          <span className="hidden sm:inline">•</span>
                           <span>Status: Waiting for doctor</span>
                         </div>
                         
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                           <button
                             onClick={() => handlePassRequest(request._id)}
-                            className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 transition-all duration-200 flex items-center gap-2"
+                            className="bg-gray-500 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
                           >
                             Pass
                           </button>
                           <button
                             onClick={() => handleAcceptRequest(request._id)}
-                            className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl"
+                            className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 sm:px-6 py-2 rounded-lg text-sm font-semibold hover:from-orange-600 hover:to-red-600 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
                           >
-                            <CheckCircle className="w-4 h-4" />
-                            Accept & Connect
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Accept & Connect</span>
+                            <span className="sm:hidden">Accept</span>
                           </button>
                         </div>
                       </div>

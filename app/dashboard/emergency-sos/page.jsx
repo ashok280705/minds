@@ -319,18 +319,18 @@ export default function EmergencySOS() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-6">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-100 dark:from-gray-900 dark:to-gray-800 p-3 sm:p-4 w-full overflow-x-hidden">
+      <div className="max-w-full sm:max-w-4xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
           
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-3">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
-              <h1 className="text-2xl font-bold text-gray-800">EMERGENCY SOS</h1>
+              <AlertTriangle className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" />
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">EMERGENCY SOS</h1>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
               <MapPin className="w-4 h-4 animate-pulse" />
-              <span className="font-medium">{locationText || 'Tracking live location...'}</span>
+              <span className="font-medium break-words">{locationText || 'Tracking live location...'}</span>
             </div>
           </div>
 
@@ -354,12 +354,12 @@ export default function EmergencySOS() {
             </div>
           )}
 
-          <div className="text-center mb-6">
+          <div className="text-center mb-4 sm:mb-6">
             <button
               onClick={triggerSOS}
               disabled={sosTriggered}
               type="button"
-              className={`w-40 h-40 rounded-full text-white font-bold text-xl shadow-2xl transition-all ${
+              className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full text-white font-bold text-lg sm:text-xl shadow-2xl transition-all ${
                 sosTriggered 
                   ? 'bg-gray-500 cursor-not-allowed' 
                   : 'bg-red-600 hover:bg-red-700 active:scale-95'
@@ -403,12 +403,12 @@ export default function EmergencySOS() {
                 Live Location Tracking
               </h3>
             </div>
-            <div ref={mapRef} className="w-full h-64"></div>
+            <div ref={mapRef} className="w-full h-48 sm:h-64"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             
-            <div className="bg-red-50 rounded-xl p-4">
+            <div className="bg-red-50 rounded-xl p-3 sm:p-4">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <Phone className="w-5 h-5" />
                 Emergency Services
@@ -428,7 +428,7 @@ export default function EmergencySOS() {
               </div>
             </div>
 
-            <div className="bg-blue-50 rounded-xl p-4">
+            <div className="bg-blue-50 rounded-xl p-3 sm:p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2">
                   <Users className="w-5 h-5" />

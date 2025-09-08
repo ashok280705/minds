@@ -54,26 +54,26 @@ export default function HealthNews() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white dark:from-gray-900 dark:to-gray-800 text-black dark:text-white p-3 sm:p-6 w-full overflow-x-hidden">
+      <div className="max-w-full sm:max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
+          <h1 className="text-2xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
             📰 Healthcare News
           </h1>
           <p className="text-gray-700 dark:text-gray-300">Stay updated with the latest healthcare and medical news</p>
         </div>
 
         {/* Category Filter Dropdown */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-black" />
-            <label className="text-lg font-semibold text-black">Filter by Category:</label>
+            <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+            <label className="text-base sm:text-lg font-semibold text-black">Filter by Category:</label>
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-3 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-xl text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[200px]"
+            className="px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 border-2 border-black dark:border-gray-600 rounded-xl text-black dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 w-full sm:min-w-[200px] sm:w-auto"
           >
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -84,11 +84,11 @@ export default function HealthNews() {
         </div>
 
         {/* Refresh Button */}
-        <div className="flex justify-end mb-8">
+        <div className="flex justify-end mb-6 sm:mb-8">
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-black rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-white border-2 border-black rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-50 text-sm sm:text-base"
           >
             <RefreshCw className={`w-5 h-5 text-black ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -115,17 +115,17 @@ export default function HealthNews() {
               news.map((article, index) => (
                 <div
                   key={index}
-                  className="p-6 rounded-2xl bg-white backdrop-blur border-2 border-black hover:border-blue-500 transition-all duration-300 group shadow-lg"
+                  className="p-4 sm:p-6 rounded-2xl bg-white backdrop-blur border-2 border-black hover:border-blue-500 transition-all duration-300 group shadow-lg"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h2 className="text-xl font-semibold text-black group-hover:text-blue-600 transition-colors flex-1 mr-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-black group-hover:text-blue-600 transition-colors flex-1">
                       {article.title}
                     </h2>
                     <a
                       href={article.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-lg border border-black hover:bg-blue-600 transition-colors text-sm"
+                      className="flex items-center gap-2 px-3 py-1 bg-blue-500 text-white rounded-lg border border-black hover:bg-blue-600 transition-colors text-sm self-start sm:self-auto"
                     >
                       <ExternalLink className="w-4 h-4" />
                       Read
@@ -136,8 +136,8 @@ export default function HealthNews() {
                     {article.snippet}
                   </p>
                   
-                  <div className="flex items-center justify-between text-sm text-gray-600">
-                    <div className="flex items-center gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-600 gap-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                       {article.source && (
                         <span className="font-medium text-blue-600">
                           {article.source}

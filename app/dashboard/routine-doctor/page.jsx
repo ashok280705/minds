@@ -65,19 +65,19 @@ export default function RoutineDoctorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
-      <div className="bg-white border-b border-orange-200 px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl flex items-center justify-center">
-              <Users className="w-8 h-8 text-white" />
+      <div className="bg-white border-b border-orange-200 px-4 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-full sm:max-w-4xl mx-auto">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-4">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl flex items-center justify-center">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Routine Doctor Consultation</h1>
-              <p className="text-gray-600 mt-1">Connect with qualified doctors for your healthcare needs</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Routine Doctor Consultation</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">Connect with qualified doctors for your healthcare needs</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-6 text-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-xs sm:text-sm">
             <div className="flex items-center gap-2 bg-green-50 px-3 py-2 rounded-full">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-green-700 font-medium">Doctors Available 24/7</span>
@@ -94,27 +94,27 @@ export default function RoutineDoctorPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Choose Your Consultation Method</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="max-w-full sm:max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">Choose Your Consultation Method</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {connectionOptions.map((option) => (
               <div
                 key={option.id}
                 onClick={() => setSelectedOption(option.id)}
-                className={`cursor-pointer p-6 rounded-2xl border-2 transition-all duration-200 ${
+                className={`cursor-pointer p-4 sm:p-6 rounded-2xl border-2 transition-all duration-200 ${
                   selectedOption === option.id
-                    ? "border-orange-400 bg-orange-50 shadow-lg scale-105"
+                    ? "border-orange-400 bg-orange-50 shadow-lg sm:scale-105"
                     : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
                 }`}
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${option.gradient} rounded-xl flex items-center justify-center`}>
-                    <option.icon className="w-6 h-6 text-white" />
+                <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r ${option.gradient} rounded-xl flex items-center justify-center`}>
+                    <option.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{option.title}</h3>
-                    <p className="text-gray-600 text-sm">{option.description}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">{option.title}</h3>
+                    <p className="text-gray-600 text-xs sm:text-sm">{option.description}</p>
                   </div>
                 </div>
                 
@@ -131,21 +131,21 @@ export default function RoutineDoctorPage() {
           </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Additional Notes (Optional)</h2>
-          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Additional Notes (Optional)</h2>
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
             <div className="flex items-start gap-3 mb-4">
               <FileText className="w-5 h-5 text-gray-500 mt-1" />
               <div>
-                <h3 className="font-medium text-gray-900">Describe your concern</h3>
-                <p className="text-sm text-gray-600">Help the doctor understand your needs better</p>
+                <h3 className="text-sm sm:text-base font-medium text-gray-900">Describe your concern</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Help the doctor understand your needs better</p>
               </div>
             </div>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Describe your symptoms, concerns, or questions for the doctor..."
-              className="w-full h-32 p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              className="w-full h-24 sm:h-32 p-3 sm:p-4 border border-gray-300 rounded-xl resize-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
               maxLength={500}
             />
             <div className="flex justify-between items-center mt-2">
@@ -155,11 +155,11 @@ export default function RoutineDoctorPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="font-semibold text-gray-900">Ready to Connect?</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Ready to Connect?</h3>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 {selectedOption 
                   ? `You'll be connected via ${connectionOptions.find(opt => opt.id === selectedOption)?.title.toLowerCase()}`
                   : "Please select a consultation method above"
@@ -169,7 +169,7 @@ export default function RoutineDoctorPage() {
             <button
               onClick={handleSubmitRequest}
               disabled={!selectedOption || isSubmitting}
-              className={`px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center gap-2 text-sm sm:text-base ${
                 selectedOption && !isSubmitting
                   ? "bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"

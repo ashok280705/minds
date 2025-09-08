@@ -424,10 +424,10 @@ export default function VideoRoom() {
       </div>
 
       {/* Video Area */}
-      <div className="flex-1 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full max-w-7xl mx-auto">
+      <div className="flex-1 p-3 sm:p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-8 h-full max-w-7xl mx-auto">
           {/* Remote participant */}
-          <div className="relative bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-emerald-100 transform hover:scale-[1.02] transition-transform duration-300">
+          <div className="relative bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border-2 border-emerald-100 transform hover:scale-[1.02] transition-transform duration-300">
             <video
               ref={remoteVideoRef}
               autoPlay
@@ -520,53 +520,53 @@ export default function VideoRoom() {
       </div>
 
       {/* Floating Controls */}
-      <div className="pb-8">
-        <div className="flex items-center justify-center space-x-6">
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-2 shadow-2xl border border-emerald-100">
-            <div className="flex items-center space-x-4">
+      <div className="pb-4 sm:pb-8">
+        <div className="flex items-center justify-center px-3">
+          <div className="bg-white/90 backdrop-blur-md rounded-xl sm:rounded-2xl p-1.5 sm:p-2 shadow-2xl border border-emerald-100">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
                 onClick={toggleMute}
-                className={`w-16 h-16 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
+                className={`w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
                   isMuted
                     ? "bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600"
                     : "bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600"
                 } flex items-center justify-center`}
                 title={isMuted ? "Unmute" : "Mute"}
               >
-                <span className="text-white text-2xl">
+                <span className="text-white text-lg sm:text-2xl">
                   {isMuted ? "🔇" : "🎤"}
                 </span>
               </button>
 
               <button
                 onClick={toggleVideo}
-                className={`w-16 h-16 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
+                className={`w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 ${
                   isVideoOff
                     ? "bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600"
                     : "bg-gradient-to-r from-teal-400 to-cyan-500 hover:from-teal-500 hover:to-cyan-600"
                 } flex items-center justify-center`}
                 title={isVideoOff ? "Turn on camera" : "Turn off camera"}
               >
-                <span className="text-white text-2xl">
+                <span className="text-white text-lg sm:text-2xl">
                   {isVideoOff ? "📹" : "📷"}
                 </span>
               </button>
 
-              <div className="w-px h-8 bg-emerald-200"></div>
+              <div className="w-px h-6 sm:h-8 bg-emerald-200"></div>
 
               <button
                 onClick={endCall}
-                className="w-16 h-16 rounded-xl bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 flex items-center justify-center"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg sm:rounded-xl bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-110 flex items-center justify-center"
                 title="End session"
               >
-                <span className="text-2xl">📞</span>
+                <span className="text-lg sm:text-2xl">📞</span>
               </button>
             </div>
           </div>
         </div>
         
-        <div className="text-center mt-4">
-          <p className="text-sm text-emerald-600 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full inline-block shadow-md">
+        <div className="text-center mt-3 sm:mt-4 px-3">
+          <p className="text-xs sm:text-sm text-emerald-600 bg-white/70 backdrop-blur-sm px-3 sm:px-4 py-1.5 sm:py-2 rounded-full inline-block shadow-md">
             🔒 End-to-end encrypted • Your privacy is protected
           </p>
         </div>

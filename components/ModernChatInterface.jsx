@@ -397,35 +397,34 @@ export default function ModernChatInterface({ onSessionSave }) {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div className="flex flex-col h-screen w-full bg-gradient-to-br from-gray-50 to-white overflow-hidden">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
-                <Bot className="text-white w-6 h-6" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">
-                  {selectedLang === 'hi' ? 'मानसिक स्वास्थ्य सहायक' : 'AI Mental Health Assistant'}
-                </h1>
-                <div className="text-sm text-gray-500 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span>{selectedLang === 'hi' ? 'आपकी सुनने के लिए यहाँ हूँ' : 'Here to listen and support you'}</span>
-                </div>
+      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+              <Bot className="text-white w-5 h-5 sm:w-6 sm:h-6" />
+            </div>
+            <div>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+                {selectedLang === 'hi' ? 'मानसिक स्वास्थ्य सहायक' : 'AI Mental Health Assistant'}
+              </h1>
+              <div className="text-xs sm:text-sm text-gray-500 flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="hidden sm:inline">{selectedLang === 'hi' ? 'आपकी सुनने के लिए यहाँ हूँ' : 'Here to listen and support you'}</span>
+                <span className="sm:hidden">Online</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Language Selector */}
-            <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg">
-              <Globe className="w-4 h-4 text-gray-600" />
+            <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+              <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
               <select 
                 value={selectedLang} 
                 onChange={(e) => setSelectedLang(e.target.value)}
-                className="bg-transparent text-sm font-medium text-gray-700 border-none outline-none"
+                className="bg-transparent text-xs sm:text-sm font-medium text-gray-700 border-none outline-none"
               >
                 {languages.map(lang => (
                   <option key={lang.code} value={lang.code}>
@@ -436,22 +435,20 @@ export default function ModernChatInterface({ onSessionSave }) {
             </div>
 
             {/* Voice Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={isSpeaking ? stopSpeaking : () => {}}
-                className={`p-2 rounded-lg transition-all ${
-                  isSpeaking 
-                    ? 'bg-red-100 text-red-600 animate-pulse' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title={isSpeaking ? 'Stop speaking' : 'Voice output'}
-              >
-                {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-            </div>
+            <button
+              onClick={isSpeaking ? stopSpeaking : () => {}}
+              className={`p-1.5 sm:p-2 rounded-lg transition-all ${
+                isSpeaking 
+                  ? 'bg-red-100 text-red-600 animate-pulse' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+              title={isSpeaking ? 'Stop speaking' : 'Voice output'}
+            >
+              {isSpeaking ? <VolumeX className="w-3 h-3 sm:w-4 sm:h-4" /> : <Volume2 className="w-3 h-3 sm:w-4 sm:h-4" />}
+            </button>
 
-            {/* Status Indicators */}
-            <div className="flex items-center gap-2">
+            {/* Status Indicators - Hidden on mobile */}
+            <div className="hidden sm:flex items-center gap-2">
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Shield className="w-3 h-3" />
                 <span>Secure</span>
@@ -466,26 +463,26 @@ export default function ModernChatInterface({ onSessionSave }) {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 w-full">
+        <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 sm:space-y-6 px-2 sm:px-0">
           {messages.map((msg, idx) => (
-            <div key={idx} className={`flex gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+            <div key={idx} className={`flex gap-2 sm:gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
               {/* Avatar */}
-              <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+              <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-md ${
                 msg.role === 'assistant' 
                   ? 'bg-gradient-to-br from-emerald-400 to-teal-500' 
                   : 'bg-gradient-to-br from-blue-400 to-purple-500'
               }`}>
                 {msg.role === 'assistant' ? (
-                  <Bot className="text-white w-5 h-5" />
+                  <Bot className="text-white w-4 h-4 sm:w-5 sm:h-5" />
                 ) : (
-                  <User className="text-white w-5 h-5" />
+                  <User className="text-white w-4 h-4 sm:w-5 sm:h-5" />
                 )}
               </div>
 
               {/* Message Content */}
-              <div className={`flex-1 max-w-3xl ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-                <div className={`inline-block p-4 rounded-2xl shadow-sm ${
+              <div className={`flex-1 max-w-[250px] sm:max-w-3xl ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+                <div className={`inline-block p-3 sm:p-4 rounded-2xl shadow-sm text-sm sm:text-base ${
                   msg.role === 'assistant' 
                     ? 'bg-white border border-gray-200 text-gray-800' 
                     : 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
@@ -503,7 +500,7 @@ export default function ModernChatInterface({ onSessionSave }) {
                     </div>
                   )}
 
-                  <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                  <p className="whitespace-pre-wrap leading-relaxed break-words">{msg.content}</p>
                   
                   {/* Crisis Detection Alert */}
                   {msg.isSuicidalDetection && (
@@ -539,16 +536,16 @@ export default function ModernChatInterface({ onSessionSave }) {
 
           {/* Typing Indicator */}
           {isTyping && (
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
-                <Bot className="text-white w-5 h-5" />
+            <div className="flex gap-2 sm:gap-4">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-md">
+                <Bot className="text-white w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-md p-4 shadow-sm">
+              <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-md p-3 sm:p-4 shadow-sm">
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  <span className="ml-2 text-sm text-gray-500">AI is thinking...</span>
+                  <span className="ml-2 text-xs sm:text-sm text-gray-500">AI is thinking...</span>
                 </div>
               </div>
             </div>
@@ -560,18 +557,19 @@ export default function ModernChatInterface({ onSessionSave }) {
 
       {/* Quick Responses */}
       {messages.length <= 1 && (
-        <div className="px-6 py-2">
+        <div className="px-3 sm:px-6 py-2">
           <div className="max-w-4xl mx-auto">
-            <p className="text-sm text-gray-500 mb-3">Quick responses:</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3">Quick responses:</p>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {quickResponses.map((response, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleQuickResponse(response.text)}
-                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-700 transition-colors"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-xs sm:text-sm text-gray-700 transition-colors"
                 >
                   <span>{response.emoji}</span>
-                  <span>{response.text}</span>
+                  <span className="hidden sm:inline">{response.text}</span>
+                  <span className="sm:hidden">{response.text.split(' ')[0]}...</span>
                 </button>
               ))}
             </div>
@@ -580,9 +578,9 @@ export default function ModernChatInterface({ onSessionSave }) {
       )}
 
       {/* Input Area */}
-      <div className="bg-white border-t border-gray-200 p-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex gap-3 items-end">
+      <div className="bg-white border-t border-gray-200 p-3 sm:p-6 w-full">
+        <div className="max-w-full sm:max-w-4xl mx-auto px-2 sm:px-0">
+          <div className="flex gap-2 sm:gap-3 items-end">
             <div className="flex-1 relative">
               <input
                 ref={inputRef}
@@ -590,24 +588,24 @@ export default function ModernChatInterface({ onSessionSave }) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-3 pr-20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none"
-                placeholder={selectedLang === 'hi' ? 'अपनी भावनाएं साझा करें...' : 'Share your feelings and thoughts...'}
+                className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 pr-12 sm:pr-20 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all resize-none text-sm sm:text-base"
+                placeholder={selectedLang === 'hi' ? 'अपनी भावनाएं साझा करें...' : 'Share your feelings...'}
                 disabled={escalating || isTyping}
               />
               
               {/* Voice Input Button */}
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
+              <div className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
                 <button
                   onClick={isListening ? () => recognition?.stop() : startListening}
                   disabled={!recognition || isTyping}
-                  className={`p-2 rounded-full transition-all ${
+                  className={`p-1.5 sm:p-2 rounded-full transition-all ${
                     isListening 
                       ? 'bg-red-500 text-white animate-pulse' 
                       : 'bg-emerald-500 text-white hover:bg-emerald-600'
                   } disabled:opacity-50`}
                   title={isListening ? 'Stop listening' : 'Voice input'}
                 >
-                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  {isListening ? <MicOff className="w-3 h-3 sm:w-4 sm:h-4" /> : <Mic className="w-3 h-3 sm:w-4 sm:h-4" />}
                 </button>
               </div>
             </div>
@@ -616,29 +614,31 @@ export default function ModernChatInterface({ onSessionSave }) {
             <button
               onClick={handleSend}
               disabled={escalating || !input.trim() || isTyping}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 flex items-center justify-center"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white p-2.5 sm:p-3 rounded-2xl shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 flex items-center justify-center"
             >
               {escalating || isTyping ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
             </button>
           </div>
           
           {/* Help Text */}
-          <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-            <div className="flex items-center gap-4">
+          <div className="mt-2 sm:mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <span className="flex items-center gap-1">
                 <Mic className="w-3 h-3" />
-                {selectedLang === 'hi' ? 'बोलने के लिए माइक दबाएं' : 'Press mic to speak'}
+                <span className="hidden sm:inline">{selectedLang === 'hi' ? 'बोलने के लिए माइक दबाएं' : 'Press mic to speak'}</span>
+                <span className="sm:hidden">Voice</span>
               </span>
               <span className="flex items-center gap-1">
                 <Shield className="w-3 h-3" />
-                {selectedLang === 'hi' ? 'पूर्ण गोपनीयता' : 'Completely confidential'}
+                <span className="hidden sm:inline">{selectedLang === 'hi' ? 'पूर्ण गोपनीयता' : 'Completely confidential'}</span>
+                <span className="sm:hidden">Private</span>
               </span>
             </div>
-            <div className="text-right">
+            <div className="text-right hidden sm:block">
               <span>Press Enter to send</span>
             </div>
           </div>

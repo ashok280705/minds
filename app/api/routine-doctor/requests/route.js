@@ -2,13 +2,21 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import RoutineDoctorRequest from "@/models/RoutineDoctorRequest";
 
-export async function GET() {
+export async function GET(request) {
   try {
     await dbConnect();
     
-    const requests = await RoutineDoctorRequest.find({ 
-      status: "pending" 
-    }).sort({ createdAt: -1 });
+    const { searchParams } = new URL(request.url);
+    const doctorId = searchParams.get('doctorId');
+    
+    let query = { status: "pending" };
+    
+    // Exclude requests already passed by this doctor
+    if (doctorId) {
+      query.passedBy = { $not: { $elemMatch: { doctorId: doctorId } } };
+    }
+    
+    const requests = await RoutineDoctorRequest.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json({
       success: true,

@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import ModernNavbar from "@/components/ModernNavbar";
-import Footer from "@/components/Footer";
+import Footer from "@/components/ModernFooter";
 import PeriodNotifications from "@/components/PeriodNotifications";
 import Sidebar from "@/components/ModernSidebar";
 import VapiGenie from "@/components/VapiGenie";

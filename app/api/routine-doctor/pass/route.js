@@ -6,7 +6,7 @@ export async function POST(request) {
   try {
     await dbConnect();
     
-    const { requestId } = await request.json();
+    const { requestId, doctorId } = await request.json();
     
     if (!requestId) {
       return NextResponse.json(
@@ -31,8 +31,15 @@ export async function POST(request) {
       );
     }
 
-    routineRequest.status = "rejected";
-    routineRequest.rejectedAt = new Date();
+    // Reset to pending so other doctors can see it
+    routineRequest.status = "pending";
+    routineRequest.passedBy = routineRequest.passedBy || [];
+    routineRequest.passedBy.push({
+      doctorId: doctorId,
+      passedAt: new Date()
+    });
+    routineRequest.doctorId = null;
+    routineRequest.doctorName = null;
     
     await routineRequest.save();
 

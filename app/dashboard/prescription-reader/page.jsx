@@ -79,15 +79,15 @@ export default function PrescriptionReaderPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-center">🔍 Prescription Reader</h1>
-      <p className="text-gray-600 text-center mb-8">
+    <div className="p-3 sm:p-6 max-w-full sm:max-w-4xl mx-auto w-full overflow-x-hidden">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center">🔍 Prescription Reader</h1>
+      <p className="text-gray-600 text-center mb-6 sm:mb-8 text-sm sm:text-base px-2">
         Upload a prescription image to extract text and verify if it's a valid medical prescription
       </p>
 
       {/* Upload Section */}
       <div 
-        className={`bg-white border-2 border-dashed rounded-lg p-8 text-center mb-6 transition-colors ${
+        className={`bg-white border-2 border-dashed rounded-lg p-4 sm:p-8 text-center mb-4 sm:mb-6 transition-colors ${
           dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
         }`}
         onDragOver={handleDragOver}
@@ -115,18 +115,18 @@ export default function PrescriptionReaderPage() {
           </div>
         ) : (
           <div>
-            <img src={preview} alt="Preview" className="max-w-md max-h-64 mx-auto mb-4 rounded-lg shadow-lg" />
-            <div className="space-x-4">
+            <img src={preview} alt="Preview" className="max-w-full sm:max-w-md max-h-48 sm:max-h-64 mx-auto mb-4 rounded-lg shadow-lg" />
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:space-x-0">
               <button
                 onClick={analyzeImage}
                 disabled={loading}
-                className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 disabled:bg-gray-300"
+                className="bg-green-500 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-green-600 disabled:bg-gray-300 text-sm sm:text-base"
               >
                 {loading ? 'Analyzing...' : 'Analyze Prescription'}
               </button>
               <button
                 onClick={clearAll}
-                className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
+                className="bg-gray-500 text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-600 text-sm sm:text-base"
               >
                 Clear
               </button>
@@ -137,7 +137,7 @@ export default function PrescriptionReaderPage() {
 
       {/* Results Section */}
       {analysis && (
-        <div className="bg-white border rounded-lg p-6 shadow-lg">
+        <div className="bg-white border rounded-lg p-4 sm:p-6 shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">📋 Analysis Results</h2>
           
           {/* Classification */}
@@ -162,7 +162,7 @@ export default function PrescriptionReaderPage() {
               <div className="space-y-3">
                 {analysis.medicines.map((medicine, index) => (
                   <div key={index} className="bg-white border rounded-lg p-4 shadow-sm">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
                       <div>
                         <label className="text-sm font-medium text-gray-600">Medicine Name</label>
                         <div className="text-lg font-semibold text-blue-600">{medicine.name}</div>

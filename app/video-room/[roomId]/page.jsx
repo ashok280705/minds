@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import io from "socket.io-client";
 import SessionFeedbackModal from "@/components/SessionFeedbackModal";
+import DigitalPrescriptionModal from "@/components/DigitalPrescriptionModal";
 
 export default function VideoRoom() {
   const { roomId } = useParams();
@@ -18,8 +19,10 @@ export default function VideoRoom() {
   const [hasOffered, setHasOffered] = useState(false);
   const [mediaError, setMediaError] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showPrescription, setShowPrescription] = useState(false);
   const [doctorName, setDoctorName] = useState("");
   const [sessionId, setSessionId] = useState(null);
+  const [patientUserId, setPatientUserId] = useState(null);
   const remoteStreamRef = useRef(null);
 
   const localVideoRef = useRef(null);
@@ -149,9 +152,15 @@ export default function VideoRoom() {
           forceNew: true,
           transports: ['websocket', 'polling']
         });
-        setSocket(socketInstance);
         
-        console.log('🔌 Socket connected:', socketInstance.id);
+        socketInstance.on('connect', () => {
+          console.log('🔌 Socket connected:', socketInstance.id);
+          setSocket(socketInstance);
+        });
+        
+        socketInstance.on('connect_error', (error) => {
+          console.error('❌ Socket connection error:', error);
+        });
 
         // Register user/doctor first
         if (session.user.isDoctor) {
@@ -221,9 +230,7 @@ export default function VideoRoom() {
           if (!session.user.isDoctor) {
             setShowFeedback(true);
           } else {
-            setTimeout(() => {
-              window.location.href = '/doctor';
-            }, 3000);
+            setShowPrescription(true);
           }
         });
 
@@ -307,9 +314,17 @@ export default function VideoRoom() {
       if (data.room) {
         setDoctorName(data.room.doctorId?.name || "Doctor");
         setSessionId(data.room.sessionId);
+        // Set patient ID from room data - userId is the patient
+        const patientId = data.room.userId?._id || data.room.userId;
+        console.log('Room data - Patient ID:', patientId, 'Doctor ID:', data.room.doctorId?._id);
+        setPatientUserId(patientId);
       }
     } catch (error) {
       console.error("Failed to fetch room info:", error);
+      // Fallback to URL param or session user ID if not doctor
+      const urlParams = new URLSearchParams(window.location.search);
+      const userIdFromUrl = urlParams.get('userId');
+      setPatientUserId(userIdFromUrl || (!session?.user?.isDoctor ? session?.user?.id : null));
     }
   };
 
@@ -367,7 +382,7 @@ export default function VideoRoom() {
       socket.disconnect();
     }
     if (session.user.isDoctor) {
-      window.location.href = '/doctor';
+      setShowPrescription(true);
     } else {
       setShowFeedback(true);
     }
@@ -485,7 +500,8 @@ export default function VideoRoom() {
               className="w-full h-full object-cover"
               style={{ 
                 display: isVideoOff ? "none" : "block",
-                backgroundColor: '#000'
+                backgroundColor: '#000',
+                transform: 'scaleX(-1)'
               }}
               onLoadedMetadata={() => console.log('Local video metadata loaded')}
               onCanPlay={() => console.log('Local video can play')}
@@ -579,6 +595,17 @@ export default function VideoRoom() {
         onClose={() => setShowFeedback(false)}
         onFeedback={handleFeedback}
         doctorName={doctorName}
+      />
+      
+      <DigitalPrescriptionModal
+        isOpen={showPrescription}
+        onClose={() => {
+          setShowPrescription(false);
+          window.location.href = '/doctor';
+        }}
+        patientId={patientUserId || (!session?.user?.isDoctor ? session?.user?.id : 'unknown')}
+        doctorId={session?.user?.id}
+        sessionId={sessionId}
       />
     </div>
   );

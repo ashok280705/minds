@@ -8,18 +8,24 @@ export async function GET(request) {
     
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
+    const requestId = searchParams.get("requestId");
     
-    if (!userId) {
+    if (!userId && !requestId) {
       return NextResponse.json(
-        { error: "User ID is required" },
+        { error: "User ID or Request ID is required" },
         { status: 400 }
       );
     }
 
-    const latestRequest = await RoutineDoctorRequest.findOne({ 
-      userId,
-      status: { $in: ["pending", "accepted"] }
-    }).sort({ createdAt: -1 });
+    let latestRequest;
+    if (requestId) {
+      latestRequest = await RoutineDoctorRequest.findById(requestId);
+    } else {
+      latestRequest = await RoutineDoctorRequest.findOne({ 
+        userId,
+        status: { $in: ["pending", "accepted"] }
+      }).sort({ createdAt: -1 });
+    }
 
     if (!latestRequest) {
       return NextResponse.json({

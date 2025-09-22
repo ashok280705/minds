@@ -124,6 +124,18 @@ export default function SimpleGenieAssistant() {
       if (data.success) {
         setResponse(data.response);
         speak(data.response);
+        
+        // Handle doctor connection if requested
+        if (data.action === 'CONNECT_TO_DOCTOR') {
+          await handleDoctorConnection(data.doctorConnection);
+        } else if (data.action === 'ASK_CONNECTION_TYPE') {
+          // Keep listening for chat/video response
+          setTimeout(() => {
+            if (recognitionRef.current) {
+              recognitionRef.current.start();
+            }
+          }, 2000);
+        }
       } else {
         throw new Error(data.error || 'Failed to get response');
       }
@@ -138,6 +150,85 @@ export default function SimpleGenieAssistant() {
         startWakeWordDetection();
       }, 5000);
     }
+  };
+
+  const handleDoctorConnection = async (doctorConnection) => {
+    try {
+      // Get user info from session/localStorage or use defaults
+      const userId = localStorage.getItem('userId') || 'genie-user-' + Date.now();
+      const userName = localStorage.getItem('userName') || 'Genie User';
+      const userEmail = localStorage.getItem('userEmail') || 'user@minds.com';
+      
+      // Step 1: Create routine doctor request (what user normally does manually)
+      const requestResponse = await fetch('/api/routine-doctor/request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          userName,
+          userEmail,
+          connectionType: 'chat', // Default to chat
+          note: 'Genie automated request - User requested doctor connection',
+          timestamp: new Date().toISOString()
+        }),
+      });
+
+      const requestData = await requestResponse.json();
+      
+      if (requestData.success) {
+        const successMsg = "Perfect! I've sent your request to available doctors. You'll be connected shortly.";
+        speak(successMsg);
+        setResponse(successMsg + " Please wait while I find an available doctor for you.");
+        
+        // Step 2: Start polling for doctor acceptance (automate the waiting process)
+        pollForDoctorAcceptance(requestData.requestId);
+      } else {
+        throw new Error(requestData.error || 'Failed to create doctor request');
+      }
+    } catch (error) {
+      const errorMsg = 'Sorry, I could not connect you to a doctor right now. Please try again later.';
+      speak(errorMsg);
+      setResponse(errorMsg);
+    }
+  };
+
+  const pollForDoctorAcceptance = async (requestId) => {
+    const maxAttempts = 30; // 5 minutes max
+    let attempts = 0;
+    
+    const checkStatus = async () => {
+      try {
+        const response = await fetch(`/api/routine-doctor/status?requestId=${requestId}`);
+        const data = await response.json();
+        
+        if (data.status === 'accepted' && data.roomId) {
+          const connectedMsg = "Great news! A doctor has accepted your request. Connecting you now...";
+          speak(connectedMsg);
+          setResponse(connectedMsg);
+          
+          // Auto-redirect to the chat/video room
+          setTimeout(() => {
+            window.location.href = `/${data.connectionType}-room/${data.roomId}`;
+          }, 2000);
+          return;
+        }
+        
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(checkStatus, 10000); // Check every 10 seconds
+        } else {
+          const timeoutMsg = "No doctors are available right now. Please try again later.";
+          speak(timeoutMsg);
+          setResponse(timeoutMsg);
+        }
+      } catch (error) {
+        console.error('Error checking doctor status:', error);
+      }
+    };
+    
+    checkStatus();
   };
 
   const speak = (text) => {
@@ -260,6 +351,15 @@ export default function SimpleGenieAssistant() {
               <div className="mb-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl">
                 <p className="text-sm text-purple-600 mb-2">Genie says:</p>
                 <p className="text-gray-800">{response}</p>
+                {response.includes('doctor') && (
+                  <div className="mt-3 p-2 bg-green-100 rounded-lg">
+                    <p className="text-sm text-green-700 font-medium">🩺 Automated Doctor Request Sent</p>
+                    <div className="flex items-center mt-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-500 mr-2"></div>
+                      <span className="text-xs text-green-600">Waiting for doctor...</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

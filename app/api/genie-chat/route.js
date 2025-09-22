@@ -38,34 +38,82 @@ export async function POST(request) {
     if (isHindi) responseLanguage = 'Hindi';
     if (isMarathi) responseLanguage = 'Marathi';
     
+    // Check if user wants to connect to doctor
+    const doctorConnectionKeywords = [
+      'connect to doc', 'connect to doctor', 'talk to doctor', 'see doctor',
+      'doctor consultation', 'medical help', 'need doctor', 'consult doctor',
+      'routine checkup', 'routine doctor', 'medical advice'
+    ];
+    
+    const wantsDoctorConnection = doctorConnectionKeywords.some(keyword => 
+      message.toLowerCase().includes(keyword.toLowerCase())
+    );
+
+    // Check if user is responding with connection type
+    const connectionTypeResponse = message.toLowerCase().includes('chat') || message.toLowerCase().includes('video');
+    
+    if (connectionTypeResponse && (message.toLowerCase().includes('chat') || message.toLowerCase().includes('video'))) {
+      const connectionType = message.toLowerCase().includes('video') ? 'video' : 'chat';
+      return NextResponse.json({
+        success: true,
+        response: `Perfect! I'm connecting you to a doctor via ${connectionType}. Sending your request now...`,
+        language: responseLanguage,
+        action: 'CONNECT_TO_DOCTOR',
+        doctorConnection: {
+          type: 'routine',
+          connectionType: connectionType,
+          message: `Genie automated ${connectionType} connection request`
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    if (wantsDoctorConnection) {
+      // Ask only chat or video preference
+      return NextResponse.json({
+        success: true,
+        response: "Would you like a chat or video call with the doctor?",
+        language: responseLanguage,
+        action: 'ASK_CONNECTION_TYPE',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Get intelligent feature suggestions
     const featureSuggestions = await suggestionEngine.processUserInput(message);
     const topFeature = featureSuggestions.suggestions[0];
     
     // Complete Minds platform training
-    const prompt = `You are Genie, the AI assistant for MINDS - our comprehensive mental health and wellness platform.
+    const prompt = `You are Genie, the official AI assistant for MINDS website. You help users by AUTOMATICALLY doing tasks they would normally do manually.
 
     User said: "${message}"
     
-    RESPONSE FORMAT:
-    1. Give helpful tips/advice for their concern
-    2. Then suggest our website feature using: "You can use [FEATURE NAME] on our website" or "Try our [FEATURE NAME] on our platform"
+    YOUR ROLE:
+    - You are the website's AI assistant who automates user tasks
+    - When users need something, you do it FOR them automatically
+    - You don't just suggest features - you ACTIVATE them for users
+    - You handle all the manual work users would normally do
     
-    OUR WEBSITE FEATURES:
-    - Period Tracker: "You can use Period Tracker on our website to monitor your menstrual health"
-    - AI Counselor: "Try our AI Counselor on our platform for 24/7 emotional support"
-    - Reports Analyzer: "You can use Reports Analyzer on our website to analyze your medical reports"
-    - Online Pharmacy: "Try our Online Pharmacy on our platform to order medicines"
-    - Telemedicine: "You can use Telemedicine on our website to consult doctors virtually"
-    - Health Monitor: "Try our Health Monitor on our platform to track your symptoms"
-    - Emergency SOS: "You can use Emergency SOS on our website for immediate help"
-    - Scans Analyzer: "Try our Scans Analyzer on our platform for medical imaging analysis"
+    RESPONSE STYLE:
+    1. Acknowledge what they need
+    2. Tell them you're doing it automatically: "Let me handle that for you" or "I'll take care of that right away"
+    3. Explain what you're doing: "I'm connecting you to..." or "I'm setting up..."
+    
+    WEBSITE FEATURES YOU CAN ACTIVATE:
+    - Doctor Connection: "I'm connecting you to our doctors right now"
+    - Health Analysis: "Let me analyze your health data for you"
+    - Medicine Orders: "I'll help you order medicines from our pharmacy"
+    - Emergency Help: "I'm activating emergency services for you"
+    - Report Analysis: "I'm analyzing your medical reports now"
     
     EXAMPLES:
-    User: "My periods are irregular"
-    Response: "Irregular periods can be due to stress or hormonal changes. You can use Period Tracker on our website to monitor your cycle and get personalized insights."
+    User: "Connect me with doctor"
+    Response: "I'll connect you to our doctors right away! Let me send your request to available doctors now."
     
-    Always say "our website" or "our platform" when mentioning features. Respond in ${responseLanguage}.`;
+    User: "I need medicine"
+    Response: "Let me help you with that! I'm connecting you to our pharmacy service to get your medicines."
+    
+    Always act like you're DOING the task, not just suggesting it. Respond in ${responseLanguage}.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -75,6 +123,7 @@ export async function POST(request) {
       success: true,
       response: text,
       language: responseLanguage,
+      detectedLanguage: detectedLang,
       suggestedFeature: topFeature ? {
         name: topFeature.name,
         route: topFeature.route,

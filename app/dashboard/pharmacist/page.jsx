@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Stethoscope, Pill, Plus, Edit, Trash2, Search, Package, AlertCircle } from "lucide-react";
+import { Stethoscope, Pill, Plus, Edit, Trash2, Search, Package, AlertCircle, Bell, CheckCircle, XCircle } from "lucide-react";
 
 export default function PharmacistDashboard() {
   const [medicines, setMedicines] = useState([]);
+  const [requestedMedicines, setRequestedMedicines] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,7 +25,48 @@ export default function PharmacistDashboard() {
 
   useEffect(() => {
     loadMedicines();
+    fetchRequestedMedicines();
+    
+    // Auto-refresh requests every 5 seconds
+    const interval = setInterval(fetchRequestedMedicines, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchRequestedMedicines = async () => {
+    try {
+      console.log('👨‍⚕️ PHARMACIST: Fetching requested medicines...');
+      const response = await fetch('/api/prescription/requested');
+      console.log('👨‍⚕️ PHARMACIST: API Response status:', response.status);
+      
+      const data = await response.json();
+      console.log('👨‍⚕️ PHARMACIST: Full API response:', data);
+      console.log('👨‍⚕️ PHARMACIST: Prescriptions array:', data.prescriptions);
+      console.log('👨‍⚕️ PHARMACIST: Number of prescriptions:', data.prescriptions?.length || 0);
+      
+      const medicines = data.prescriptions || [];
+      console.log('👨‍⚕️ PHARMACIST: Setting requested medicines:', medicines);
+      setRequestedMedicines(medicines);
+    } catch (error) {
+      console.error('👨‍⚕️ PHARMACIST: Error fetching requested medicines:', error);
+    }
+  };
+
+  const handleAvailability = async (prescriptionId, status) => {
+    try {
+      const response = await fetch('/api/prescription/availability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prescriptionId, status, pharmacistId: 'pharmacist_id' })
+      });
+      
+      if (response.ok) {
+        fetchRequestedMedicines();
+        alert(`Medicine marked as ${status}`);
+      }
+    } catch (error) {
+      console.error('Error updating availability:', error);
+    }
+  };
 
   const loadMedicines = async () => {
     try {
@@ -145,12 +187,24 @@ export default function PharmacistDashboard() {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 mb-4 sm:mb-6">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-            Pharmacist Dashboard
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
-            Manage your pharmacy inventory
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                Pharmacist Dashboard
+              </h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
+                Manage your pharmacy inventory
+              </p>
+            </div>
+            <div className="relative bg-orange-100 p-3 rounded-full">
+              <Bell className="w-8 h-8 text-orange-600" />
+              {requestedMedicines.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse font-bold">
+                  {requestedMedicines.length}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -330,76 +384,160 @@ export default function PharmacistDashboard() {
           >
             Out of Stock
           </button>
+          <button
+            onClick={() => setActiveTab("requests")}
+            className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base relative ${activeTab === "requests" ? "bg-orange-600 text-white" : "bg-gray-200 text-gray-700"}`}
+          >
+            Request
+            {requestedMedicines.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {requestedMedicines.length}
+              </span>
+            )}
+          </button>
         </div>
 
-        {/* Medicine List */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Medicine</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Category</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Expiry</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-                {filteredMedicines
-                  .filter(med => activeTab === "inventory" ? med.stockStatus !== "out-of-stock" : med.stockStatus === "out-of-stock")
-                  .sort((a, b) => activeTab === "out-of-stock" && a.restockDate && b.restockDate ? new Date(a.restockDate) - new Date(b.restockDate) : 0)
-                  .map((medicine) => (
-                  <tr key={medicine._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+        {/* Content based on active tab */}
+        {activeTab === "requests" ? (
+          /* Medicine Requests */
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 sm:p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <Package className="w-6 h-6 text-orange-600" />
+              Medicine Requests ({requestedMedicines.length})
+            </h3>
+            
+            {requestedMedicines.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No medicine requests</p>
+            ) : (
+              <div className="space-y-4">
+                {requestedMedicines.map((prescription) => (
+                  <div key={prescription._id} className="bg-gray-50 rounded-lg p-4 border">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-3">
                       <div>
-                        <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{medicine.name}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{medicine.manufacturer}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 sm:hidden">{medicine.category}</div>
+                        <h4 className="font-semibold text-gray-800">🔔 Patient: {prescription.patientName}</h4>
+                        <p className="text-sm text-gray-600">Dr. {prescription.doctorName} • {new Date(prescription.requestedAt || prescription.createdAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Status: <span className={`font-medium ${
+                            prescription.availability === 'available' ? 'text-green-600' :
+                            prescription.availability === 'unavailable' ? 'text-red-600' :
+                            'text-yellow-600'
+                          }`}>
+                            {prescription.availability || 'Pending'}
+                          </span>
+                        </p>
                       </div>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white hidden sm:table-cell">{medicine.category}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white">₹{medicine.price}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className="space-y-1">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                          medicine.stockStatus === 'in-stock' ? 'bg-green-100 text-green-800' : 
-                          medicine.stockStatus === 'out-of-stock' ? 'bg-red-100 text-red-800' : 
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {medicine.stockStatus === 'in-stock' ? `${medicine.stock} units` : 
-                           medicine.stockStatus === 'out-of-stock' ? 'Out of Stock' : 
-                           "We Don't Sell"}
-                        </span>
-                        {medicine.stockStatus === 'out-of-stock' && medicine.restockDate && (
-                          <div className="text-xs text-gray-500">Available: {medicine.restockDate}</div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white hidden md:table-cell">{medicine.expiryDate}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium">
-                      <div className="flex space-x-1 sm:space-x-2">
+                      <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <button
-                          onClick={() => handleEdit(medicine)}
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 p-1"
+                          onClick={() => handleAvailability(prescription._id, 'available')}
+                          className="flex items-center justify-center gap-1 px-3 py-2 bg-green-500 text-white rounded text-sm hover:bg-green-600 focus:bg-green-600 active:bg-green-700 focus:outline-none"
+                          disabled={prescription.availability}
                         >
-                          <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <CheckCircle className="w-4 h-4" />
+                          Available
                         </button>
                         <button
-                          onClick={() => handleDelete(medicine._id)}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 p-1"
+                          onClick={() => handleAvailability(prescription._id, 'unavailable')}
+                          className="flex items-center justify-center gap-1 px-3 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600 focus:bg-red-600 active:bg-red-700 focus:outline-none"
+                          disabled={prescription.availability}
                         >
-                          <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <XCircle className="w-4 h-4" />
+                          Out of Stock
                         </button>
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {prescription.medicines.map((medicine, index) => (
+                        <div key={index} className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="flex items-center justify-between mb-2">
+                            <h5 className="font-semibold text-gray-800">{medicine.name}</h5>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              {medicine.quantity || 'N/A'}
+                            </span>
+                          </div>
+                          <div className="space-y-1 text-sm text-gray-600">
+                            <p><span className="font-medium">Dosage:</span> {medicine.dosage}</p>
+                            <p><span className="font-medium">Frequency:</span> {medicine.frequency}</p>
+                            <p><span className="font-medium">Duration:</span> {medicine.duration}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
-        </div>
+        ) : (
+          /* Medicine List */
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[600px]">
+                <thead className="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Medicine</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Category</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Expiry</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                  {filteredMedicines
+                    .filter(med => activeTab === "inventory" ? med.stockStatus !== "out-of-stock" : med.stockStatus === "out-of-stock")
+                    .sort((a, b) => activeTab === "out-of-stock" && a.restockDate && b.restockDate ? new Date(a.restockDate) - new Date(b.restockDate) : 0)
+                    .map((medicine) => (
+                    <tr key={medicine._id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <div>
+                          <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{medicine.name}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{medicine.manufacturer}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 sm:hidden">{medicine.category}</div>
+                        </div>
+                      </td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white hidden sm:table-cell">{medicine.category}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white">₹{medicine.price}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <div className="space-y-1">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                            medicine.stockStatus === 'in-stock' ? 'bg-green-100 text-green-800' : 
+                            medicine.stockStatus === 'out-of-stock' ? 'bg-red-100 text-red-800' : 
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {medicine.stockStatus === 'in-stock' ? `${medicine.stock} units` : 
+                             medicine.stockStatus === 'out-of-stock' ? 'Out of Stock' : 
+                             "We Don't Sell"}
+                          </span>
+                          {medicine.stockStatus === 'out-of-stock' && medicine.restockDate && (
+                            <div className="text-xs text-gray-500">Available: {medicine.restockDate}</div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-white hidden md:table-cell">{medicine.expiryDate}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm font-medium">
+                        <div className="flex space-x-1 sm:space-x-2">
+                          <button
+                            onClick={() => handleEdit(medicine)}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 p-1"
+                          >
+                            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(medicine._id)}
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 p-1"
+                          >
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

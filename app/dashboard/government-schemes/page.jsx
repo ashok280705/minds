@@ -10,14 +10,14 @@ export default function GovernmentSchemes() {
   const [selectedCategory, setSelectedCategory] = useState('insurance');
 
   const categories = [
-    { id: 'insurance', name: 'Health Insurance & Financial Protection' },
-    { id: 'maternal', name: 'Maternal & Child Health' },
-    { id: 'disease', name: 'Disease Control Programs' },
-    { id: 'primary', name: 'Primary & Preventive Healthcare' },
-    { id: 'nutrition', name: 'Nutrition & Anemia Control' },
-    { id: 'ayush', name: 'Traditional & Alternative Medicine (AYUSH)' },
-    { id: 'rural', name: 'Rural & Tribal Health' },
-    { id: 'mental', name: 'Mental Health & Disability' }
+    { id: 'insurance', name: 'Punjab Health Insurance & Financial Protection' },
+    { id: 'maternal', name: 'Punjab Maternal & Child Health' },
+    { id: 'disease', name: 'Punjab Disease Control Programs' },
+    { id: 'primary', name: 'Punjab Primary & Preventive Healthcare' },
+    { id: 'nutrition', name: 'Punjab Nutrition & Anemia Control' },
+    { id: 'ayush', name: 'Punjab Traditional & Alternative Medicine (AYUSH)' },
+    { id: 'rural', name: 'Punjab Rural & Tribal Health' },
+    { id: 'mental', name: 'Punjab Mental Health & Disability' }
   ];
 
   const fetchSchemes = async () => {
@@ -49,9 +49,9 @@ export default function GovernmentSchemes() {
       <div className="max-w-full sm:max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600 mb-4">
-            🏛️ Government Health Schemes
+            🏛️ Punjab Government Health Schemes
           </h1>
-          <p className="text-gray-700 dark:text-gray-300">Discover government healthcare schemes and programs in India</p>
+          <p className="text-gray-700 dark:text-gray-300">Discover Punjab government healthcare schemes and programs for Nabha region</p>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-6 sm:mb-8">

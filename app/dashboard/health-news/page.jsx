@@ -36,21 +36,21 @@ export default function HealthNews() {
   }, [selectedCategory]);
 
   const categories = [
-    { id: 'general', name: 'General Health' },
-    { id: 'mental', name: 'Mental Health' },
-    { id: 'cardiology', name: 'Cardiology' },
-    { id: 'diabetes', name: 'Diabetes' },
-    { id: 'cancer', name: 'Cancer' },
-    { id: 'pediatrics', name: 'Pediatrics' },
-    { id: 'neurology', name: 'Neurology' },
-    { id: 'orthopedics', name: 'Orthopedics' },
-    { id: 'dermatology', name: 'Dermatology' },
-    { id: 'gynecology', name: 'Gynecology' },
-    { id: 'ophthalmology', name: 'Ophthalmology' },
-    { id: 'dentistry', name: 'Dentistry' },
-    { id: 'nutrition', name: 'Nutrition' },
-    { id: 'pharmacy', name: 'Pharmacy' },
-    { id: 'emergency', name: 'Emergency Medicine' }
+    { id: 'general', name: 'Punjab General Health' },
+    { id: 'mental', name: 'Punjab Mental Health' },
+    { id: 'cardiology', name: 'Punjab Cardiology' },
+    { id: 'diabetes', name: 'Punjab Diabetes Care' },
+    { id: 'cancer', name: 'Punjab Cancer Treatment' },
+    { id: 'pediatrics', name: 'Punjab Child Health' },
+    { id: 'neurology', name: 'Punjab Neurology' },
+    { id: 'orthopedics', name: 'Punjab Orthopedics' },
+    { id: 'dermatology', name: 'Punjab Skin Care' },
+    { id: 'gynecology', name: 'Punjab Women Health' },
+    { id: 'ophthalmology', name: 'Punjab Eye Care' },
+    { id: 'dentistry', name: 'Punjab Dental Care' },
+    { id: 'nutrition', name: 'Punjab Nutrition' },
+    { id: 'pharmacy', name: 'Punjab Pharmacy' },
+    { id: 'emergency', name: 'Punjab Emergency Services' }
   ];
 
   return (
@@ -59,9 +59,9 @@ export default function HealthNews() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
-            📰 Healthcare News
+            📰 Punjab Healthcare News
           </h1>
-          <p className="text-gray-700 dark:text-gray-300">Stay updated with the latest healthcare and medical news</p>
+          <p className="text-gray-700 dark:text-gray-300">Stay updated with the latest healthcare and medical news from Punjab and Nabha region</p>
         </div>
 
         {/* Category Filter Dropdown */}
@@ -99,7 +99,7 @@ export default function HealthNews() {
         {loading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading latest healthcare news...</p>
+            <p className="text-gray-600">Loading latest Punjab healthcare news...</p>
           </div>
         )}
 

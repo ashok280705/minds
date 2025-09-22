@@ -67,6 +67,21 @@ export default function ModernFooter() {
             <strong>Emergency:</strong> Mental health crisis? Call 988 immediately
           </p>
         </div>
+        
+        {/* Designer Credit */}
+        <div className="mt-4 pt-3 border-t border-gray-700">
+          <div className="bg-gradient-to-r from-emerald-900/30 to-teal-900/30 border border-emerald-700/30 rounded-lg p-3">
+            <p className="text-center text-xs text-emerald-300">
+              <span className="font-medium">Designed by </span>
+              <span className="font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                Arjuna_03
+              </span>
+              <span className="mx-2 text-gray-400">•</span>
+              <span className="text-gray-300">Crafted for </span>
+              <span className="font-semibold text-emerald-400">Nabha Region</span>
+            </p>
+          </div>
+        </div>
       </div>
     </footer>
   );

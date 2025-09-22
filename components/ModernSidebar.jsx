@@ -45,10 +45,16 @@ export default function ModernSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [expandedItem, setExpandedItem] = useState(null);
+  const [prescriptionCount, setPrescriptionCount] = useState(0);
 
   useEffect(() => {
     if (session?.user?.email) {
       fetchUserProfile();
+      checkPrescriptions();
+      
+      // Check for new prescriptions every 10 seconds
+      const interval = setInterval(checkPrescriptions, 10000);
+      return () => clearInterval(interval);
     }
   }, [session]);
 
@@ -63,6 +69,35 @@ export default function ModernSidebar() {
     }
   };
 
+  const checkPrescriptions = async () => {
+    try {
+      const res = await fetch(`/api/prescription/user?userId=${session?.user?.id}`);
+      const data = await res.json();
+      const newCount = data.prescriptions?.length || 0;
+      
+      // If count increased, trigger Genie notification
+      if (newCount > prescriptionCount && prescriptionCount > 0) {
+        triggerGenieNotification();
+      }
+      
+      setPrescriptionCount(newCount);
+    } catch (error) {
+      console.error("Error checking prescriptions:", error);
+    }
+  };
+
+  const triggerGenieNotification = () => {
+    // Trigger Genie to speak
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(
+        'Great news! You have received a new prescription from your doctor. You can view it in your prescriptions section.'
+      );
+      utterance.rate = 0.9;
+      utterance.pitch = 1.1;
+      speechSynthesis.speak(utterance);
+    }
+  };
+
   const mainLinks = [
     { 
       href: "/dashboard", 
@@ -71,20 +106,11 @@ export default function ModernSidebar() {
       description: "Overview & Quick Access"
     },
     { 
-      href: "/dashboard/mental-counselor", 
-      label: "Mental Health Counsellor", 
-      icon: Brain,
-      description: "Chat with AI Assistant"
+      href: "/dashboard/routine-doctor", 
+      label: "Routine Doctor", 
+      icon: Phone,
+      description: "Virtual Doctor Consultations"
     },
-
-    { 
-      href: "/dashboard/mental-counselor/period-tracker", 
-      label: "Period Tracker", 
-      icon: CalendarHeart,
-      description: "Menstrual Health Tracking",
-      locked: userGender !== "female"
-    },
-
     { 
       href: "/personal-documents", 
       label: "Personal Documents", 
@@ -103,28 +129,10 @@ export default function ModernSidebar() {
       ]
     },
     { 
-      href: "/dashboard/prescription-reader", 
-      label: "Prescription Reader", 
-      icon: Scan,
-      description: "Scan & Analyze Prescriptions"
-    },
-    { 
-      href: "/dashboard/doctor", 
-      label: "Doctor Dashboard", 
-      icon: Stethoscope,
-      description: "Medical Professional Portal"
-    },
-    { 
-      href: "/dashboard/health-news", 
-      label: "Health News", 
-      icon: Newspaper,
-      description: "Latest Healthcare Updates"
-    },
-    { 
-      href: "/dashboard/government-schemes", 
-      label: "Government Schemes", 
-      icon: Building,
-      description: "Healthcare Programs & Policies"
+      href: "/dashboard/prescriptions", 
+      label: "My Prescriptions", 
+      icon: FileText,
+      description: "View Digital Prescriptions"
     },
     { 
       href: "/dashboard/ayurveda", 
@@ -133,40 +141,17 @@ export default function ModernSidebar() {
       description: "AYUSH Natural Remedies"
     },
     { 
-      href: "/dashboard/emergency-sos", 
-      label: "Emergency SOS", 
-      icon: AlertTriangle,
-      description: "Accident & Crisis Support"
+      href: "/dashboard/health-news", 
+      label: "Health News", 
+      icon: Newspaper,
+      description: "Nabha Region Healthcare Updates"
     },
     { 
-      href: "/dashboard/skin-care", 
-      label: "Personal Dermat", 
-      icon: Sparkles,
-      description: "Dermatology Consultation"
-    },
-    { 
-      href: "/dashboard/routine-doctor", 
-      label: "Routine Doctor", 
-      icon: Phone,
-      description: "Virtual Doctor Consultations"
-    },
-    { 
-      href: "/dashboard/nearby-services", 
-      label: "Nearby Services", 
-      icon: MapPin,
-      description: "Hospitals & Ambulance"
-    },
-    { 
-      href: "/dashboard/blood-bank", 
-      label: "Blood Bank Services", 
-      icon: Droplets,
-      description: "Blood Donation & Medicine Tracking",
-      dropdown: [
-        { href: "/dashboard/blood-bank", label: "Blood Bank" },
-        { href: "/dashboard/blood-bank/medicines", label: "My Medicines" }
-      ]
-    },
-
+      href: "/dashboard/government-schemes", 
+      label: "Government Schemes", 
+      icon: Building,
+      description: "Punjab Healthcare Programs"
+    }
   ];
 
   const bottomLinks = [
@@ -186,7 +171,7 @@ export default function ModernSidebar() {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} min-h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col relative`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-64'} h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col relative fixed top-0 left-0 z-40`}>
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -296,10 +281,24 @@ export default function ModernSidebar() {
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     {!isCollapsed && (
                       <div className="flex-1">
-                        <p className="font-medium">{label}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium">{label}</p>
+                          {href === '/dashboard/prescriptions' && prescriptionCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">
+                              {prescriptionCount}
+                            </span>
+                          )}
+                        </div>
                         <p className={`text-xs ${isActive ? 'text-emerald-100' : 'text-gray-500'}`}>
                           {description}
                         </p>
+                      </div>
+                    )}
+                    
+                    {/* Badge for collapsed state */}
+                    {isCollapsed && href === '/dashboard/prescriptions' && prescriptionCount > 0 && (
+                      <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {prescriptionCount > 9 ? '9+' : prescriptionCount}
                       </div>
                     )}
                   </Link>

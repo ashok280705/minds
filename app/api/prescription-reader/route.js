@@ -13,7 +13,7 @@ export async function POST(request) {
     }
 
     // Forward to prescription reader service
-    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5003';
+    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5009';
     
     const serviceFormData = new FormData();
     serviceFormData.append('image', image);
@@ -51,7 +51,7 @@ export async function POST(request) {
 
 export async function GET() {
   try {
-    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5003';
+    const prescriptionServiceUrl = process.env.PRESCRIPTION_READER_URL || 'http://localhost:5009';
     const response = await fetch(`${prescriptionServiceUrl}/health`);
     
     if (response.ok) {

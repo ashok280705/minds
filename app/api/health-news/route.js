@@ -7,32 +7,32 @@ export async function GET(request) {
     const type = searchParams.get('type') || 'news';
     
     const categoryQueries = {
-      general: 'healthcare OR medical OR hospital',
-      mental: 'mental health OR psychology OR depression OR anxiety',
-      cardiology: 'heart disease OR cardiology OR cardiac OR cardiovascular',
-      diabetes: 'diabetes OR blood sugar OR insulin OR diabetic',
-      cancer: 'cancer OR oncology OR tumor OR chemotherapy',
-      pediatrics: 'pediatrics OR child health OR vaccination OR infant',
-      neurology: 'neurology OR brain OR alzheimer OR parkinson OR stroke',
-      orthopedics: 'orthopedics OR bone OR joint OR fracture OR spine',
-      dermatology: 'dermatology OR skin OR acne OR eczema OR psoriasis',
-      gynecology: 'gynecology OR women health OR pregnancy OR menstrual',
-      ophthalmology: 'ophthalmology OR eye OR vision OR cataract OR glaucoma',
-      dentistry: 'dentistry OR dental OR teeth OR oral health',
-      nutrition: 'nutrition OR diet OR vitamins OR healthy eating',
-      pharmacy: 'pharmacy OR medicines OR drugs OR prescription',
-      emergency: 'emergency medicine OR trauma OR first aid OR ambulance'
+      general: 'Punjab healthcare OR Nabha hospital OR Patiala medical OR Punjab health news',
+      mental: 'Punjab mental health OR Nabha psychology OR Punjab depression anxiety',
+      cardiology: 'Punjab heart disease OR Nabha cardiology OR Punjab cardiac center',
+      diabetes: 'Punjab diabetes OR Nabha blood sugar OR Punjab diabetic care',
+      cancer: 'Punjab cancer hospital OR Nabha oncology OR Punjab tumor treatment',
+      pediatrics: 'Punjab child health OR Nabha pediatrics OR Punjab vaccination',
+      neurology: 'Punjab neurology OR Nabha brain center OR Punjab stroke care',
+      orthopedics: 'Punjab orthopedics OR Nabha bone hospital OR Punjab joint care',
+      dermatology: 'Punjab skin care OR Nabha dermatology OR Punjab skin hospital',
+      gynecology: 'Punjab women health OR Nabha gynecology OR Punjab maternity',
+      ophthalmology: 'Punjab eye care OR Nabha vision center OR Punjab eye hospital',
+      dentistry: 'Punjab dental OR Nabha dentistry OR Punjab oral health',
+      nutrition: 'Punjab nutrition OR Nabha diet center OR Punjab healthy eating',
+      pharmacy: 'Punjab pharmacy OR Nabha medicines OR Punjab drug store',
+      emergency: 'Punjab emergency OR Nabha ambulance OR Punjab trauma center'
     };
     
     const schemes = {
-      insurance: 'Ayushman Bharat scheme OR PMJAY OR health insurance scheme India OR Rashtriya Swasthya Bima Yojana',
-      maternal: 'Janani Suraksha Yojana OR Pradhan Mantri Matru Vandana Yojana OR maternal health scheme India OR child health program',
-      disease: 'National Health Mission OR disease control program India OR TB control OR malaria control OR HIV AIDS control',
-      primary: 'Ayushman Bharat Health and Wellness Centre OR primary healthcare scheme India OR preventive healthcare program',
-      nutrition: 'Anemia Mukt Bharat OR nutrition scheme India OR POSHAN Abhiyaan OR mid day meal scheme OR ICDS',
-      ayush: 'AYUSH scheme India OR traditional medicine program OR Ayurveda scheme OR homeopathy program OR yoga wellness',
-      rural: 'National Rural Health Mission OR tribal health scheme India OR ASHA worker program OR rural healthcare initiative',
-      mental: 'National Mental Health Programme OR District Mental Health Programme OR disability scheme India OR mental health policy'
+      insurance: 'Punjab Ayushman Bharat OR Nabha PMJAY OR Punjab health insurance OR Sarbat Sehat Bima Yojana Punjab',
+      maternal: 'Punjab Janani Suraksha OR Nabha maternal health OR Punjab pregnancy scheme OR Punjab child health program',
+      disease: 'Punjab Health Mission OR Nabha disease control OR Punjab TB control OR Punjab malaria control',
+      primary: 'Punjab Health Centre OR Nabha primary healthcare OR Punjab preventive healthcare OR Punjab wellness center',
+      nutrition: 'Punjab nutrition scheme OR Nabha POSHAN OR Punjab mid day meal OR Punjab ICDS program',
+      ayush: 'Punjab AYUSH OR Nabha Ayurveda OR Punjab traditional medicine OR Punjab homeopathy center',
+      rural: 'Punjab Rural Health OR Nabha ASHA worker OR Punjab village healthcare OR Punjab rural hospital',
+      mental: 'Punjab Mental Health OR Nabha mental health center OR Punjab disability scheme OR Punjab mental health policy'
     };
     
     const query = type === 'schemes' ? schemes[category] : categoryQueries[category];

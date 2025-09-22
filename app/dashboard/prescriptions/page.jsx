@@ -117,10 +117,10 @@ export default function PrescriptionsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 sm:ml-64">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
       {/* Header */}
       <div className="bg-white border-b border-blue-200 px-4 sm:px-6 py-6 sm:py-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-full sm:max-w-4xl mx-auto">
           <div className="flex items-center gap-3 sm:gap-4 mb-4">
             <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center">
               <FileText className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
@@ -145,7 +145,7 @@ export default function PrescriptionsPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="max-w-full sm:max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {prescriptions.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">

@@ -59,7 +59,10 @@ export default function VapiGenie() {
     try {
       console.log('🔧 Initializing Vapi...');
       
-      const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939';
+      const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+      if (!publicKey) {
+        throw new Error('VAPI public key not found in environment variables');
+      }
       vapiRef.current = new Vapi(publicKey);
       
       // Set up Vapi event listeners
@@ -120,7 +123,7 @@ export default function VapiGenie() {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       
       porcupineRef.current = await PorcupineWorker.create(
-        process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939',
+        process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY,
         ['Porcupine'], // Built-in keyword
         (keywordIndex) => {
           console.log('✅ "PORCUPINE" WAKE WORD DETECTED! Starting Multilingual Genie...');
@@ -272,8 +275,12 @@ export default function VapiGenie() {
       console.log('🚀 Starting Vapi conversation...');
       setStatus('connecting');
       
-      // Start with the new Genie assistant
-      await vapiRef.current.start('9be02aa3-0572-406c-be3c-cc6dd85176ce');
+      // Start with assistant's built-in multilingual greeting
+      const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+      if (!assistantId) {
+        throw new Error('VAPI assistant ID not found in environment variables');
+      }
+      await vapiRef.current.start(assistantId);
       
     } catch (error) {
       console.error('❌ Failed to start Vapi conversation:', error);
@@ -359,7 +366,8 @@ export default function VapiGenie() {
             // Ensure Vapi connection for Genie's voice
             if (!isConnected && vapiRef.current) {
               console.log('🎤 Starting Vapi for Genie voice...');
-              await vapiRef.current.start('9be02aa3-0572-406c-be3c-cc6dd85176ce');
+              const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+              await vapiRef.current.start(assistantId);
               // Wait a moment for connection to establish
               await new Promise(resolve => setTimeout(resolve, 1000));
             }

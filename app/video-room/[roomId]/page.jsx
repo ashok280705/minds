@@ -145,17 +145,14 @@ export default function VideoRoom() {
           }
         };
 
-        // Initialize socket with unique connection
+        // Initialize socket with fallback system
         const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || window.location.origin;
         
         socketInstance = io(socketUrl, {
           forceNew: true,
           transports: ['polling', 'websocket'],
           upgrade: true,
-          rememberUpgrade: false,
-          timeout: 20000,
-          pingTimeout: 60000,
-          pingInterval: 25000
+          rememberUpgrade: false
         });
         
         socketInstance.on('connect', () => {

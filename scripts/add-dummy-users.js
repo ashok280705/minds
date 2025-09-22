@@ -59,7 +59,7 @@ async function addDummyUsers() {
     // Dummy Patient User
     const patientUser = {
       name: 'Demo Patient',
-      email: 'patient@demo.com',
+      email: 'patient1@demo.com',
       password: hashedPassword,
       phone: '+91 9876543210',
       isDoctor: false,
@@ -128,7 +128,7 @@ async function addDummyUsers() {
 
     console.log('\n🎉 All dummy users have been added to the database!');
     console.log('\nLogin Credentials:');
-    console.log('Patient: patient@demo.com / demo123');
+    console.log('Patient: patient1@demo.com / demo123');
     console.log('Doctor: doctor@demo.com / demo123');
     console.log('Pharmacist: pharmacist@demo.com / demo123');
 

@@ -32,7 +32,7 @@ export default function LoginPage() {
     setMounted(true);
     
     // Set default demo credentials
-    setEmail("patient@demo.com");
+    setEmail("patient1@demo.com");
     setPassword("demo123");
 
     // Animate elements on mount
@@ -266,7 +266,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => {
                   setUserType("patient");
-                  setEmail("patient@demo.com");
+                  setEmail("patient1@demo.com");
                   setPassword("demo123");
                 }}
                 className={`flex-1 flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 ${

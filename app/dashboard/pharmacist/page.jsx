@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { Stethoscope, Pill, Plus, Edit, Trash2, Search, Package, AlertCircle, Bell, CheckCircle, XCircle } from "lucide-react";
+import { Stethoscope, Pill, Plus, Edit, Trash2, Search, Package, AlertCircle, Bell, CheckCircle, XCircle, LogOut } from "lucide-react";
 
 export default function PharmacistDashboard() {
+  const { data: session } = useSession();
   const [medicines, setMedicines] = useState([]);
   const [requestedMedicines, setRequestedMedicines] = useState([]);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -22,6 +24,10 @@ export default function PharmacistDashboard() {
     stockStatus: "in-stock",
     restockDate: ""
   });
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/auth/login' });
+  };
 
   useEffect(() => {
     loadMedicines();
@@ -196,13 +202,22 @@ export default function PharmacistDashboard() {
                 Manage your pharmacy inventory
               </p>
             </div>
-            <div className="relative bg-orange-100 p-3 rounded-full">
-              <Bell className="w-8 h-8 text-orange-600" />
-              {requestedMedicines.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse font-bold">
-                  {requestedMedicines.length}
-                </span>
-              )}
+            <div className="flex items-center gap-3">
+              <div className="relative bg-orange-100 p-3 rounded-full">
+                <Bell className="w-8 h-8 text-orange-600" />
+                {requestedMedicines.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center animate-pulse font-bold">
+                    {requestedMedicines.length}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
             </div>
           </div>
         </div>

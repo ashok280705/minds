@@ -92,7 +92,7 @@ export default function DoctorPage() {
 
   const handleLogout = async () => {
     await updateOnlineStatus(false);
-    await signOut({ callbackUrl: '/' });
+    await signOut({ callbackUrl: '/auth/login' });
   };
 
   if (!session?.user?.isDoctor) {

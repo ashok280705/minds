@@ -4,10 +4,10 @@ const next = require('next');
 const { Server } = require('socket.io');
 
 const dev = process.env.NODE_ENV !== 'production';
-const hostname = 'localhost';
+const hostname = dev ? 'localhost' : '0.0.0.0';
 const port = process.env.PORT || 3000;
 
-const app = next({ dev, hostname, port });
+const app = next({ dev });
 const handler = app.getRequestHandler();
 
 const userSockets = new Map();
@@ -114,7 +114,7 @@ app.prepare().then(() => {
       console.error(err);
       process.exit(1);
     })
-    .listen(port, () => {
+    .listen(port, hostname, () => {
       console.log(`> Ready on http://${hostname}:${port}`);
     });
 });

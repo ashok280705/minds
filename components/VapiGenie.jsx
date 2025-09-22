@@ -59,7 +59,7 @@ export default function VapiGenie() {
     try {
       console.log('🔧 Initializing Vapi...');
       
-      const publicKey = '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939';
+      const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939';
       vapiRef.current = new Vapi(publicKey);
       
       // Set up Vapi event listeners
@@ -120,7 +120,7 @@ export default function VapiGenie() {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       
       porcupineRef.current = await PorcupineWorker.create(
-        '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939', // New public key
+        process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || '7bb2a0d9-6efc-4df5-b86c-e73ea12b1939',
         ['Porcupine'], // Built-in keyword
         (keywordIndex) => {
           console.log('✅ "PORCUPINE" WAKE WORD DETECTED! Starting Multilingual Genie...');
@@ -272,10 +272,8 @@ export default function VapiGenie() {
       console.log('🚀 Starting Vapi conversation...');
       setStatus('connecting');
       
-      // Start with English greeting and language detection
-      await vapiRef.current.start('9be02aa3-0572-406c-be3c-cc6dd85176ce', {
-        firstMessage: "Hello! I'm Genie, your AI assistant. I can speak multiple languages. Please tell me which language you'd prefer to use, or just start speaking in your preferred language and I'll adapt automatically."
-      });
+      // Start with the new Genie assistant
+      await vapiRef.current.start('9be02aa3-0572-406c-be3c-cc6dd85176ce');
       
     } catch (error) {
       console.error('❌ Failed to start Vapi conversation:', error);

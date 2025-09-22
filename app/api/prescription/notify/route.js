@@ -2,30 +2,25 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { userId, prescriptionId } = await request.json();
+    const { patientId, prescriptionId, doctorId, doctorName, medicines, instructions } = await request.json();
     
-    // Trigger Genie notification
-    const notification = {
-      userId,
+    // Store notification for pharmacy dashboard
+    global.pharmacyRequests = global.pharmacyRequests || [];
+    global.pharmacyRequests.push({
       prescriptionId,
-      message: "Your prescription has been received from the doctor",
-      timestamp: new Date().toISOString()
-    };
-
-    // Store notification for Genie to pick up
-    global.prescriptionNotifications = global.prescriptionNotifications || [];
-    global.prescriptionNotifications.push(notification);
-
-    return NextResponse.json({
-      success: true,
-      message: "Notification sent to Genie"
+      patientId,
+      patientName: 'Patient', // You can get this from user data
+      doctorId,
+      doctorName,
+      medicines,
+      instructions,
+      requestedAt: new Date(),
+      status: 'pending'
     });
 
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error sending notification:", error);
-    return NextResponse.json(
-      { error: "Failed to send notification" },
-      { status: 500 }
-    );
+    console.error("Error sending pharmacy notification:", error);
+    return NextResponse.json({ error: "Failed to notify pharmacy" }, { status: 500 });
   }
 }

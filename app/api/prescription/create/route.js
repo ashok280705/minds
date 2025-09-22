@@ -32,6 +32,20 @@ export async function POST(request) {
       timestamp: new Date()
     };
 
+    // Notify pharmacy about new prescription
+    global.pharmacyRequests = global.pharmacyRequests || [];
+    global.pharmacyRequests.push({
+      prescriptionId: prescription._id,
+      patientId,
+      patientName: patientName || 'Patient',
+      doctorId,
+      doctorName: doctorName || 'Doctor',
+      medicines,
+      instructions,
+      requestedAt: new Date(),
+      status: 'pending'
+    });
+
     return NextResponse.json({
       success: true,
       prescriptionId: prescription._id,

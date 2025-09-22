@@ -20,7 +20,12 @@ export default function ChatRoom() {
     if (!session?.user?.id) return;
 
     // Initialize socket
-    const socketInstance = io();
+    const socketInstance = io({
+      transports: ['polling', 'websocket'],
+      upgrade: true,
+      rememberUpgrade: false,
+      timeout: 20000
+    });
     setSocket(socketInstance);
 
     // Register user/doctor

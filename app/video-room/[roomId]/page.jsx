@@ -150,7 +150,12 @@ export default function VideoRoom() {
         
         socketInstance = io(socketUrl, {
           forceNew: true,
-          transports: ['websocket', 'polling']
+          transports: ['polling', 'websocket'],
+          upgrade: true,
+          rememberUpgrade: false,
+          timeout: 20000,
+          pingTimeout: 60000,
+          pingInterval: 25000
         });
         
         socketInstance.on('connect', () => {

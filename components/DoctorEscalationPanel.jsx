@@ -38,7 +38,12 @@ export default function DoctorEscalationPanel({ inline = false }) {
   useEffect(() => {
     if (!session?.user?.isDoctor || !session?.user?.id) return;
 
-    const socketInstance = io();
+    const socketInstance = io({
+      transports: ['polling', 'websocket'],
+      upgrade: true,
+      rememberUpgrade: false,
+      timeout: 20000
+    });
     setSocket(socketInstance);
 
     socketInstance.emit("register-doctor", { doctorId: session.user.id });

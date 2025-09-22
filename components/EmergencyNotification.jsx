@@ -9,7 +9,12 @@ export default function EmergencyNotification() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io();
+    const newSocket = io({
+      transports: ['polling', 'websocket'],
+      upgrade: true,
+      rememberUpgrade: false,
+      timeout: 20000
+    });
     setSocket(newSocket);
 
     newSocket.on('emergency-request', (data) => {

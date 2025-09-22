@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import ThemeToggle from "@/components/ThemeToggle";
+
 import { 
   Brain, 
   FileText, 
@@ -441,7 +441,7 @@ export default function ModernDashboard() {
                 <option value="hi">🇮🇳 हिंदी</option>
                 <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
               </select>
-              <ThemeToggle />
+
               <div className="flex items-center gap-2 bg-emerald-50 px-3 sm:px-4 py-2 rounded-full">
                 <Shield className="w-4 h-4 text-emerald-600" />
                 <span className="text-xs sm:text-sm font-medium text-emerald-700 hidden sm:inline">{t.secure}</span>

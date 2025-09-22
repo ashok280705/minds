@@ -30,6 +30,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     setMounted(true);
+    
+    // Set default demo credentials
+    setEmail("patient@demo.com");
+    setPassword("demo123");
 
     // Animate elements on mount
     setTimeout(() => {
@@ -238,7 +242,7 @@ export default function LoginPage() {
         </div>
 
         {/* Main Login Container */}
-        <div className="glass-effect rounded-xl p-3 sm:p-4 md:p-6 w-full max-w-[280px] sm:max-w-[320px] md:max-w-sm mx-3 relative z-10 shadow-xl">
+        <div className="glass-effect rounded-xl p-4 sm:p-6 md:p-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-4 relative z-10 shadow-xl">
           {/* Header */}
           <div ref={titleRef} className="animate-in text-center mb-3 sm:mb-4">
             <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
@@ -256,43 +260,55 @@ export default function LoginPage() {
           </div>
 
           <div ref={formRef} className="animate-in">
-            {/* User Type Toggle */}
-            <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4 p-1">
+            {/* User Type Toggle - Capsule Format */}
+            <div className="bg-gray-100 rounded-full p-1 mb-3 sm:mb-4 flex">
               <button
                 type="button"
-                onClick={() => setUserType("patient")}
-                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                onClick={() => {
+                  setUserType("patient");
+                  setEmail("patient@demo.com");
+                  setPassword("demo123");
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 ${
                   userType === "patient"
                     ? "bg-white text-blue-600 shadow-md"
-                    : "bg-gray-50 text-gray-600 hover:text-blue-600"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <User className="w-3 h-3" />
-                Patient
+                <span className="text-[10px] sm:text-xs">Patient</span>
               </button>
               <button
                 type="button"
-                onClick={() => setUserType("doctor")}
-                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                onClick={() => {
+                  setUserType("doctor");
+                  setEmail("doctor@demo.com");
+                  setPassword("demo123");
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 ${
                   userType === "doctor"
                     ? "bg-white text-blue-600 shadow-md"
-                    : "bg-gray-50 text-gray-600 hover:text-blue-600"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 <Stethoscope className="w-3 h-3" />
-                Doctor
+                <span className="text-[10px] sm:text-xs">Doctor</span>
               </button>
               <button
                 type="button"
-                onClick={() => setUserType("pharmacist")}
-                className={`flex items-center justify-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-300 border border-black ${
+                onClick={() => {
+                  setUserType("pharmacist");
+                  setEmail("pharmacist@demo.com");
+                  setPassword("demo123");
+                }}
+                className={`flex-1 flex items-center justify-center gap-1 px-2 sm:px-3 py-2 rounded-full text-xs font-medium transition-all duration-300 ${
                   userType === "pharmacist"
                     ? "bg-white text-green-600 shadow-md"
-                    : "bg-gray-50 text-gray-600 hover:text-green-600"
+                    : "text-gray-600 hover:text-green-600"
                 }`}
               >
                 <Pill className="w-3 h-3" />
-                Pharmacist
+                <span className="text-[10px] sm:text-xs">Pharmacist</span>
               </button>
             </div>
 
@@ -358,27 +374,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Google Login for Patients Only */}
-            {userType === "patient" && (
-              <>
-                <div className="flex items-center my-3 sm:my-4">
-                  <div className="flex-1 border-t border-gray-200"></div>
-                  <span className="px-2 text-gray-500 text-[10px] sm:text-xs">
-                    or continue with
-                  </span>
-                  <div className="flex-1 border-t border-gray-200"></div>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={handleGoogleLogin}
-                  className="btn-hover w-full flex items-center justify-center gap-1.5 border-2 border-gray-200 py-2.5 sm:py-3 px-3 rounded-lg hover:bg-gray-50 transition-all duration-300 font-medium text-gray-700 text-xs sm:text-sm"
-                >
-                  <Fingerprint className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
-                  Continue with Google
-                </button>
-              </>
-            )}
 
             {/* Sign Up Links */}
             <div className="text-center mt-3 sm:mt-4">

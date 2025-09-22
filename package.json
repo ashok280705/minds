@@ -16,6 +16,7 @@
     "@huggingface/inference": "^4.7.1",
     "@picovoice/porcupine-web": "^3.0.3",
     "@vapi-ai/web": "^2.3.10",
+    "@vercel/analytics": "^1.5.0",
     "autoprefixer": "^10.4.21",
     "bcryptjs": "^3.0.2",
     "canvas": "^3.2.0",

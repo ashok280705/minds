@@ -1,4 +1,5 @@
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import SessionWrapper from "../components/SessionWrapper";
 import LayoutWrapper from "../components/LayoutWrapper";
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
         {children}
         </LayoutWrapper>
         </SessionWrapper>
+        <Analytics />
       </body>
     </html>
   );

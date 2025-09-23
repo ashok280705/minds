@@ -58,6 +58,10 @@ export default function VapiGenie() {
   const initializeVapi = async () => {
     try {
       console.log('🔧 Initializing Vapi...');
+      console.log('🔍 Available env vars:', {
+        publicKey: process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY ? 'Found' : 'Missing',
+        assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID ? 'Found' : 'Missing'
+      });
       
       const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
       if (!publicKey) {
@@ -277,6 +281,7 @@ export default function VapiGenie() {
       
       // Start with assistant's built-in multilingual greeting
       const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+      console.log('🔍 Assistant ID check:', assistantId ? 'Found' : 'Missing');
       if (!assistantId) {
         throw new Error('VAPI assistant ID not found in environment variables');
       }
@@ -367,6 +372,10 @@ export default function VapiGenie() {
             if (!isConnected && vapiRef.current) {
               console.log('🎤 Starting Vapi for Genie voice...');
               const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+              if (!assistantId) {
+                console.error('❌ Assistant ID missing for voice mode');
+                return;
+              }
               await vapiRef.current.start(assistantId);
               // Wait a moment for connection to establish
               await new Promise(resolve => setTimeout(resolve, 1000));

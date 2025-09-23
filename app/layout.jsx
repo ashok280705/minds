@@ -3,6 +3,8 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import SessionWrapper from "../components/SessionWrapper";
 import LayoutWrapper from "../components/LayoutWrapper";
+import KeepAlive from "../components/KeepAlive";
+import SelfPingInit from "../components/SelfPingInit";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,6 +27,8 @@ export default function RootLayout({ children }) {
         {children}
         </LayoutWrapper>
         </SessionWrapper>
+        <KeepAlive />
+        <SelfPingInit />
         <Analytics />
       </body>
     </html>

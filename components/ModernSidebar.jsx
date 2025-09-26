@@ -123,9 +123,8 @@ export default function ModernSidebar() {
       icon: Pill,
       description: "Medicine & Prescriptions",
       dropdown: [
-        { href: "/dashboard/pharmacy/online", label: "Clarity Pharm" },
         { href: "/dashboard/pharmacy/physical", label: "Nearby Pharmacies" },
-        { href: "/dashboard/pharmacy/offline", label: "Offline Pharmacy" }
+        { href: "/dashboard/pharmacy/offline", label: "Local Pharmacies" }
       ]
     },
     { 

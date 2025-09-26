@@ -149,7 +149,7 @@ export default function OfflinePharmacies() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-8 border border-gray-200">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">Local Pharmacy Medicine Checker</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-2">Local Pharmacies</h1>
           <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Find medicines at nearby pharmacies before you travel</p>
           
           {/* Search Section */}

@@ -106,12 +106,7 @@ export default function VapiGenie() {
       });
       
       vapiRef.current.on('error', (error) => {
-        console.error('❌ Vapi error details:', {
-          message: error.message,
-          code: error.code,
-          type: error.type,
-          full: error
-        });
+        console.error('❌ Vapi error:', error);
         setIsConnected(false);
         setStatus('waiting');
       });
@@ -293,12 +288,7 @@ export default function VapiGenie() {
       await vapiRef.current.start(assistantId);
       
     } catch (error) {
-      console.error('❌ Failed to start Vapi conversation:', {
-        message: error.message,
-        code: error.code,
-        response: error.response,
-        full: error
-      });
+      console.error('❌ Failed to start Vapi conversation:', error);
       setStatus('waiting');
     }
   };
